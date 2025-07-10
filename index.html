@@ -8,21 +8,32 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             display: flex;
+            flex-direction: column; /* This is the key change to stack items vertically */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             background-color: #f8f9fa;
             margin: 0;
+            padding: 20px; /* Added some padding for small screens */
+            box-sizing: border-box; /* Ensures padding is included in the element's total width and height */
         }
 
         .link-card {
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 40px;
+            padding: 30px 40px;
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%; /* Make card take up available width */
+            max-width: 600px; /* But not more than 600px */
+            margin-bottom: 20px; /* This creates space between the cards */
         }
+
+        .link-card:last-child {
+            margin-bottom: 0; /* Removes margin from the last card */
+        }
+
 
         .link-card:hover {
             transform: translateY(-5px);
