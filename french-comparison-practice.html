@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Comparison Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .feedback-card {
+            transition: all 0.3s ease-in-out;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+        }
+        .feedback-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-start justify-center min-h-screen p-4 md:p-8">
+
+    <div class="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+
+        <!-- Main Content -->
+        <main class="w-full lg:flex-grow order-2 lg:order-1">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-2">French Comparison Practice</h1>
+                <p class="text-center text-gray-500 mb-6 md:mb-8">Fill in the blank with the correct comparison.</p>
+
+                <!-- Question Area -->
+                <div class="bg-gray-50 rounded-lg p-6 text-center mb-6 min-h-[150px] flex flex-col items-center justify-center">
+                    <p id="sentence-display" class="text-xl md:text-2xl text-gray-700 leading-relaxed">
+                        <span id="sentence-start"></span>
+                        <span class="font-bold text-blue-600">__________</span>
+                        <span id="sentence-end"></span>
+                    </p>
+                    <p id="translation-display" class="text-sm italic text-gray-500 mt-3"></p>
+                    <p id="hint-display" class="text-base font-medium text-gray-500 mt-1"></p>
+                </div>
+
+                <!-- Input and Actions -->
+                <div class="flex flex-col sm:flex-row items-center gap-4 mb-6">
+                    <input type="text" id="user-answer" class="flex-grow w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Type your answer...">
+                    <button id="check-btn" class="w-full sm:w-auto bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md">Check</button>
+                    <button id="next-btn" class="w-full sm:w-auto bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors duration-300 shadow-md" style="display: none;">Next</button>
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="feedback-container" class="feedback-card">
+                    <div id="feedback-card-content" class="p-5 rounded-lg">
+                        <h3 id="feedback-result" class="text-xl font-bold mb-2"></h3>
+                        <p id="correct-answer" class="text-lg mb-3 leading-relaxed"></p>
+                        <div class="flex items-start">
+                             <svg class="w-5 h-5 text-sky-500 mr-2 flex-shrink-0 mt-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                            </svg>
+                            <p id="explanation" class="text-gray-600"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="w-full lg:w-1/3 lg:max-w-sm bg-white rounded-xl shadow-lg p-6 order-1 lg:order-2 h-fit">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Comparison Rules</h2>
+            <div class="space-y-4">
+                <!-- Rule 1 -->
+                <div class="p-3 bg-blue-50 rounded-lg">
+                    <h3 class="font-bold text-blue-800">plus ... que</h3>
+                    <p class="text-sm text-blue-700">"more ... than"</p>
+                    <p class="text-xs text-gray-600 mt-1">Use with adjectives & adverbs.</p>
+                </div>
+                <!-- Rule 2 -->
+                <div class="p-3 bg-green-50 rounded-lg">
+                    <h3 class="font-bold text-green-800">plus de ... que</h3>
+                    <p class="text-sm text-green-700">"more ... than"</p>
+                    <p class="text-xs text-gray-600 mt-1">Use with nouns (quantity).</p>
+                </div>
+                <!-- Rule 3 -->
+                <div class="p-3 bg-yellow-50 rounded-lg">
+                    <h3 class="font-bold text-yellow-800">aussi ... que</h3>
+                    <p class="text-sm text-yellow-700">"as ... as"</p>
+                    <p class="text-xs text-gray-600 mt-1">Use with adjectives & adverbs.</p>
+                </div>
+                <!-- Rule 4 -->
+                <div class="p-3 bg-purple-50 rounded-lg">
+                    <h3 class="font-bold text-purple-800">autant de ... que</h3>
+                    <p class="text-sm text-purple-700">"as much/many ... as"</p>
+                    <p class="text-xs text-gray-600 mt-1">Use with nouns (quantity).</p>
+                </div>
+                <!-- Rule 5 -->
+                <div class="p-3 bg-red-50 rounded-lg">
+                    <h3 class="font-bold text-red-800">moins ... que</h3>
+                    <p class="text-sm text-red-700">"less ... than"</p>
+                    <p class="text-xs text-gray-600 mt-1">Use with adjectives & adverbs.</p>
+                </div>
+                <!-- Rule 6 -->
+                <div class="p-3 bg-indigo-50 rounded-lg">
+                    <h3 class="font-bold text-indigo-800">moins de ... que</h3>
+                    <p class="text-sm text-indigo-700">"less/fewer ... than"</p>
+                    <p class="text-xs text-gray-600 mt-1">Use with nouns (quantity).</p>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        const sentences = [
+            // plus ... que (adjective/adverb)
+            { start: "Il est", end: "son frère.", answer: "plus grand que", hint: "(more than)", translation: "He is taller than his brother.", explanation: "Use 'plus [adjectif] que' to compare qualities. 'Grand' is an adjective." },
+            { start: "Elle court", end: "moi.", answer: "plus vite que", hint: "(more than)", translation: "She runs faster than me.", explanation: "Use 'plus [adverbe] que' to compare actions. 'Vite' is an adverb." },
+            { start: "Ce livre est", end: "le film.", answer: "plus intéressant que", hint: "(more than)", translation: "This book is more interesting than the movie.", explanation: "Use 'plus [adjectif] que' for adjectives like 'intéressant'." },
+            { start: "L'avion est", end: "le train.", answer: "plus rapide que", hint: "(more than)", translation: "The plane is faster than the train.", explanation: "Use 'plus [adjectif] que' to compare qualities. 'Rapide' is an adjective." },
+            { start: "Elle parle", end: "sa sœur.", answer: "plus clairement que", hint: "(more than)", translation: "She speaks more clearly than her sister.", explanation: "Use 'plus [adverbe] que' to compare how actions are done. 'Clairement' is an adverb." },
+            { start: "Ce problème est", end: "je ne le pensais.", answer: "plus compliqué que", hint: "(more than)", translation: "This problem is more complicated than I thought.", explanation: "Use 'plus [adjectif] que' for adjectives like 'compliqué'." },
+            { start: "Il travaille", end: "ses collègues.", answer: "plus efficacement que", hint: "(more than)", translation: "He works more efficiently than his colleagues.", explanation: "Use 'plus [adverbe] que' to compare actions. 'Efficacement' is an adverb." },
+            { start: "La musique est", end: "le silence.", answer: "plus forte que", hint: "(more than)", translation: "The music is louder than the silence.", explanation: "Use 'plus [adjectif] que' to compare qualities. 'Forte' is an adjective." },
+            { start: "L'été ici est", end: "dans mon pays.", answer: "plus chaud que", hint: "(more than)", translation: "The summer here is hotter than in my country.", explanation: "Use 'plus [adjectif] que' for adjectives like 'chaud'." },
+            { start: "Cette version est", end: "l'ancienne.", answer: "plus moderne que", hint: "(more than)", translation: "This version is more modern than the old one.", explanation: "Use 'plus [adjectif] que' to compare qualities. 'Moderne' is an adjective." },
+
+            // plus de ... que (noun)
+            { start: "J'ai", end: "livres que toi.", answer: "plus de", hint: "(more than)", translation: "I have more books than you.", explanation: "Use 'plus de [nom] que' to compare quantities of nouns. 'Livres' is a noun." },
+            { start: "Il y a", end: "soleil aujourd'hui qu'hier.", answer: "plus de", hint: "(more than)", translation: "There is more sun today than yesterday.", explanation: "Use 'plus de [nom] que' for quantities. 'Soleil' is a noun." },
+            { start: "Elle a", end: "amis que sa sœur.", answer: "plus d'", hint: "(more than)", translation: "She has more friends than her sister.", explanation: "Use 'plus d'[nom] que' when the noun starts with a vowel or h. 'Amis' starts with a vowel." },
+            { start: "Nous voulons", end: "résultats que d'excuses.", answer: "plus de", hint: "(more than)", translation: "We want more results than excuses.", explanation: "Use 'plus de [nom] que' to compare quantities of nouns. 'Résultats' is a noun." },
+            { start: "Il a", end: "chance que moi.", answer: "plus de", hint: "(more than)", translation: "He has more luck than me.", explanation: "Use 'plus de [nom] que' for quantities. 'Chance' is a noun." },
+            { start: "Vous avez", end: "temps libre ce week-end.", answer: "plus de", hint: "(more than)", translation: "You have more free time this weekend.", explanation: "Use 'plus de [nom] que' to compare quantities. 'Temps' is a noun." },
+            { start: "Il faut", end: "efforts pour réussir.", answer: "plus d'", hint: "(more than)", translation: "It takes more effort to succeed.", explanation: "Use 'plus d'[nom] que' when the noun starts with a vowel. 'Efforts' starts with a vowel." },
+            { start: "Cette ville a", end: "habitants que la mienne.", answer: "plus d'", hint: "(more than)", translation: "This city has more inhabitants than mine.", explanation: "Use 'plus d'[nom] que' when the noun starts with h. 'Habitants' starts with 'h'." },
+            { start: "Elle boit", end: "eau que de soda.", answer: "plus d'", hint: "(more than)", translation: "She drinks more water than soda.", explanation: "Use 'plus d'[nom] que' when the noun starts with a vowel. 'Eau' starts with a vowel." },
+            { start: "L'entreprise a eu", end: "bénéfices cette année.", answer: "plus de", hint: "(more than)", translation: "The company had more profits this year.", explanation: "Use 'plus de [nom] que' to compare quantities. 'Bénéfices' is a noun." },
+
+            // aussi ... que (adjective/adverb)
+            { start: "Marie est", end: "intelligente que Pierre.", answer: "aussi", hint: "(equal to)", translation: "Marie is as intelligent as Pierre.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Intelligente' is an adjective." },
+            { start: "Je travaille", end: "dur que vous.", answer: "aussi", hint: "(equal to)", translation: "I work as hard as you.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Dur' is an adverb here." },
+            { start: "Ce gâteau est", end: "bon que celui de ma grand-mère.", answer: "aussi", hint: "(equal to)", translation: "This cake is as good as my grandmother's.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Bon' is an adjective." },
+            { start: "Il conduit", end: "prudemment que son père.", answer: "aussi", hint: "(equal to)", translation: "He drives as carefully as his father.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Prudemment' is an adverb." },
+            { start: "Cette maison est", end: "grande que la nôtre.", answer: "aussi", hint: "(equal to)", translation: "This house is as big as ours.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Grande' is an adjective." },
+            { start: "Elle est arrivée", end: "tôt que prévu.", answer: "aussi", hint: "(equal to)", translation: "She arrived as early as expected.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Tôt' is an adverb." },
+            { start: "Le film était", end: "ennuyeux que le livre.", answer: "aussi", hint: "(equal to)", translation: "The movie was as boring as the book.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Ennuyeux' is an adjective." },
+            { start: "Tu sembles", end: "fatigué que moi.", answer: "aussi", hint: "(equal to)", translation: "You seem as tired as me.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Fatigué' is an adjective." },
+            { start: "Il faut répondre", end: "vite que possible.", answer: "aussi", hint: "(equal to)", translation: "You must answer as quickly as possible.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Vite' is an adverb." },
+            { start: "Son opinion est", end: "importante que la tienne.", answer: "aussi", hint: "(equal to)", translation: "Her opinion is as important as yours.", explanation: "Use 'aussi [adjectif/adverbe] que' for equality. 'Importante' is an adjective." },
+
+            // autant de ... que (noun)
+            { start: "Il a", end: "argent que son patron.", answer: "autant d'", hint: "(equal to)", translation: "He has as much money as his boss.", explanation: "Use 'autant de/d' [nom] que' for equal quantity. 'Argent' starts with a vowel." },
+            { start: "Nous avons", end: "problèmes que de solutions.", answer: "autant de", hint: "(equal to)", translation: "We have as many problems as solutions.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Problèmes' is a noun." },
+            { start: "Elle mange", end: "fruits que de légumes.", answer: "autant de", hint: "(equal to)", translation: "She eats as many fruits as vegetables.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Fruits' is a noun." },
+            { start: "J'ai lu", end: "livres que toi cet été.", answer: "autant de", hint: "(equal to)", translation: "I read as many books as you this summer.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Livres' is a noun." },
+            { start: "Il y a", end: "chaises que d'invités.", answer: "autant de", hint: "(equal to)", translation: "There are as many chairs as guests.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Chaises' is a noun." },
+            { start: "Elle a mis", end: "temps que moi pour finir.", answer: "autant de", hint: "(equal to)", translation: "She took as much time as me to finish.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Temps' is a noun." },
+            { start: "Il montre", end: "patience que son professeur.", answer: "autant de", hint: "(equal to)", translation: "He shows as much patience as his teacher.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Patience' is a noun." },
+            { start: "Cette recette demande", end: "farine que de sucre.", answer: "autant de", hint: "(equal to)", translation: "This recipe requires as much flour as sugar.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Farine' is a noun." },
+            { start: "Il a", end: "idées que son collègue.", answer: "autant d'", hint: "(equal to)", translation: "He has as many ideas as his colleague.", explanation: "Use 'autant d' [nom] que' when the noun starts with a vowel. 'Idées' starts with 'i'." },
+            { start: "Vous avez", end: "courage que nous.", answer: "autant de", hint: "(equal to)", translation: "You have as much courage as us.", explanation: "Use 'autant de [nom] que' for equal quantity. 'Courage' is a noun." },
+
+            // moins ... que (adjective/adverb)
+            { start: "Le train est", end: "rapide que l'avion.", answer: "moins", hint: "(less than)", translation: "The train is less fast than the plane.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Rapide' is an adjective." },
+            { start: "Cette chaise est", end: "confortable que le canapé.", answer: "moins", hint: "(less than)", translation: "This chair is less comfortable than the sofa.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Confortable' is an adjective." },
+            { start: "Il parle", end: "fort que son père.", answer: "moins", hint: "(less than)", translation: "He speaks less loudly than his father.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Fort' is an adverb here." },
+            { start: "Ce film est", end: "connu que l'original.", answer: "moins", hint: "(less than)", translation: "This movie is less known than the original.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Connu' is an adjective." },
+            { start: "Je suis", end: "optimiste que lui.", answer: "moins", hint: "(less than)", translation: "I am less optimistic than him.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Optimiste' is an adjective." },
+            { start: "Elle marche", end: "vite que d'habitude.", answer: "moins", hint: "(less than)", translation: "She walks less quickly than usual.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Vite' is an adverb." },
+            { start: "Le café est", end: "cher ici que là-bas.", answer: "moins", hint: "(less than)", translation: "The coffee is less expensive here than there.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Cher' is an adjective." },
+            { start: "Cette tâche est", end: "difficile que la précédente.", answer: "moins", hint: "(less than)", translation: "This task is less difficult than the previous one.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Difficile' is an adjective." },
+            { start: "Il semble", end: "inquiet que sa femme.", answer: "moins", hint: "(less than)", translation: "He seems less worried than his wife.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Inquiet' is an adjective." },
+            { start: "L'hiver est", end: "long cette année.", answer: "moins", hint: "(less than)", translation: "The winter is less long this year.", explanation: "Use 'moins [adjectif/adverbe] que' for inferiority. 'Long' is an adjective." },
+
+            // moins de ... que (noun)
+            { start: "J'ai", end: "temps libre que l'année dernière.", answer: "moins de", hint: "(less than)", translation: "I have less free time than last year.", explanation: "Use 'moins de [nom] que' for lesser quantity. 'Temps' is a noun." },
+            { start: "Il y a", end: "circulation le dimanche.", answer: "moins de", hint: "(less than)", translation: "There is less traffic on Sunday.", explanation: "Use 'moins de [nom] que' for lesser quantity. 'Circulation' is a noun." },
+            { start: "Elle a fait", end: "erreurs que moi.", answer: "moins d'", hint: "(less than)", translation: "She made fewer mistakes than me.", explanation: "Use 'moins d' [nom] que' when the noun starts with a vowel. 'Erreurs' starts with 'e'." },
+            { start: "Nous avons reçu", end: "plaintes ce mois-ci.", answer: "moins de", hint: "(less than)", translation: "We received fewer complaints this month.", explanation: "Use 'moins de [nom] que' for lesser quantity. 'Plaintes' is a noun." },
+            { start: "Il y a", end: "arbres dans cette rue.", answer: "moins d'", hint: "(less than)", translation: "There are fewer trees on this street.", explanation: "Use 'moins d' [nom] que' when the noun starts with a vowel. 'Arbres' starts with 'a'." },
+            { start: "Le magasin a", end: "clients aujourd'hui.", answer: "moins de", hint: "(less than)", translation: "The store has fewer customers today.", explanation: "Use 'moins de [nom] que' for lesser quantity. 'Clients' is a noun." },
+            { start: "J'ai", end: "motivation ce matin.", answer: "moins de", hint: "(less than)", translation: "I have less motivation this morning.", explanation: "Use 'moins de [nom] que' for lesser quantity. 'Motivation' is a noun." },
+            { start: "Il boit", end: "café que moi.", answer: "moins de", hint: "(less than)", translation: "He drinks less coffee than me.", explanation: "Use 'moins de [nom] que' for lesser quantity. 'Café' is a noun." },
+            { start: "Il y a", end: "options disponibles.", answer: "moins d'", hint: "(less than)", translation: "There are fewer options available.", explanation: "Use 'moins d' [nom] que' when the noun starts with a vowel. 'Options' starts with 'o'." },
+            { start: "Elle a", end: "responsabilités dans son nouveau poste.", answer: "moins de", hint: "(less than)", translation: "She has fewer responsibilities in her new job.", explanation: "Use 'moins de [nom] que' for lesser quantity. 'Responsabilités' is a noun." },
+        ];
+
+        let shuffledSentences = [];
+        let currentIndex = 0;
+
+        // DOM Elements
+        const sentenceStartEl = document.getElementById('sentence-start');
+        const sentenceEndEl = document.getElementById('sentence-end');
+        const translationDisplayEl = document.getElementById('translation-display');
+        const hintDisplayEl = document.getElementById('hint-display');
+        const userAnswerEl = document.getElementById('user-answer');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackCardContent = document.getElementById('feedback-card-content');
+        const feedbackResultEl = document.getElementById('feedback-result');
+        const correctAnswerEl = document.getElementById('correct-answer');
+        const explanationEl = document.getElementById('explanation');
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function loadSentence() {
+            if (currentIndex >= shuffledSentences.length) {
+                // Reshuffle and start over if all sentences have been shown
+                shuffleArray(shuffledSentences);
+                currentIndex = 0;
+            }
+
+            const currentSentence = shuffledSentences[currentIndex];
+            sentenceStartEl.textContent = currentSentence.start + ' ';
+            sentenceEndEl.textContent = ' ' + currentSentence.end;
+            translationDisplayEl.textContent = currentSentence.translation;
+            hintDisplayEl.textContent = `Hint: ${currentSentence.hint}`;
+
+            // Reset UI
+            userAnswerEl.value = '';
+            userAnswerEl.disabled = false;
+            feedbackContainer.classList.remove('visible');
+            checkBtn.style.display = 'inline-flex';
+            nextBtn.style.display = 'none';
+            userAnswerEl.focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = userAnswerEl.value.trim().toLowerCase();
+            const correctAnswer = shuffledSentences[currentIndex].answer.toLowerCase();
+            const isCorrect = userAnswer === correctAnswer;
+
+            feedbackContainer.classList.add('visible');
+            userAnswerEl.disabled = true;
+
+            if (isCorrect) {
+                feedbackResultEl.textContent = "Correct!";
+                feedbackCardContent.className = 'p-5 rounded-lg bg-green-100 text-green-800';
+            } else {
+                feedbackResultEl.textContent = "Wrong!";
+                feedbackCardContent.className = 'p-5 rounded-lg bg-red-100 text-red-800';
+            }
+            
+            const fullSentence = `${shuffledSentences[currentIndex].start} <strong class="font-bold">${shuffledSentences[currentIndex].answer}</strong> ${shuffledSentences[currentIndex].end}`;
+            const translation = shuffledSentences[currentIndex].translation;
+            correctAnswerEl.innerHTML = `Correct answer: ${fullSentence}<br><span class="text-sm italic text-gray-600">${translation}</span>`;
+            explanationEl.textContent = shuffledSentences[currentIndex].explanation;
+
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-flex';
+            nextBtn.focus();
+        }
+
+        function nextSentence() {
+            currentIndex++;
+            loadSentence();
+        }
+
+        // Event Listeners
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextSentence);
+        userAnswerEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && checkBtn.style.display !== 'none') {
+                checkAnswer();
+            }
+        });
+
+        // Initial Load
+        window.onload = () => {
+            shuffledSentences = [...sentences];
+            shuffleArray(shuffledSentences);
+            loadSentence();
+        };
+
+    </script>
+</body>
+</html>
+

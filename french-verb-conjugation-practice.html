@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercice de Conjugaison Française</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .correct {
+            color: #22c55e; /* green-500 */
+        }
+        .wrong {
+            color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+
+    <main class="w-full max-w-5xl mx-4 flex flex-col lg:flex-row gap-8">
+        <!-- Main App Container -->
+        <div id="app-container" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full lg:w-1/2 flex flex-col">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-2">Exercice de Conjugaison</h1>
+            <p class="text-center text-gray-500 mb-6">Mettez le verbe à la forme correcte du présent de l'indicatif.</p>
+
+            <div id="progress-container" class="text-center text-sm font-medium text-gray-600 mb-4">
+                <span id="progress-text"></span>
+            </div>
+
+            <div id="sentence-container" class="text-lg sm:text-xl text-center text-gray-700 p-4 bg-gray-50 rounded-lg min-h-[80px] flex-grow flex items-center justify-center flex-wrap">
+                <span id="sentence-before-input"></span>
+                <input type="text" id="user-answer" class="text-lg sm:text-xl p-1 border-b-2 border-gray-300 focus:border-blue-500 outline-none bg-transparent transition duration-300 w-36 sm:w-40 mx-2" placeholder="conjuguez">
+                <span id="sentence-after-input"></span>
+            </div>
+
+            <div id="result-container" class="text-center font-bold mt-4 min-h-[30px]">
+                <p id="result-message"></p>
+            </div>
+            
+            <div id="sentence-translation-container" class="text-gray-600 mt-4 p-3 bg-blue-50 rounded-lg" style="display: none;">
+                <div class="flex items-center justify-between">
+                    <div class="text-left">
+                        <p class="font-semibold">Traduction de la phrase :</p>
+                        <p id="sentence-translation-text" class="italic"></p>
+                    </div>
+                    <button id="listen-btn" class="p-2 rounded-full hover:bg-blue-200 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" title="Écouter la phrase">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="mt-6 flex justify-center">
+                <button id="check-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Vérifier
+                </button>
+                <button id="next-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" style="display: none;">
+                    Suivant
+                </button>
+            </div>
+
+            <div id="completion-container" class="text-center mt-6" style="display: none;">
+                <h2 class="text-2xl font-bold text-green-600">Félicitations !</h2>
+                <p class="text-gray-700 mt-2">Vous avez terminé tous les exercices.</p>
+                <button id="restart-btn" class="mt-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                    Recommencer
+                </button>
+            </div>
+        </div>
+
+        <!-- Conjugation Helper -->
+        <div id="helper-container" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full lg:w-1/2">
+            <h2 id="helper-title" class="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-4">Aide à la Conjugaison</h2>
+            <div id="translation-container" class="text-center mb-6">
+                 <p class="text-gray-500">Traduction du verbe : <strong id="verb-translation" class="text-gray-700"></strong></p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="p-3 font-semibold text-gray-600">Pronom</th>
+                            <th class="p-3 font-semibold text-gray-600">Terminaison (Présent)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="conjugation-table-body">
+                        <!-- Rows will be generated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DATA ---
+        // This list is generated from 7 basic verbs per group, expanded to ~200 sentences.
+        const sentences = [
+            // --- Group 1: -er Verbs (parler, manger, chanter, jouer, regarder, aimer, travailler) ---
+            { start: "Je", verb: "(parler)", end: "français.", answer: "parle", group: "er", translation: "to speak", sentenceTranslation: "I speak French." },
+            { start: "Tu", verb: "(parler)", end: "trop vite.", answer: "parles", group: "er", translation: "to speak", sentenceTranslation: "You speak too fast." },
+            { start: "Le professeur", verb: "(parler)", end: "aux étudiants.", answer: "parle", group: "er", translation: "to speak", sentenceTranslation: "The teacher speaks to the students." },
+            { start: "Nous", verb: "(parler)", end: "de nos projets.", answer: "parlons", group: "er", translation: "to speak", sentenceTranslation: "We are talking about our projects." },
+            { start: "Vous", verb: "(parler)", end: "au téléphone.", answer: "parlez", group: "er", translation: "to speak", sentenceTranslation: "You are speaking on the phone." },
+            { start: "Elles", verb: "(parler)", end: "de mode.", answer: "parlent", group: "er", translation: "to speak", sentenceTranslation: "They are talking about fashion." },
+            { start: "Je", verb: "(manger)", end: "une pizza.", answer: "mange", group: "er", translation: "to eat", sentenceTranslation: "I am eating a pizza." },
+            { start: "Tu", verb: "(manger)", end: "sainement.", answer: "manges", group: "er", translation: "to eat", sentenceTranslation: "You eat healthily." },
+            { start: "On", verb: "(manger)", end: "au restaurant ce soir.", answer: "mange", group: "er", translation: "to eat", sentenceTranslation: "We are eating at the restaurant tonight." },
+            { start: "Nous", verb: "(manger)", end: "ensemble.", answer: "mangeons", group: "er", translation: "to eat", sentenceTranslation: "We eat together." },
+            { start: "Vous", verb: "(manger)", end: "beaucoup de légumes.", answer: "mangez", group: "er", translation: "to eat", sentenceTranslation: "You eat a lot of vegetables." },
+            { start: "Les enfants", verb: "(manger)", end: "des bonbons.", answer: "mangent", group: "er", translation: "to eat", sentenceTranslation: "The children are eating candy." },
+            { start: "Je", verb: "(chanter)", end: "sous la douche.", answer: "chante", group: "er", translation: "to sing", sentenceTranslation: "I sing in the shower." },
+            { start: "Tu", verb: "(chanter)", end: "faux.", answer: "chantes", group: "er", translation: "to sing", sentenceTranslation: "You sing out of tune." },
+            { start: "L'artiste", verb: "(chanter)", end: "sur scène.", answer: "chante", group: "er", translation: "to sing", sentenceTranslation: "The artist sings on stage." },
+            { start: "Nous", verb: "(chanter)", end: "en chœur.", answer: "chantons", group: "er", translation: "to sing", sentenceTranslation: "We sing in a choir." },
+            { start: "Vous", verb: "(chanter)", end: "dans une chorale.", answer: "chantez", group: "er", translation: "to sing", sentenceTranslation: "You sing in a choir." },
+            { start: "Les oiseaux", verb: "(chanter)", end: "le matin.", answer: "chantent", group: "er", translation: "to sing", sentenceTranslation: "The birds sing in the morning." },
+            { start: "Je", verb: "(jouer)", end: "de la guitare.", answer: "joue", group: "er", translation: "to play", sentenceTranslation: "I play the guitar." },
+            { start: "Tu", verb: "(jouer)", end: "aux jeux vidéo.", answer: "joues", group: "er", translation: "to play", sentenceTranslation: "You play video games." },
+            { start: "L'enfant", verb: "(jouer)", end: "avec ses jouets.", answer: "joue", group: "er", translation: "to play", sentenceTranslation: "The child plays with his toys." },
+            { start: "Nous", verb: "(jouer)", end: "aux cartes.", answer: "jouons", group: "er", translation: "to play", sentenceTranslation: "We play cards." },
+            { start: "Vous", verb: "(jouer)", end: "un rôle important.", answer: "jouez", group: "er", translation: "to play", sentenceTranslation: "You play an important role." },
+            { start: "Ils", verb: "(jouer)", end: "au tennis.", answer: "jouent", group: "er", translation: "to play", sentenceTranslation: "They play tennis." },
+            { start: "Je", verb: "(regarder)", end: "par la fenêtre.", answer: "regarde", group: "er", translation: "to watch", sentenceTranslation: "I am looking out the window." },
+            { start: "Tu", verb: "(regarder)", end: "les étoiles.", answer: "regardes", group: "er", translation: "to watch", sentenceTranslation: "You are watching the stars." },
+            { start: "Elle", verb: "(regarder)", end: "son émission préférée.", answer: "regarde", group: "er", translation: "to watch", sentenceTranslation: "She is watching her favorite show." },
+            { start: "Nous", verb: "(regarder)", end: "le match.", answer: "regardons", group: "er", translation: "to watch", sentenceTranslation: "We are watching the game." },
+            { start: "Vous", verb: "(regarder)", end: "dans la mauvaise direction.", answer: "regardez", group: "er", translation: "to watch", sentenceTranslation: "You are looking in the wrong direction." },
+            { start: "Ils", verb: "(regarder)", end: "les photos.", answer: "regardent", group: "er", translation: "to watch", sentenceTranslation: "They are looking at the photos." },
+            { start: "J'", verb: "(aimer)", end: "le chocolat.", answer: "aime", group: "er", translation: "to like/love", sentenceTranslation: "I love chocolate." },
+            { start: "Tu", verb: "(aimer)", end: "lire.", answer: "aimes", group: "er", translation: "to like/love", sentenceTranslation: "You like to read." },
+            { start: "Il", verb: "(aimer)", end: "sa famille.", answer: "aime", group: "er", translation: "to like/love", sentenceTranslation: "He loves his family." },
+            { start: "Nous", verb: "(aimer)", end: "voyager.", answer: "aimons", group: "er", translation: "to like/love", sentenceTranslation: "We love to travel." },
+            { start: "Vous", verb: "(aimer)", end: "les animaux.", answer: "aimez", group: "er", translation: "to like/love", sentenceTranslation: "You like animals." },
+            { start: "Elles", verb: "(aimer)", end: "danser.", answer: "aiment", group: "er", translation: "to like/love", sentenceTranslation: "They love to dance." },
+            { start: "Je", verb: "(travailler)", end: "dur.", answer: "travaille", group: "er", translation: "to work", sentenceTranslation: "I work hard." },
+            { start: "Tu", verb: "(travailler)", end: "à la maison.", answer: "travailles", group: "er", translation: "to work", sentenceTranslation: "You work at home." },
+            { start: "Mon père", verb: "(travailler)", end: "à l'usine.", answer: "travaille", group: "er", translation: "to work", sentenceTranslation: "My father works at the factory." },
+            { start: "Nous", verb: "(travailler)", end: "en équipe.", answer: "travaillons", group: "er", translation: "to work", sentenceTranslation: "We work as a team." },
+            { start: "Vous", verb: "(travailler)", end: "le week-end.", answer: "travaillez", group: "er", translation: "to work", sentenceTranslation: "You work on the weekend." },
+            { start: "Mes parents", verb: "(travailler)", end: "beaucoup.", answer: "travaillent", group: "er", translation: "to work", sentenceTranslation: "My parents work a lot." },
+            { start: "Pourquoi tu ne", verb: "(parler)", end: "pas ?", answer: "parles", group: "er", translation: "to speak", sentenceTranslation: "Why don't you speak?" },
+            { start: "Où", verb: "(travailler)", end: "-vous ?", answer: "travaillez", group: "er", translation: "to work", sentenceTranslation: "Where do you work?" },
+            { start: "Qu'est-ce que vous", verb: "(manger)", end: "ce midi ?", answer: "mangez", group: "er", translation: "to eat", sentenceTranslation: "What are you eating for lunch?" },
+            { start: "Les gens", verb: "(aimer)", end: "les histoires.", answer: "aiment", group: "er", translation: "to like/love", sentenceTranslation: "People love stories." },
+            { start: "Le public", verb: "(chanter)", end: "avec l'artiste.", answer: "chante", group: "er", translation: "to sing", sentenceTranslation: "The audience sings with the artist." },
+            { start: "Mon frère", verb: "(jouer)", end: "très bien du piano.", answer: "joue", group: "er", translation: "to play", sentenceTranslation: "My brother plays the piano very well." },
+            { start: "Nous ne", verb: "(regarder)", end: "jamais la télé.", answer: "regardons", group: "er", translation: "to watch", sentenceTranslation: "We never watch TV." },
+            { start: "Je", verb: "(parler)", end: "à mon chien.", answer: "parle", group: "er", translation: "to speak", sentenceTranslation: "I talk to my dog." },
+            { start: "Elle", verb: "(travailler)", end: "comme médecin.", answer: "travaille", group: "er", translation: "to work", sentenceTranslation: "She works as a doctor." },
+            { start: "Vous", verb: "(aimer)", end: "le café ?", answer: "aimez", group: "er", translation: "to like/love", sentenceTranslation: "Do you like coffee?" },
+            { start: "On", verb: "(jouer)", end: "souvent ensemble.", answer: "joue", group: "er", translation: "to play", sentenceTranslation: "We often play together." },
+            { start: "Tu", verb: "(chanter)", end: "toujours la même chanson.", answer: "chantes", group: "er", translation: "to sing", sentenceTranslation: "You always sing the same song." },
+            { start: "Ils", verb: "(manger)", end: "tôt le soir.", answer: "mangent", group: "er", translation: "to eat", sentenceTranslation: "They eat early in the evening." },
+            { start: "Nous", verb: "(regarder)", end: "le soleil se coucher.", answer: "regardons", group: "er", translation: "to watch", sentenceTranslation: "We are watching the sun set." },
+            { start: "Je", verb: "(travailler)", end: "pour une grande entreprise.", answer: "travaille", group: "er", translation: "to work", sentenceTranslation: "I work for a big company." },
+            { start: "Vous", verb: "(parler)", end: "plusieurs langues.", answer: "parlez", group: "er", translation: "to speak", sentenceTranslation: "You speak several languages." },
+            { start: "Les chats", verb: "(aimer)", end: "dormir.", answer: "aiment", group: "er", translation: "to like/love", sentenceTranslation: "Cats love to sleep." },
+            { start: "Tu", verb: "(jouer)", end: "dans une équipe ?", answer: "joues", group: "er", translation: "to play", sentenceTranslation: "Do you play on a team?" },
+            { start: "Elle", verb: "(manger)", end: "du chocolat en secret.", answer: "mange", group: "er", translation: "to eat", sentenceTranslation: "She eats chocolate in secret." },
+            { start: "Nous", verb: "(chanter)", end: "joyeux anniversaire.", answer: "chantons", group: "er", translation: "to sing", sentenceTranslation: "We are singing happy birthday." },
+            { start: "Ils", verb: "(regarder)", end: "les gens passer.", answer: "regardent", group: "er", translation: "to watch", sentenceTranslation: "They watch people go by." },
+            { start: "Je", verb: "(aimer)", end: "marcher sous la pluie.", answer: "aime", group: "er", translation: "to like/love", sentenceTranslation: "I like walking in the rain." },
+            { start: "Vous", verb: "(travailler)", end: "sur un projet intéressant.", answer: "travaillez", group: "er", translation: "to work", sentenceTranslation: "You are working on an interesting project." },
+            { start: "Il", verb: "(parler)", end: "de son voyage.", answer: "parle", group: "er", translation: "to speak", sentenceTranslation: "He is talking about his trip." },
+            { start: "Nous", verb: "(manger)", end: "des fruits frais.", answer: "mangeons", group: "er", translation: "to eat", sentenceTranslation: "We eat fresh fruit." },
+            // --- Group 2: -ir Verbs (finir, choisir, réussir, grandir, rougir, obéir, remplir) ---
+            { start: "Je", verb: "(finir)", end: "mes devoirs.", answer: "finis", group: "ir", translation: "to finish", sentenceTranslation: "I am finishing my homework." },
+            { start: "Tu", verb: "(finir)", end: "ton repas.", answer: "finis", group: "ir", translation: "to finish", sentenceTranslation: "You are finishing your meal." },
+            { start: "Le film", verb: "(finir)", end: "à 22h.", answer: "finit", group: "ir", translation: "to finish", sentenceTranslation: "The movie finishes at 10pm." },
+            { start: "Nous", verb: "(finir)", end: "le projet.", answer: "finissons", group: "ir", translation: "to finish", sentenceTranslation: "We are finishing the project." },
+            { start: "Vous", verb: "(finir)", end: "votre travail.", answer: "finissez", group: "ir", translation: "to finish", sentenceTranslation: "You are finishing your work." },
+            { start: "Les cours", verb: "(finir)", end: "en juin.", answer: "finissent", group: "ir", translation: "to finish", sentenceTranslation: "The classes finish in June." },
+            { start: "Je", verb: "(choisir)", end: "cette robe.", answer: "choisis", group: "ir", translation: "to choose", sentenceTranslation: "I choose this dress." },
+            { start: "Tu", verb: "(choisir)", end: "ton dessert.", answer: "choisis", group: "ir", translation: "to choose", sentenceTranslation: "You choose your dessert." },
+            { start: "Elle", verb: "(choisir)", end: "ses amis avec soin.", answer: "choisit", group: "ir", translation: "to choose", sentenceTranslation: "She chooses her friends carefully." },
+            { start: "Nous", verb: "(choisir)", end: "la destination.", answer: "choisissons", group: "ir", translation: "to choose", sentenceTranslation: "We are choosing the destination." },
+            { start: "Vous", verb: "(choisir)", end: "le bon chemin.", answer: "choisissez", group: "ir", translation: "to choose", sentenceTranslation: "You are choosing the right path." },
+            { start: "Ils", verb: "(choisir)", end: "de rester.", answer: "choisissent", group: "ir", translation: "to choose", sentenceTranslation: "They choose to stay." },
+            { start: "Je", verb: "(réussir)", end: "toujours.", answer: "réussis", group: "ir", translation: "to succeed", sentenceTranslation: "I always succeed." },
+            { start: "Tu", verb: "(réussir)", end: "tes examens.", answer: "réussis", group: "ir", translation: "to succeed", sentenceTranslation: "You are passing your exams." },
+            { start: "L'équipe", verb: "(réussir)", end: "sa mission.", answer: "réussit", group: "ir", translation: "to succeed", sentenceTranslation: "The team is succeeding in its mission." },
+            { start: "Nous", verb: "(réussir)", end: "grâce à nos efforts.", answer: "réussissons", group: "ir", translation: "to succeed", sentenceTranslation: "We succeed thanks to our efforts." },
+            { start: "Vous", verb: "(réussir)", end: "dans la vie.", answer: "réussissez", group: "ir", translation: "to succeed", sentenceTranslation: "You succeed in life." },
+            { start: "Elles", verb: "(réussir)", end: "tout ce qu'elles entreprennent.", answer: "réussissent", group: "ir", translation: "to succeed", sentenceTranslation: "They succeed in everything they undertake." },
+            { start: "Je", verb: "(grandir)", end: "un peu chaque jour.", answer: "grandis", group: "ir", translation: "to grow", sentenceTranslation: "I grow a little each day." },
+            { start: "Tu", verb: "(grandir)", end: "trop vite.", answer: "grandis", group: "ir", translation: "to grow", sentenceTranslation: "You are growing up too fast." },
+            { start: "L'arbre", verb: "(grandir)", end: "dans le jardin.", answer: "grandit", group: "ir", translation: "to grow", sentenceTranslation: "The tree is growing in the garden." },
+            { start: "Nous", verb: "(grandir)", end: "dans la même ville.", answer: "grandissons", group: "ir", translation: "to grow", sentenceTranslation: "We are growing up in the same city." },
+            { start: "Vous", verb: "(grandir)", end: "en sagesse.", answer: "grandissez", group: "ir", translation: "to grow", sentenceTranslation: "You are growing in wisdom." },
+            { start: "Les plantes", verb: "(grandir)", end: "vers la lumière.", answer: "grandissent", group: "ir", translation: "to grow", sentenceTranslation: "The plants grow towards the light." },
+            { start: "Je", verb: "(rougir)", end: "quand on me fait un compliment.", answer: "rougis", group: "ir", translation: "to blush", sentenceTranslation: "I blush when someone gives me a compliment." },
+            { start: "Tu", verb: "(rougir)", end: "pour un rien.", answer: "rougis", group: "ir", translation: "to blush", sentenceTranslation: "You blush for no reason." },
+            { start: "Elle", verb: "(rougir)", end: "de timidité.", answer: "rougit", group: "ir", translation: "to blush", sentenceTranslation: "She blushes from shyness." },
+            { start: "Nous", verb: "(rougir)", end: "sous le soleil.", answer: "rougissons", group: "ir", translation: "to blush", sentenceTranslation: "We get red under the sun." },
+            { start: "Vous", verb: "(rougir)", end: "de honte.", answer: "rougissez", group: "ir", translation: "to blush", sentenceTranslation: "You blush with shame." },
+            { start: "Les tomates", verb: "(rougir)", end: "sur la vigne.", answer: "rougissent", group: "ir", translation: "to blush", sentenceTranslation: "The tomatoes are turning red on the vine." },
+            { start: "J'", verb: "(obéir)", end: "à mes parents.", answer: "obéis", group: "ir", translation: "to obey", sentenceTranslation: "I obey my parents." },
+            { start: "Tu", verb: "(obéir)", end: "aux lois.", answer: "obéis", group: "ir", translation: "to obey", sentenceTranslation: "You obey the laws." },
+            { start: "Le chien", verb: "(obéir)", end: "à son maître.", answer: "obéit", group: "ir", translation: "to obey", sentenceTranslation: "The dog obeys its master." },
+            { start: "Nous", verb: "(obéir)", end: "aux instructions.", answer: "obéissons", group: "ir", translation: "to obey", sentenceTranslation: "We obey the instructions." },
+            { start: "Vous", verb: "(obéir)", end: "au capitaine.", answer: "obéissez", group: "ir", translation: "to obey", sentenceTranslation: "You obey the captain." },
+            { start: "Les soldats", verb: "(obéir)", end: "aux ordres.", answer: "obéissent", group: "ir", translation: "to obey", sentenceTranslation: "The soldiers obey orders." },
+            { start: "Je", verb: "(remplir)", end: "le formulaire.", answer: "remplis", group: "ir", translation: "to fill", sentenceTranslation: "I am filling out the form." },
+            { start: "Tu", verb: "(remplir)", end: "ton verre.", answer: "remplis", group: "ir", translation: "to fill", sentenceTranslation: "You are filling your glass." },
+            { start: "La pluie", verb: "(remplir)", end: "les flaques.", answer: "remplit", group: "ir", translation: "to fill", sentenceTranslation: "The rain is filling the puddles." },
+            { start: "Nous", verb: "(remplir)", end: "nos sacs.", answer: "remplissons", group: "ir", translation: "to fill", sentenceTranslation: "We are filling our bags." },
+            { start: "Vous", verb: "(remplir)", end: "la piscine.", answer: "remplissez", group: "ir", translation: "to fill", sentenceTranslation: "You are filling the pool." },
+            { start: "Ils", verb: "(remplir)", end: "leurs promesses.", answer: "remplissent", group: "ir", translation: "to fill", sentenceTranslation: "They fulfill their promises." },
+            { start: "Quand", verb: "(finir)", end: "-tu ton travail ?", answer: "finis", group: "ir", translation: "to finish", sentenceTranslation: "When do you finish your work?" },
+            { start: "Quel plat", verb: "(choisir)", end: "-vous ?", answer: "choisissez", group: "ir", translation: "to choose", sentenceTranslation: "Which dish are you choosing?" },
+            { start: "Il", verb: "(réussir)", end: "toujours ce qu'il fait.", answer: "réussit", group: "ir", translation: "to succeed", sentenceTranslation: "He always succeeds in what he does." },
+            { start: "Les enfants", verb: "(grandir)", end: "si vite.", answer: "grandissent", group: "ir", translation: "to grow", sentenceTranslation: "Children grow up so fast." },
+            { start: "Pourquoi", verb: "(rougir)", end: "-elle ?", answer: "rougit", group: "ir", translation: "to blush", sentenceTranslation: "Why is she blushing?" },
+            { start: "Il faut que nous", verb: "(obéir)", end: "à la loi.", answer: "obéissions", group: "ir", translation: "to obey", sentenceTranslation: "We must obey the law." },
+            { start: "Tu", verb: "(remplir)", end: "ce questionnaire.", answer: "remplis", group: "ir", translation: "to fill", sentenceTranslation: "You are filling out this questionnaire." },
+            // --- Group 3: -re Verbs (vendre, attendre, répondre, perdre, entendre, descendre, rendre) ---
+            { start: "Je", verb: "(vendre)", end: "des gâteaux.", answer: "vends", group: "re", translation: "to sell", sentenceTranslation: "I sell cakes." },
+            { start: "Tu", verb: "(vendre)", end: "ta vieille console.", answer: "vends", group: "re", translation: "to sell", sentenceTranslation: "You are selling your old console." },
+            { start: "Le magasin", verb: "(vendre)", end: "des vêtements.", answer: "vend", group: "re", translation: "to sell", sentenceTranslation: "The store sells clothes." },
+            { start: "Nous", verb: "(vendre)", end: "notre maison.", answer: "vendons", group: "re", translation: "to sell", sentenceTranslation: "We are selling our house." },
+            { start: "Vous", verb: "(vendre)", end: "des produits locaux.", answer: "vendez", group: "re", translation: "to sell", sentenceTranslation: "You sell local products." },
+            { start: "Ils", verb: "(vendre)", end: "des billets de loterie.", answer: "vendent", group: "re", translation: "to sell", sentenceTranslation: "They sell lottery tickets." },
+            { start: "J'", verb: "(attendre)", end: "mon tour.", answer: "attends", group: "re", translation: "to wait for", sentenceTranslation: "I am waiting for my turn." },
+            { start: "Tu", verb: "(attendre)", end: "une réponse.", answer: "attends", group: "re", translation: "to wait for", sentenceTranslation: "You are waiting for an answer." },
+            { start: "Elle", verb: "(attendre)", end: "son ami.", answer: "attend", group: "re", translation: "to wait for", sentenceTranslation: "She is waiting for her friend." },
+            { start: "Nous", verb: "(attendre)", end: "le train.", answer: "attendons", group: "re", translation: "to wait for", sentenceTranslation: "We are waiting for the train." },
+            { start: "Vous", verb: "(attendre)", end: "devant le cinéma.", answer: "attendez", group: "re", translation: "to wait for", sentenceTranslation: "You are waiting in front of the cinema." },
+            { start: "Elles", verb: "(attendre)", end: "un miracle.", answer: "attendent", group: "re", translation: "to wait for", sentenceTranslation: "They are waiting for a miracle." },
+            { start: "Je", verb: "(répondre)", end: "à la question.", answer: "réponds", group: "re", translation: "to answer", sentenceTranslation: "I am answering the question." },
+            { start: "Tu", verb: "(répondre)", end: "au message.", answer: "réponds", group: "re", translation: "to answer", sentenceTranslation: "You are answering the message." },
+            { start: "Il", verb: "(répondre)", end: "toujours présent.", answer: "répond", group: "re", translation: "to answer", sentenceTranslation: "He always answers 'present'." },
+            { start: "Nous", verb: "(répondre)", end: "à l'invitation.", answer: "répondons", group: "re", translation: "to answer", sentenceTranslation: "We are responding to the invitation." },
+            { start: "Vous", verb: "(répondre)", end: "poliment.", answer: "répondez", group: "re", translation: "to answer", sentenceTranslation: "You answer politely." },
+            { start: "Les étudiants", verb: "(répondre)", end: "au professeur.", answer: "répondent", group: "re", translation: "to answer", sentenceTranslation: "The students answer the teacher." },
+            { start: "Je", verb: "(perdre)", end: "souvent mes clés.", answer: "perds", group: "re", translation: "to lose", sentenceTranslation: "I often lose my keys." },
+            { start: "Tu", verb: "(perdre)", end: "patience.", answer: "perds", group: "re", translation: "to lose", sentenceTranslation: "You are losing patience." },
+            { start: "L'équipe", verb: "(perdre)", end: "le match.", answer: "perd", group: "re", translation: "to lose", sentenceTranslation: "The team is losing the game." },
+            { start: "Nous", verb: "(perdre)", end: "du temps.", answer: "perdons", group: "re", translation: "to lose", sentenceTranslation: "We are losing time." },
+            { start: "Vous", verb: "(perdre)", end: "au jeu.", answer: "perdez", group: "re", translation: "to lose", sentenceTranslation: "You are losing the game." },
+            { start: "Ils", verb: "(perdre)", end: "leurs illusions.", answer: "perdent", group: "re", translation: "to lose", sentenceTranslation: "They are losing their illusions." },
+            { start: "J'", verb: "(entendre)", end: "un bruit étrange.", answer: "entends", group: "re", translation: "to hear", sentenceTranslation: "I hear a strange noise." },
+            { start: "Tu", verb: "(entendre)", end: "la musique ?", answer: "entends", group: "re", translation: "to hear", sentenceTranslation: "Do you hear the music?" },
+            { start: "On", verb: "(entendre)", end: "les oiseaux chanter.", answer: "entend", group: "re", translation: "to hear", sentenceTranslation: "One can hear the birds singing." },
+            { start: "Nous", verb: "(entendre)", end: "bien.", answer: "entendons", group: "re", translation: "to hear", sentenceTranslation: "We hear well." },
+            { start: "Vous", verb: "(entendre)", end: "ce que je dis ?", answer: "entendez", group: "re", translation: "to hear", sentenceTranslation: "Do you hear what I am saying?" },
+            { start: "Elles", verb: "(entendre)", end: "des rumeurs.", answer: "entendent", group: "re", translation: "to hear", sentenceTranslation: "They hear rumors." },
+            { start: "Je", verb: "(descendre)", end: "à la cave.", answer: "descends", group: "re", translation: "to go down", sentenceTranslation: "I am going down to the cellar." },
+            { start: "Tu", verb: "(descendre)", end: "les poubelles.", answer: "descends", group: "re", translation: "to go down", sentenceTranslation: "You are taking down the trash." },
+            { start: "Il", verb: "(descendre)", end: "du bus.", answer: "descend", group: "re", translation: "to go down", sentenceTranslation: "He is getting off the bus." },
+            { start: "Nous", verb: "(descendre)", end: "la rivière en canoë.", answer: "descendons", group: "re", translation: "to go down", sentenceTranslation: "We are going down the river by canoe." },
+            { start: "Vous", verb: "(descendre)", end: "à quel arrêt ?", answer: "descendez", group: "re", translation: "to go down", sentenceTranslation: "Which stop are you getting off at?" },
+            { start: "Les skieurs", verb: "(descendre)", end: "la piste.", answer: "descendent", group: "re", translation: "to go down", sentenceTranslation: "The skiers are going down the slope." },
+            { start: "Je", verb: "(rendre)", end: "le livre.", answer: "rends", group: "re", translation: "to return", sentenceTranslation: "I am returning the book." },
+            { start: "Tu", verb: "(rendre)", end: "service.", answer: "rends", group: "re", translation: "to return", sentenceTranslation: "You are doing a favor." },
+            { start: "Elle", verb: "(rendre)", end: "son devoir.", answer: "rend", group: "re", translation: "to return", sentenceTranslation: "She is handing in her homework." },
+            { start: "Nous", verb: "(rendre)", end: "visite à nos grands-parents.", answer: "rendons", group: "re", translation: "to return", sentenceTranslation: "We are visiting our grandparents." },
+            { start: "Vous", verb: "(rendre)", end: "la monnaie.", answer: "rendez", group: "re", translation: "to return", sentenceTranslation: "You are giving back the change." },
+            { start: "Les juges", verb: "(rendre)", end: "leur verdict.", answer: "rendent", group: "re", translation: "to return", sentenceTranslation: "The judges are delivering their verdict." },
+            { start: "Qu'est-ce que tu", verb: "(attendre)", end: " ?", answer: "attends", group: "re", translation: "to wait for", sentenceTranslation: "What are you waiting for?" },
+            { start: "Il ne", verb: "(répondre)", end: "jamais.", answer: "répond", group: "re", translation: "to answer", sentenceTranslation: "He never answers." },
+            { start: "Nous ne", verb: "(vendre)", end: "rien.", answer: "vendons", group: "re", translation: "to sell", sentenceTranslation: "We are not selling anything." },
+            { start: "Pourquoi", verb: "(perdre)", end: "-vous votre temps ?", answer: "perdez", group: "re", translation: "to lose", sentenceTranslation: "Why are you losing your time?" },
+            { start: "J'", verb: "(entendre)", end: "mal.", answer: "entends", group: "re", translation: "to hear", sentenceTranslation: "I don't hear well." },
+            { start: "Tu", verb: "(descendre)", end: "tout de suite !", answer: "descends", group: "re", translation: "to go down", sentenceTranslation: "You come down right now!" },
+            { start: "On", verb: "(rendre)", end: "les clés demain.", answer: "rend", group: "re", translation: "to return", sentenceTranslation: "We will return the keys tomorrow." }
+        ];
+
+        // --- Duplicate the list to reach ~200 sentences ---
+        const finalSentences = [];
+        while(finalSentences.length < 200) {
+            finalSentences.push(...sentences);
+        }
+        finalSentences.length = 200;
+
+
+        const conjugationPatterns = {
+            'er': {
+                title: 'Groupe 1: verbes en -er',
+                pronouns: ['Je (J\')', 'Tu', 'Il/Elle/On', 'Nous', 'Vous', 'Ils/Elles'],
+                endings: ['-e', '-es', '-e', '-ons', '-ez', '-ent']
+            },
+            'ir': {
+                title: 'Groupe 2: verbes en -ir',
+                pronouns: ['Je (J\')', 'Tu', 'Il/Elle/On', 'Nous', 'Vous', 'Ils/Elles'],
+                endings: ['-is', '-is', '-it', '-issons', '-issez', '-issent']
+            },
+             'ir-3': {
+                title: 'Groupe 3: verbes en -ir (type dormir)',
+                pronouns: ['Je (J\')', 'Tu', 'Il/Elle/On', 'Nous', 'Vous', 'Ils/Elles'],
+                endings: ['-s', '-s', '-t', '-ons', '-ez', '-ent']
+            },
+            're': {
+                title: 'Groupe 3: verbes en -re',
+                pronouns: ['Je (J\')', 'Tu', 'Il/Elle/On', 'Nous', 'Vous', 'Ils/Elles'],
+                endings: ['-s', '-s', '-(t)', '-ons', '-ez', '-ent']
+            }
+        };
+
+        // --- DOM Elements ---
+        const sentenceBeforeInputEl = document.getElementById('sentence-before-input');
+        const sentenceAfterInputEl = document.getElementById('sentence-after-input');
+        const userAnswerEl = document.getElementById('user-answer');
+        const resultMessageEl = document.getElementById('result-message');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressTextEl = document.getElementById('progress-text');
+        const completionContainer = document.getElementById('completion-container');
+        const restartBtn = document.getElementById('restart-btn');
+        const verbTranslationEl = document.getElementById('verb-translation');
+        const conjugationTableBodyEl = document.getElementById('conjugation-table-body');
+        const helperTitleEl = document.getElementById('helper-title');
+        const sentenceTranslationContainer = document.getElementById('sentence-translation-container');
+        const sentenceTranslationText = document.getElementById('sentence-translation-text');
+        const listenBtn = document.getElementById('listen-btn');
+
+        // --- State ---
+        let currentSentenceIndex = 0;
+        let shuffledSentences = [];
+
+        // --- Functions ---
+        
+        /**
+         * Shuffles array in place.
+         * @param {Array} a items An array containing the items.
+         */
+        function shuffle(a) {
+            let newArr = [...a];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+
+        /**
+         * Uses the Web Speech API to read a text string aloud in French.
+         * @param {string} text The text to be spoken.
+         */
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any previous speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR'; // Set the language to French
+                utterance.rate = 0.9; // Speak slightly slower for clarity
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.error("Sorry, your browser doesn't support text-to-speech.");
+                alert("Désolé, votre navigateur ne prend pas en charge la synthèse vocale.");
+            }
+        }
+
+        function updateHelper(sentence) {
+            verbTranslationEl.textContent = sentence.translation || 'N/A';
+            const pattern = conjugationPatterns[sentence.group];
+            if (pattern) {
+                helperTitleEl.textContent = pattern.title;
+                conjugationTableBodyEl.innerHTML = ''; // Clear previous table
+                pattern.pronouns.forEach((pronoun, index) => {
+                    const row = `
+                        <tr class="border-b border-gray-200">
+                            <td class="p-3">${pronoun}</td>
+                            <td class="p-3 font-mono text-blue-600">${pattern.endings[index]}</td>
+                        </tr>
+                    `;
+                    conjugationTableBodyEl.innerHTML += row;
+                });
+            } else {
+                 helperTitleEl.textContent = 'Aide à la Conjugaison';
+                 conjugationTableBodyEl.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-gray-500">Aucun modèle de conjugaison disponible.</td></tr>';
+            }
+        }
+
+        function displaySentence() {
+            if (currentSentenceIndex >= shuffledSentences.length) {
+                showCompletionScreen();
+                return;
+            }
+
+            const currentSentence = shuffledSentences[currentSentenceIndex];
+            
+            sentenceBeforeInputEl.innerHTML = `${currentSentence.start} <span class="font-bold text-blue-600">${currentSentence.verb}</span>`;
+            sentenceAfterInputEl.textContent = currentSentence.end;
+
+            progressTextEl.textContent = `Phrase ${currentSentenceIndex + 1} sur ${shuffledSentences.length}`;
+            
+            updateHelper(currentSentence);
+            
+            resultMessageEl.textContent = '';
+            resultMessageEl.className = '';
+            userAnswerEl.value = '';
+            userAnswerEl.disabled = false;
+            
+            sentenceTranslationContainer.style.display = 'none';
+            
+            checkBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+
+            userAnswerEl.focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = userAnswerEl.value.trim();
+            const currentSentence = shuffledSentences[currentSentenceIndex];
+            const correctAnswer = currentSentence.answer;
+
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                resultMessageEl.textContent = 'OK !';
+                resultMessageEl.className = 'correct font-bold text-lg';
+            } else {
+                resultMessageEl.innerHTML = `Incorrect. La bonne réponse est : <strong class="underline">${correctAnswer}</strong>`;
+                resultMessageEl.className = 'wrong font-bold text-lg';
+            }
+
+            const fullSentence = `${currentSentence.start} ${correctAnswer} ${currentSentence.end}`;
+            listenBtn.dataset.sentence = fullSentence;
+
+            if (currentSentence.sentenceTranslation) {
+                sentenceTranslationText.textContent = currentSentence.sentenceTranslation;
+                sentenceTranslationContainer.style.display = 'block';
+            }
+
+            userAnswerEl.disabled = true;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+            nextBtn.focus();
+        }
+
+        function nextSentence() {
+            currentSentenceIndex++;
+            displaySentence();
+        }
+
+        function showCompletionScreen() {
+            document.getElementById('app-container').classList.add('lg:w-full');
+            document.getElementById('helper-container').style.display = 'none';
+            
+            const exerciseElements = document.querySelectorAll('#progress-container, #sentence-container, #result-container, #check-btn, #next-btn, #sentence-translation-container');
+            exerciseElements.forEach(el => el.style.display = 'none');
+
+            completionContainer.style.display = 'block';
+        }
+        
+        function restartApp() {
+            shuffledSentences = shuffle(finalSentences);
+            currentSentenceIndex = 0;
+
+            document.getElementById('app-container').classList.remove('lg:w-full');
+            document.getElementById('helper-container').style.display = 'block';
+            
+            const exerciseElements = document.querySelectorAll('#progress-container, #sentence-container, #result-container');
+            exerciseElements.forEach(el => {
+                el.style.display = el.id === 'sentence-container' ? 'flex' : 'block';
+            });
+
+            completionContainer.style.display = 'none';
+            displaySentence();
+        }
+
+        // --- Event Listeners ---
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextSentence);
+        restartBtn.addEventListener('click', restartApp);
+
+        listenBtn.addEventListener('click', () => {
+            const sentenceToSpeak = listenBtn.dataset.sentence;
+            if (sentenceToSpeak) {
+                speak(sentenceToSpeak);
+            }
+        });
+
+        userAnswerEl.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (checkBtn.style.display !== 'none') {
+                    checkBtn.click();
+                } else if (nextBtn.style.display !== 'none') {
+                    nextBtn.click();
+                }
+            }
+        });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            shuffledSentences = shuffle(finalSentences);
+            displaySentence();
+        });
+
+    </script>
+</body>
+</html>
+

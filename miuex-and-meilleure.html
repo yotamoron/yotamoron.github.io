@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Practice: Mieux vs. Meilleure</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        #quiz-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 2.5em 3em;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #1a237e;
+            margin-bottom: 0.5em;
+        }
+        #progress-indicator {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 2em;
+        }
+        .sentence-display {
+            font-size: 1.5em;
+            color: #222;
+            margin-bottom: 1.5em;
+            line-height: 1.4;
+            min-height: 70px;
+        }
+        .input-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5em;
+        }
+        #user-input {
+            font-size: 1.2em;
+            padding: 10px 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        #user-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        #submit-btn {
+            background-color: #3498db;
+        }
+        #submit-btn:hover {
+            background-color: #2980b9;
+        }
+        #next-btn {
+            background-color: #2ecc71;
+        }
+        #next-btn:hover {
+            background-color: #27ae60;
+        }
+        #feedback {
+            margin-top: 1.5em;
+            padding: 1em;
+            border-radius: 8px;
+            min-height: 100px;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+        #feedback.correct {
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+        }
+        #feedback.incorrect {
+            background-color: #ffebee;
+            border: 1px solid #ef9a9a;
+        }
+        .feedback-explanation {
+            margin-top: 0.5em;
+            font-style: italic;
+            color: #444;
+        }
+        .feedback-translation {
+            margin-top: 0.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        .hidden {
+            display: none;
+        }
+        #completion-message {
+            font-size: 1.8em;
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <h1>Practice: Mieux vs. Meilleure</h1>
+        <p id="progress-indicator"></p>
+
+        <div id="sentence-container">
+            <div class="sentence-display" id="sentence-display"></div>
+            <div class="input-area">
+                <input type="text" id="user-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            </div>
+            <button id="submit-btn">Check Answer</button>
+            <button id="next-btn" class="hidden">Next</button>
+            <div id="feedback"></div>
+        </div>
+
+        <div id="completion-message" class="hidden">
+            <h2>Félicitations!</h2>
+            <p>You have completed the exercise.</p>
+        </div>
+    </div>
+
+    <script>
+        const sentences = [
+            // Mieux sentences
+            { sentence: "Je parle français ______ que toi.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'parle' (to speak).", translation: "I speak French better than you." },
+            { sentence: "Elle chante ______ maintenant.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'chante' (to sing).", translation: "She sings better now." },
+            { sentence: "Il comprend ______ les règles.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'comprend' (to understand).", translation: "He understands the rules better." },
+            { sentence: "Tu travailles ______ quand tu es seul.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'travailles' (to work).", translation: "You work better when you are alone." },
+            { sentence: "Nous voyons ______ avec des lunettes.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'voyons' (to see).", translation: "We see better with glasses." },
+            { sentence: "Le matin, je me sens ______.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'me sens' (I feel).", translation: "In the morning, I feel better." },
+            { sentence: "Ce stylo écrit ______ que l'autre.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'écrit' (to write).", translation: "This pen writes better than the other one." },
+            { sentence: "On dort ______ dans un lit confortable.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'dort' (to sleep).", translation: "One sleeps better in a comfortable bed." },
+            { sentence: "L'ordinateur fonctionne ______ après la mise à jour.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'fonctionne' (to work/function).", translation: "The computer works better after the update." },
+            { sentence: "Elle cuisine ______ que sa mère.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'cuisine' (to cook).", translation: "She cooks better than her mother." },
+            { sentence: "Il explique les choses ______ que le professeur.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'explique' (to explain).", translation: "He explains things better than the teacher." },
+            { sentence: "Tu te portes ______ aujourd'hui ?", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'te portes' (you are doing/feeling).", translation: "Are you feeling better today?" },
+            { sentence: "Avec ce micro, on entend ______.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'entend' (to hear).", translation: "With this microphone, we can hear better." },
+            { sentence: "L'équipe joue ______ cette saison.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'joue' (to play).", translation: "The team is playing better this season." },
+            { sentence: "Je me concentre ______ avec de la musique.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'me concentre' (I concentrate).", translation: "I concentrate better with music." },
+            { sentence: "Il vaut ______ partir tôt.", answer: "mieux", explanation: "'Vaut mieux' is a fixed idiomatic expression meaning 'it is better'.", translation: "It is better to leave early." },
+            { sentence: "Elle danse ______ que moi.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'danse' (to dance).", translation: "She dances better than me." },
+            { sentence: "On apprend ______ en pratiquant.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'apprend' (to learn).", translation: "We learn better by practicing." },
+            { sentence: "Le commerce va ______ cette année.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'va' (is going).", translation: "Business is going better this year." },
+            { sentence: "Tu parles anglais de ______ en ______.", answer: "mieux", explanation: "'De mieux en mieux' is a fixed expression meaning 'better and better'.", translation: "You speak English better and better." },
+            { sentence: "C'est ______ comme ça.", answer: "mieux", explanation: "Mieux is used as an adverb with 'c'est' to express a general judgment.", translation: "It's better like this." },
+            { sentence: "Il se sent ______ après ses vacances.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'se sent' (he feels).", translation: "He feels better after his vacation." },
+            { sentence: "Elle s'habille ______ pour les grandes occasions.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 's'habille' (she dresses).", translation: "She dresses better for special occasions." },
+            { sentence: "On voit ______ les étoiles loin de la ville.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'voit' (to see).", translation: "We see the stars better far from the city." },
+            { sentence: "Je conduis ______ la nuit.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'conduis' (to drive).", translation: "I drive better at night." },
+            { sentence: "L'économie se porte ______.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'se porte' (is doing).", translation: "The economy is doing better." },
+            { sentence: "Tu comprends ______ quand je parle lentement.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'comprends' (to understand).", translation: "You understand better when I speak slowly." },
+            { sentence: "Le vin vieillit ______ avec le temps.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'vieillit' (to age).", translation: "Wine ages better with time." },
+            { sentence: "Elle gère ______ son temps maintenant.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'gère' (to manage).", translation: "She manages her time better now." },
+            { sentence: "Il s'exprime ______ à l'écrit.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 's'exprime' (he expresses himself).", translation: "He expresses himself better in writing." },
+            { sentence: "On mange ______ quand on prend son temps.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'mange' (to eat).", translation: "We eat better when we take our time." },
+            { sentence: "Je dors ______ la fenêtre ouverte.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'dors' (to sleep).", translation: "I sleep better with the window open." },
+            { sentence: "Elle dessine ______ que son frère.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'dessine' (to draw).", translation: "She draws better than her brother." },
+            { sentence: "L'imprimante fonctionne ______ avec ce papier.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'fonctionne' (to work/function).", translation: "The printer works better with this paper." },
+            { sentence: "Tu nages ______ que moi.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'nages' (to swim).", translation: "You swim better than me." },
+            { sentence: "Il entend ______ de cette oreille.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'entend' (to hear).", translation: "He hears better with this ear." },
+            { sentence: "Elle réfléchit ______ avant de parler.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'réfléchit' (to think).", translation: "She thinks better before speaking." },
+            { sentence: "On travaille ______ dans un environnement calme.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'travaille' (to work).", translation: "We work better in a calm environment." },
+            { sentence: "Je me souviens ______ des détails maintenant.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'me souviens' (I remember).", translation: "I remember the details better now." },
+            { sentence: "Le gâteau lève ______ avec cette levure.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'lève' (to rise).", translation: "The cake rises better with this yeast." },
+            { sentence: "Il parle ______ depuis qu'il a pris des cours.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'parle' (to speak).", translation: "He speaks better since he took classes." },
+            { sentence: "Elle se sent ______ dans sa nouvelle maison.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'se sent' (she feels).", translation: "She feels better in her new house." },
+            { sentence: "On respire ______ à la campagne.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'respire' (to breathe).", translation: "We breathe better in the countryside." },
+            { sentence: "Je comprends ______ le film en version originale.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'comprends' (to understand).", translation: "I understand the movie better in the original version." },
+            { sentence: "L'entreprise vend ______ ses produits en ligne.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'vend' (to sell).", translation: "The company sells its products better online." },
+            { sentence: "Il vaut ______ être prudent.", answer: "mieux", explanation: "'Vaut mieux' is a fixed idiomatic expression.", translation: "It is better to be careful." },
+            { sentence: "Elle s'organise ______ pour ses examens.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 's'organise' (she organizes herself).", translation: "She organizes herself better for her exams." },
+            { sentence: "On voit ______ le paysage d'ici.", answer: "mieux", explanation: "Mieux is an adverb modifying the verb 'voit' (to see).", translation: "We see the landscape better from here." },
+            { sentence: "Je me sens ______ dans ce fauteuil.", answer: "mieux", explanation: "Mieux is an adverb modifying the pronominal verb 'me sens' (I feel).", translation: "I feel better in this armchair." },
+            { sentence: "Fais de ton ______.", answer: "mieux", explanation: "'Faire de son mieux' is a fixed expression meaning 'to do one's best'.", translation: "Do your best." },
+
+            // Meilleure sentences
+            { sentence: "C'est la ______ pizza que j'ai jamais mangée.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'pizza'.", translation: "This is the best pizza I have ever eaten." },
+            { sentence: "Elle est ma ______ amie.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'amie' (friend).", translation: "She is my best friend." },
+            { sentence: "Cette solution est ______ que la précédente.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'solution'.", translation: "This solution is better than the previous one." },
+            { sentence: "J'ai eu une ______ note en français.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'note' (grade).", translation: "I got a better grade in French." },
+            { sentence: "C'est une ______ idée.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'idée' (idea).", translation: "It's a better idea." },
+            { sentence: "La ______ partie du film est à la fin.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'partie' (part).", translation: "The best part of the movie is at the end." },
+            { sentence: "Elle a une ______ voiture que moi.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'voiture' (car).", translation: "She has a better car than me." },
+            { sentence: "C'est la ______ chanson de l'album.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'chanson' (song).", translation: "It's the best song on the album." },
+            { sentence: "Donne-moi ta ______ recette de gâteau.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'recette' (recipe).", translation: "Give me your best cake recipe." },
+            { sentence: "La qualité de cette image est ______.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'qualité' (quality).", translation: "The quality of this image is better." },
+            { sentence: "Je cherche une ______ place pour m'asseoir.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'place' (seat/spot).", translation: "I'm looking for a better place to sit." },
+            { sentence: "C'est la ______ boulangerie du quartier.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'boulangerie' (bakery).", translation: "It's the best bakery in the neighborhood." },
+            { sentence: "Cette version du logiciel est ______.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'version'.", translation: "This version of the software is better." },
+            { sentence: "Elle a une ______ mémoire que moi.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'mémoire' (memory).", translation: "She has a better memory than me." },
+            { sentence: "C'est la ______ réponse possible.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'réponse' (answer).", translation: "It's the best possible answer." },
+            { sentence: "J'espère avoir une ______ année.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'année' (year).", translation: "I hope to have a better year." },
+            { sentence: "Cette chaise est ______ pour le dos.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'chaise' (chair).", translation: "This chair is better for the back." },
+            { sentence: "La ______ chose à faire est de partir.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'chose' (thing).", translation: "The best thing to do is to leave." },
+            { sentence: "Elle est la ______ élève de la classe.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'élève' (student).", translation: "She is the best student in the class." },
+            { sentence: "J'ai pris une ______ photo cette fois.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'photo'.", translation: "I took a better photo this time." },
+            { sentence: "C'est une ______ opportunité pour toi.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'opportunité' (opportunity).", translation: "This is a better opportunity for you." },
+            { sentence: "La ______ saison pour visiter est le printemps.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'saison' (season).", translation: "The best season to visit is spring." },
+            { sentence: "Elle a trouvé une ______ organisation.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'organisation'.", translation: "She found a better organization." },
+            { sentence: "C'est la ______ glace que j'ai goûtée.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'glace' (ice cream).", translation: "This is the best ice cream I have tasted." },
+            { sentence: "J'ai une ______ connexion internet maintenant.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'connexion'.", translation: "I have a better internet connection now." },
+            { sentence: "Cette méthode de travail est ______.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'méthode' (method).", translation: "This working method is better." },
+            { sentence: "C'est la ______ nouvelle de la journée.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'nouvelle' (news).", translation: "This is the best news of the day." },
+            { sentence: "Elle a une ______ compréhension du problème.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'compréhension' (understanding).", translation: "She has a better understanding of the problem." },
+            { sentence: "C'est la ______ excuse que tu as trouvée ?", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'excuse'.", translation: "Is that the best excuse you could find?" },
+            { sentence: "Je te souhaite une ______ santé.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'santé' (health).", translation: "I wish you better health." },
+            { sentence: "C'est une ______ façon de faire.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'façon' (way).", translation: "It's a better way of doing things." },
+            { sentence: "La ______ bière est celle qui est bien fraîche.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'bière' (beer).", translation: "The best beer is a very cold one." },
+            { sentence: "Elle a une ______ opinion sur le sujet.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'opinion'.", translation: "She has a better opinion on the subject." },
+            { sentence: "C'est la ______ comédie que j'ai vue.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'comédie' (comedy).", translation: "It's the best comedy I've seen." },
+            { sentence: "J'ai besoin d'une ______ explication.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'explication' (explanation).", translation: "I need a better explanation." },
+            { sentence: "Cette ______ actrice a gagné un prix.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'actrice' (actress).", translation: "This better actress won an award." },
+            { sentence: "C'est une ______ position pour négocier.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'position'.", translation: "It's a better position to negotiate." },
+            { sentence: "La ______ heure pour appeler est le matin.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'heure' (time/hour).", translation: "The best time to call is in the morning." },
+            { sentence: "Elle est une ______ candidate pour le poste.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'candidate'.", translation: "She is a better candidate for the position." },
+            { sentence: "C'est la ______ tarte aux pommes de ma grand-mère.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'tarte' (pie).", translation: "This is my grandmother's best apple pie." },
+            { sentence: "J'ai une ______ vue de ma fenêtre.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'vue' (view).", translation: "I have a better view from my window." },
+            { sentence: "C'est une ______ question.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'question'.", translation: "That's a better question." },
+            { sentence: "La ______ éducation est essentielle.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'éducation' (education).", translation: "A better education is essential." },
+            { sentence: "Elle a pris la ______ décision.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'décision' (decision).", translation: "She made the best decision." },
+            { sentence: "C'est la ______ chose qui pouvait arriver.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'chose' (thing).", translation: "It's the best thing that could happen." },
+            { sentence: "J'ai trouvé une ______ offre en ligne.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'offre' (offer).", translation: "I found a better offer online." },
+            { sentence: "C'est une ______ alternative.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'alternative'.", translation: "It's a better alternative." },
+            { sentence: "La ______ partie de la journée, c'est le soir.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'partie' (part).", translation: "The best part of the day is the evening." },
+            { sentence: "Elle a une ______ prononciation que moi.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'prononciation' (pronunciation).", translation: "She has a better pronunciation than me." },
+            { sentence: "C'est la ______ joueuse de l'équipe.", answer: "meilleure", explanation: "Meilleure is an adjective modifying the feminine noun 'joueuse' (player).", translation: "She is the best player on the team." }
+        ];
+
+        let currentIndex = 0;
+
+        const progressIndicator = document.getElementById('progress-indicator');
+        const sentenceDisplay = document.getElementById('sentence-display');
+        const userInput = document.getElementById('user-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const feedback = document.getElementById('feedback');
+        const sentenceContainer = document.getElementById('sentence-container');
+        const completionMessage = document.getElementById('completion-message');
+
+        function loadSentence() {
+            if (currentIndex < sentences.length) {
+                const currentSentence = sentences[currentIndex];
+                progressIndicator.textContent = `Sentence ${currentIndex + 1} of ${sentences.length}`;
+                sentenceDisplay.innerHTML = currentSentence.sentence.replace('______', '<strong>______</strong>');
+                userInput.value = '';
+                feedback.innerHTML = '';
+                feedback.className = '';
+                userInput.disabled = false;
+                submitBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+                userInput.focus();
+            } else {
+                sentenceContainer.classList.add('hidden');
+                completionMessage.classList.remove('hidden');
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = userInput.value.trim().toLowerCase();
+            const currentSentence = sentences[currentIndex];
+
+            if (!userAnswer) {
+                feedback.innerHTML = 'Please enter an answer.';
+                feedback.className = 'incorrect';
+                return;
+            }
+
+            let resultHTML;
+            if (userAnswer === currentSentence.answer) {
+                feedback.className = 'correct';
+                resultHTML = `<strong>Right!</strong>`;
+            } else {
+                feedback.className = 'incorrect';
+                resultHTML = `<strong>Wrong.</strong> The correct answer is "<strong>${currentSentence.answer}</strong>".`;
+            }
+
+            resultHTML += `<div class="feedback-explanation">${currentSentence.explanation}</div>`;
+            resultHTML += `<div class="feedback-translation"><em>Translation:</em> "${currentSentence.translation}"</div>`;
+            feedback.innerHTML = resultHTML;
+
+            userInput.disabled = true;
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        submitBtn.addEventListener('click', checkAnswer);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex++;
+            loadSentence();
+        });
+
+        // Initial load
+        loadSentence();
+    </script>
+</body>
+</html>

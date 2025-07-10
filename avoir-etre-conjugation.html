@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Verb Practice: Être & Avoir</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom focus ring color */
+        .focus-ring-custom:focus {
+            --tw-ring-color: #4f46e5; /* indigo-600 */
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md mx-4">
+        <h1 class="text-2xl font-bold text-center text-slate-800 mb-2">French Verb Practice</h1>
+        <p class="text-center text-slate-500 mb-6">Conjugate <strong>être</strong> and <strong>avoir</strong> in the present tense.</p>
+
+        <!-- Prompt Area -->
+        <div class="bg-slate-200 p-4 rounded-lg text-center mb-4">
+            <p class="text-3xl font-mono text-slate-900" id="prompt-text">
+                <!-- je (être) -->
+            </p>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex flex-col gap-4">
+            <input type="text" id="answer-input" class="w-full px-4 py-3 border border-slate-300 rounded-lg text-lg text-center focus:outline-none focus:border-indigo-500 focus-ring-custom" placeholder="Type your answer...">
+            
+            <button id="submit-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+                Submit
+            </button>
+            
+            <button id="next-btn" class="w-full bg-slate-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-700 transition-colors duration-200" style="display: none;">
+                Next Question
+            </button>
+        </div>
+
+        <!-- Result Message Area -->
+        <div id="result-message" class="mt-6 p-4 rounded-lg text-center font-semibold text-lg" role="alert">
+            <!-- Correct / Incorrect messages will appear here -->
+        </div>
+    </div>
+
+    <script>
+        // --- DOM ELEMENTS ---
+        const promptText = document.getElementById('prompt-text');
+        const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const resultMessage = document.getElementById('result-message');
+
+        // --- DATA ---
+        // The complete set of conjugations for the verbs
+        const conjugations = {
+            'être': {
+                'je': 'suis',
+                'tu': 'es',
+                'il': 'est',
+                'elle': 'est',
+                'on': 'est',
+                'nous': 'sommes',
+                'vous': 'êtes',
+                'ils': 'sont',
+                'elles': 'sont'
+            },
+            'avoir': {
+                'je': 'ai',
+                'tu': 'as',
+                'il': 'a',
+                'elle': 'a',
+                'on': 'a',
+                'nous': 'avons',
+                'vous': 'avez',
+                'ils': 'ont',
+                'elles': 'ont'
+            }
+        };
+
+        const verbNames = Object.keys(conjugations);
+        const pronouns = ['je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles'];
+
+        // --- STATE ---
+        // Variables to keep track of the current question
+        let currentVerb = '';
+        let currentPronoun = '';
+        let correctAnswer = '';
+
+        // --- FUNCTIONS ---
+
+        /**
+         * Generates a new random question, updates the UI, and resets the state.
+         */
+        function generateQuestion() {
+            // 1. Pick a random verb and pronoun
+            currentVerb = verbNames[Math.floor(Math.random() * verbNames.length)];
+            currentPronoun = pronouns[Math.floor(Math.random() * pronouns.length)];
+            correctAnswer = conjugations[currentVerb][currentPronoun];
+            
+            // 2. Format the prompt (handle elision for j')
+            let promptPronoun = currentPronoun;
+            if (currentPronoun === 'je' && currentVerb === 'avoir') {
+                promptPronoun = "j'";
+            }
+            promptText.innerHTML = `${promptPronoun} (<span class="font-bold">${currentVerb}</span>)`;
+
+            // 3. Reset UI elements for the new question
+            resultMessage.innerHTML = '';
+            resultMessage.className = 'mt-6 p-4 rounded-lg text-center font-semibold text-lg'; // Reset classes
+            answerInput.value = '';
+            answerInput.disabled = false;
+            answerInput.focus();
+
+            // 4. Toggle button visibility
+            submitBtn.style.display = 'block';
+            nextBtn.style.display = 'none';
+        }
+
+        /**
+         * Checks the user's answer against the correct one and displays feedback.
+         */
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            
+            // Don't do anything if the input is empty
+            if (!userAnswer) return;
+
+            // Normalize "j'ai" to "ai" for easier comparison
+            const normalizedUserAnswer = (currentPronoun === 'je' && userAnswer === "j'ai") ? 'ai' : userAnswer;
+
+            if (normalizedUserAnswer === correctAnswer) {
+                // Correct Answer
+                resultMessage.textContent = 'OK!';
+                resultMessage.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                // Incorrect Answer
+                resultMessage.innerHTML = `WRONG! The correct answer is: <strong class="ml-1">${correctAnswer}</strong>`;
+                resultMessage.classList.add('bg-red-100', 'text-red-800');
+            }
+            
+            // Disable input and toggle buttons
+            answerInput.disabled = true;
+            submitBtn.style.display = 'none';
+            nextBtn.style.display = 'block';
+            nextBtn.focus(); // Set focus on the "Next" button for accessibility
+        }
+
+        // --- EVENT LISTENERS ---
+
+        // Handle clicks on the "Submit" button
+        submitBtn.addEventListener('click', checkAnswer);
+
+        // Handle clicks on the "Next Question" button
+        nextBtn.addEventListener('click', generateQuestion);
+
+        // Allow pressing 'Enter' to submit the answer or move to the next question
+        answerInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission behavior
+                if (submitBtn.style.display !== 'none') {
+                    submitBtn.click();
+                }
+            }
+        });
+        
+        // This allows pressing Enter when the "Next" button is focused
+        document.body.addEventListener('keypress', function(event) {
+             if (event.key === 'Enter' && nextBtn.style.display !== 'none' && document.activeElement === nextBtn) {
+                 event.preventDefault();
+                 nextBtn.click();
+             }
+        });
+
+        // --- INITIALIZATION ---
+        // Start the practice session when the page loads
+        window.onload = generateQuestion;
+    </script>
+</body>
+</html>
+
