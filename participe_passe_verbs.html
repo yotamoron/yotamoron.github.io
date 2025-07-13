@@ -160,43 +160,43 @@
     </div>
 
     <script>
-        // --- DATA: The list of 30 verbs ---
+        // --- DATA: The list of 30 verbs with English translations ---
         const verbs = [
             // Group 1: Regular -ER verbs (Auxiliary: AVOIR)
-            { infinitive: 'parler', participe: 'parlé', auxiliary: 'avoir' },
-            { infinitive: 'chanter', participe: 'chanté', auxiliary: 'avoir' },
-            { infinitive: 'manger', participe: 'mangé', auxiliary: 'avoir' },
-            { infinitive: 'trouver', participe: 'trouvé', auxiliary: 'avoir' },
-            { infinitive: 'donner', participe: 'donné', auxiliary: 'avoir' },
-            { infinitive: 'regarder', participe: 'regardé', auxiliary: 'avoir' },
-            { infinitive: 'écouter', participe: 'écouté', auxiliary: 'avoir' },
-            { infinitive: 'travailler', participe: 'travaillé', auxiliary: 'avoir' },
-            { infinitive: 'aimer', participe: 'aimé', auxiliary: 'avoir' },
-            { infinitive: 'jouer', participe: 'joué', auxiliary: 'avoir' },
+            { infinitive: 'parler', participe: 'parlé', auxiliary: 'avoir', translation: 'spoken' },
+            { infinitive: 'chanter', participe: 'chanté', auxiliary: 'avoir', translation: 'sung' },
+            { infinitive: 'manger', participe: 'mangé', auxiliary: 'avoir', translation: 'eaten' },
+            { infinitive: 'trouver', participe: 'trouvé', auxiliary: 'avoir', translation: 'found' },
+            { infinitive: 'donner', participe: 'donné', auxiliary: 'avoir', translation: 'given' },
+            { infinitive: 'regarder', participe: 'regardé', auxiliary: 'avoir', translation: 'watched' },
+            { infinitive: 'écouter', participe: 'écouté', auxiliary: 'avoir', translation: 'listened' },
+            { infinitive: 'travailler', participe: 'travaillé', auxiliary: 'avoir', translation: 'worked' },
+            { infinitive: 'aimer', participe: 'aimé', auxiliary: 'avoir', translation: 'loved' },
+            { infinitive: 'jouer', participe: 'joué', auxiliary: 'avoir', translation: 'played' },
 
             // Group 2: Regular -IR verbs (Auxiliary: AVOIR)
-            { infinitive: 'finir', participe: 'fini', auxiliary: 'avoir' },
-            { infinitive: 'choisir', participe: 'choisi', auxiliary: 'avoir' },
-            { infinitive: 'réussir', participe: 'réussi', auxiliary: 'avoir' },
-            { infinitive: 'grandir', participe: 'grandi', auxiliary: 'avoir' },
-            { infinitive: 'punir', participe: 'puni', auxiliary: 'avoir' },
-            { infinitive: 'remplir', participe: 'rempli', auxiliary: 'avoir' },
-            { infinitive: 'obéir', participe: 'obéi', auxiliary: 'avoir' },
-            { infinitive: 'bâtir', participe: 'bâti', auxiliary: 'avoir' },
-            { infinitive: 'rougir', participe: 'rougi', auxiliary: 'avoir' },
-            { infinitive: 'nourrir', participe: 'nourri', auxiliary: 'avoir' },
+            { infinitive: 'finir', participe: 'fini', auxiliary: 'avoir', translation: 'finished' },
+            { infinitive: 'choisir', participe: 'choisi', auxiliary: 'avoir', translation: 'chosen' },
+            { infinitive: 'réussir', participe: 'réussi', auxiliary: 'avoir', translation: 'succeeded' },
+            { infinitive: 'grandir', participe: 'grandi', auxiliary: 'avoir', translation: 'grown' },
+            { infinitive: 'punir', participe: 'puni', auxiliary: 'avoir', translation: 'punished' },
+            { infinitive: 'remplir', participe: 'rempli', auxiliary: 'avoir', translation: 'filled' },
+            { infinitive: 'obéir', participe: 'obéi', auxiliary: 'avoir', translation: 'obeyed' },
+            { infinitive: 'bâtir', participe: 'bâti', auxiliary: 'avoir', translation: 'built' },
+            { infinitive: 'rougir', participe: 'rougi', auxiliary: 'avoir', translation: 'blushed' },
+            { infinitive: 'nourrir', participe: 'nourri', auxiliary: 'avoir', translation: 'fed' },
 
             // Group 3: Irregular verbs (Mixed Auxiliaries)
-            { infinitive: 'avoir', participe: 'eu', auxiliary: 'avoir' },
-            { infinitive: 'être', participe: 'été', auxiliary: 'avoir' },
-            { infinitive: 'faire', participe: 'fait', auxiliary: 'avoir' },
-            { infinitive: 'prendre', participe: 'pris', auxiliary: 'avoir' },
-            { infinitive: 'voir', participe: 'vu', auxiliary: 'avoir' },
-            { infinitive: 'devoir', participe: 'dû', auxiliary: 'avoir' },
-            { infinitive: 'vouloir', participe: 'voulu', auxiliary: 'avoir' },
-            { infinitive: 'aller', participe: 'allé', auxiliary: 'être' },
-            { infinitive: 'venir', participe: 'venu', auxiliary: 'être' },
-            { infinitive: 'naître', participe: 'né', auxiliary: 'être' }
+            { infinitive: 'avoir', participe: 'eu', auxiliary: 'avoir', translation: 'had' },
+            { infinitive: 'être', participe: 'été', auxiliary: 'avoir', translation: 'been' },
+            { infinitive: 'faire', participe: 'fait', auxiliary: 'avoir', translation: 'done' },
+            { infinitive: 'prendre', participe: 'pris', auxiliary: 'avoir', translation: 'taken' },
+            { infinitive: 'voir', participe: 'vu', auxiliary: 'avoir', translation: 'seen' },
+            { infinitive: 'devoir', participe: 'dû', auxiliary: 'avoir', translation: 'had to' },
+            { infinitive: 'vouloir', participe: 'voulu', auxiliary: 'avoir', translation: 'wanted' },
+            { infinitive: 'aller', participe: 'allé', auxiliary: 'être', translation: 'gone' },
+            { infinitive: 'venir', participe: 'venu', auxiliary: 'être', translation: 'come' },
+            { infinitive: 'naître', participe: 'né', auxiliary: 'être', translation: 'born' }
         ];
 
         // --- DOM ELEMENTS ---
@@ -221,23 +221,23 @@
         function generateExamples(verb) {
             if (verb.auxiliary === 'avoir') {
                 return `
-                    <li><code>J'ai ${verb.participe}</code> (I have ${verb.participe})</li>
-                    <li><code>Tu as ${verb.participe}</code> (You have ${verb.participe})</li>
-                    <li><code>Il/Elle a ${verb.participe}</code> (He/She has ${verb.participe})</li>
-                    <li><code>Nous avons ${verb.participe}</code> (We have ${verb.participe})</li>
-                    <li><code>Vous avez ${verb.participe}</code> (You have ${verb.participe})</li>
-                    <li><code>Ils/Elles ont ${verb.participe}</code> (They have ${verb.participe})</li>
+                    <li><code>J'ai ${verb.participe}</code> (I have ${verb.translation})</li>
+                    <li><code>Tu as ${verb.participe}</code> (You have ${verb.translation})</li>
+                    <li><code>Il/Elle a ${verb.participe}</code> (He/She has ${verb.translation})</li>
+                    <li><code>Nous avons ${verb.participe}</code> (We have ${verb.translation})</li>
+                    <li><code>Vous avez ${verb.participe}</code> (You have ${verb.translation})</li>
+                    <li><code>Ils/Elles ont ${verb.participe}</code> (They have ${verb.translation})</li>
                 `;
             } else { // Auxiliary is 'être'
                 return `
-                    <li><code>Je suis ${verb.participe}(e)</code> (I have ${verb.participe})</li>
-                    <li><code>Tu es ${verb.participe}(e)</code> (You have ${verb.participe})</li>
-                    <li><code>Il est ${verb.participe}</code> (He has ${verb.participe})</li>
-                    <li><code>Elle est ${verb.participe}e</code> (She has ${verb.participe})</li>
-                    <li><code>Nous sommes ${verb.participe}s</code> (We have ${verb.participe})</li>
-                    <li><code>Vous êtes ${verb.participe}(e)(s)</code> (You have ${verb.participe})</li>
-                    <li><code>Ils sont ${verb.participe}s</code> (They have ${verb.participe})</li>
-                    <li><code>Elles sont ${verb.participe}es</code> (They have ${verb.participe})</li>
+                    <li><code>Je suis ${verb.participe}(e)</code> (I have ${verb.translation})</li>
+                    <li><code>Tu es ${verb.participe}(e)</code> (You have ${verb.translation})</li>
+                    <li><code>Il est ${verb.participe}</code> (He has ${verb.translation})</li>
+                    <li><code>Elle est ${verb.participe}e</code> (She has ${verb.translation})</li>
+                    <li><code>Nous sommes ${verb.participe}s</code> (We have ${verb.translation})</li>
+                    <li><code>Vous êtes ${verb.participe}(e)(s)</code> (You have ${verb.translation})</li>
+                    <li><code>Ils sont ${verb.participe}s</code> (They have ${verb.translation})</li>
+                    <li><code>Elles sont ${verb.participe}es</code> (They have ${verb.translation})</li>
                 `;
             }
         }
