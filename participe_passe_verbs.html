@@ -15,11 +15,21 @@
             color: #1c1e21;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Align items to the top */
             min-height: 100vh;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+        }
+
+        /* Wrapper for the two-column layout */
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
         }
 
         /* Main container for the app */
@@ -32,6 +42,44 @@
             max-width: 600px;
             text-align: center;
             transition: all 0.3s ease;
+            flex-grow: 1;
+        }
+
+        /* Rules Frame Styling */
+        .rules-frame {
+            width: 350px;
+            flex-shrink: 0; /* Prevent the frame from shrinking */
+            background-color: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 12px;
+            padding: 25px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .rules-frame h2 {
+            margin-top: 0;
+            color: #005a9c;
+            border-bottom: 2px solid #b3d7ff;
+            padding-bottom: 10px;
+        }
+        
+        .rules-frame h3 {
+            color: #004a80;
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+
+        .rules-frame p {
+            margin-bottom: 1em;
+            line-height: 1.6;
+        }
+
+        .rules-frame code {
+            background-color: rgba(0, 90, 156, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
         }
 
         h1 {
@@ -139,23 +187,59 @@
             padding: 2px 5px;
             border-radius: 4px;
         }
+
+        /* Responsive layout for smaller screens */
+        @media (max-width: 900px) {
+            .wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+            .rules-frame {
+                position: static; /* Remove sticky positioning on mobile */
+                width: 100%;
+                max-width: 600px;
+                margin-top: 30px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="trainer-container">
-        <h1>Participe Passé Practice</h1>
-        <p>Enter the correct past participle for the verb shown below.</p>
+    <div class="wrapper">
+        <div class="trainer-container">
+            <h1>Participe Passé Practice</h1>
+            <p>Enter the correct past participle for the verb shown below.</p>
 
-        <div id="verb-display" class="verb-display"></div>
-        <input type="text" id="answer-input" class="answer-input" placeholder="Type your answer here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        <button id="submit-btn" class="submit-btn">Submit</button>
+            <div id="verb-display" class="verb-display"></div>
+            <input type="text" id="answer-input" class="answer-input" placeholder="Type your answer here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <button id="submit-btn" class="submit-btn">Submit</button>
 
-        <div id="feedback" class="feedback">
-            <h3 id="feedback-title"></h3>
-            <p id="feedback-correct-answer"></p>
-            <h4>Example Sentences:</h4>
-            <ul id="example-list"></ul>
+            <div id="feedback" class="feedback">
+                <h3 id="feedback-title"></h3>
+                <p id="feedback-correct-answer"></p>
+                <h4>Example Sentences:</h4>
+                <ul id="example-list"></ul>
+            </div>
+        </div>
+
+        <div class="rules-frame">
+            <h2>Formation Rules</h2>
+            <h3>Verbs ending in -ER</h3>
+            <p>Drop the <code>-er</code> and add <code>-é</code>.</p>
+            <p>Example: <code>parler</code> → <code>parlé</code></p>
+            
+            <h3>Verbs ending in -IR</h3>
+            <p>Drop the <code>-ir</code> and add <code>-i</code>.</p>
+            <p>Example: <code>finir</code> → <code>fini</code></p>
+
+            <h3>Irregular Verbs</h3>
+            <p>These verbs have unique endings that must be memorized.</p>
+            <p>Examples: <br>
+                <code>avoir</code> → <code>eu</code><br>
+                <code>être</code> → <code>été</code><br>
+                <code>faire</code> → <code>fait</code><br>
+                <code>prendre</code> → <code>pris</code>
+            </p>
         </div>
     </div>
 
