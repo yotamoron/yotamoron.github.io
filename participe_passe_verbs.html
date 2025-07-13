@@ -289,6 +289,9 @@
             <p><strong>-IR Verbs:</strong> Drop <code>-ir</code> → <code>-i</code><br>(e.g., <code>finir</code> → <code>fini</code>)</p>
             <p><strong>-RE Verbs:</strong> Drop <code>-re</code> → <code>-u</code><br>(e.g., <code>vendre</code> → <code>vendu</code>)</p>
 
+            <h3>Verbs using Être</h3>
+            <p>A small group of verbs, mostly involving movement or state change, use <strong>être</strong>. Remember the mnemonic <strong>DR MRS VANDERTRAMP</strong>.</p>
+            
             <h3>Irregular Verbs & Exceptions</h3>
             <p>Many common verbs are irregular. Some follow patterns:</p>
             <p><strong>Ending in -is:</strong><br>
@@ -302,20 +305,22 @@
             <p><strong>Ending in -u / -û:</strong><br>
                 <code>voir</code> → <code>vu</code><br>
                 <code>pouvoir</code> → <code>pu</code><br>
-                <code>devoir</code> → <code>dû</code>
+                <code>devoir</code> → <code>dû</code><br>
+                <code>lire</code> → <code>lu</code>
             </p>
              <p><strong>Other common irregulars:</strong><br>
                 <code>faire</code> → <code>fait</code><br>
                 <code>être</code> → <code>été</code><br>
-                <code>avoir</code> → <code>eu</code>
+                <code>avoir</code> → <code>eu</code><br>
+                 <code>mourir</code> → <code>mort</code>
             </p>
         </div>
     </div>
 
     <script>
-        // --- DATA: The list of 30 verbs with English translations ---
+        // --- DATA: The list of verbs with English translations ---
         const verbs = [
-            // Group 1: Regular -ER verbs (Auxiliary: AVOIR)
+            // --- Group 1: Regular -ER verbs (AVOIR) ---
             { infinitive: 'parler', participe: 'parlé', auxiliary: 'avoir', translation: 'spoken' },
             { infinitive: 'chanter', participe: 'chanté', auxiliary: 'avoir', translation: 'sung' },
             { infinitive: 'manger', participe: 'mangé', auxiliary: 'avoir', translation: 'eaten' },
@@ -327,7 +332,7 @@
             { infinitive: 'aimer', participe: 'aimé', auxiliary: 'avoir', translation: 'loved' },
             { infinitive: 'jouer', participe: 'joué', auxiliary: 'avoir', translation: 'played' },
 
-            // Group 2: Regular -IR verbs (Auxiliary: AVOIR)
+            // --- Group 2: Regular -IR verbs (AVOIR) ---
             { infinitive: 'finir', participe: 'fini', auxiliary: 'avoir', translation: 'finished' },
             { infinitive: 'choisir', participe: 'choisi', auxiliary: 'avoir', translation: 'chosen' },
             { infinitive: 'réussir', participe: 'réussi', auxiliary: 'avoir', translation: 'succeeded' },
@@ -336,20 +341,56 @@
             { infinitive: 'remplir', participe: 'rempli', auxiliary: 'avoir', translation: 'filled' },
             { infinitive: 'obéir', participe: 'obéi', auxiliary: 'avoir', translation: 'obeyed' },
             { infinitive: 'bâtir', participe: 'bâti', auxiliary: 'avoir', translation: 'built' },
-            
-            // Group 3: Irregular verbs (Mixed Auxiliaries)
+            { infinitive: 'applaudir', participe: 'applaudi', auxiliary: 'avoir', translation: 'applauded' },
+            { infinitive: 'guérir', participe: 'guéri', auxiliary: 'avoir', translation: 'healed' },
+
+            // --- Group 3: Regular -RE verbs (AVOIR) ---
             { infinitive: 'vendre', participe: 'vendu', auxiliary: 'avoir', translation: 'sold' },
-            { infinitive: 'dire', participe: 'dit', auxiliary: 'avoir', translation: 'said' },
-            { infinitive: 'mettre', participe: 'mis', auxiliary: 'avoir', translation: 'put' },
+            { infinitive: 'attendre', participe: 'attendu', auxiliary: 'avoir', translation: 'waited for' },
+            { infinitive: 'répondre', participe: 'répondu', auxiliary: 'avoir', translation: 'answered' },
+            { infinitive: 'perdre', participe: 'perdu', auxiliary: 'avoir', translation: 'lost' },
+            { infinitive: 'entendre', participe: 'entendu', auxiliary: 'avoir', translation: 'heard' },
+            { infinitive: 'rendre', participe: 'rendu', auxiliary: 'avoir', translation: 'returned' },
+            { infinitive: 'défendre', participe: 'défendu', auxiliary: 'avoir', translation: 'defended' },
+            { infinitive: 'mordre', participe: 'mordu', auxiliary: 'avoir', translation: 'bitten' },
+            { infinitive: 'confondre', participe: 'confondu', auxiliary: 'avoir', translation: 'confused' },
+            { infinitive: 'prétendre', participe: 'prétendu', auxiliary: 'avoir', translation: 'pretended' },
+
+            // --- Group 4: DR MRS VANDERTRAMP Verbs (ÊTRE) ---
+            { infinitive: 'devenir', participe: 'devenu', auxiliary: 'être', translation: 'become' },
+            { infinitive: 'revenir', participe: 'revenu', auxiliary: 'être', translation: 'come back' },
+            { infinitive: 'monter', participe: 'monté', auxiliary: 'être', translation: 'gone up' },
+            { infinitive: 'rester', participe: 'resté', auxiliary: 'être', translation: 'stayed' },
+            { infinitive: 'sortir', participe: 'sorti', auxiliary: 'être', translation: 'gone out' },
+            { infinitive: 'venir', participe: 'venu', auxiliary: 'être', translation: 'come' },
+            { infinitive: 'aller', participe: 'allé', auxiliary: 'être', translation: 'gone' },
+            { infinitive: 'naître', participe: 'né', auxiliary: 'être', translation: 'born' },
+            { infinitive: 'descendre', participe: 'descendu', auxiliary: 'être', translation: 'gone down' },
+            { infinitive: 'entrer', participe: 'entré', auxiliary: 'être', translation: 'entered' },
+            { infinitive: 'rentrer', participe: 'rentré', auxiliary: 'être', translation: 'returned home' },
+            { infinitive: 'tomber', participe: 'tombé', auxiliary: 'être', translation: 'fallen' },
+            { infinitive: 'retourner', participe: 'retourné', auxiliary: 'être', translation: 'returned' },
+            { infinitive: 'arriver', participe: 'arrivé', auxiliary: 'être', translation: 'arrived' },
+            { infinitive: 'mourir', participe: 'mort', auxiliary: 'être', translation: 'died' },
+            { infinitive: 'partir', participe: 'parti', auxiliary: 'être', translation: 'left' },
+
+            // --- Group 5: Other Irregular Verbs (AVOIR) ---
             { infinitive: 'avoir', participe: 'eu', auxiliary: 'avoir', translation: 'had' },
             { infinitive: 'être', participe: 'été', auxiliary: 'avoir', translation: 'been' },
             { infinitive: 'faire', participe: 'fait', auxiliary: 'avoir', translation: 'done' },
             { infinitive: 'prendre', participe: 'pris', auxiliary: 'avoir', translation: 'taken' },
+            { infinitive: 'mettre', participe: 'mis', auxiliary: 'avoir', translation: 'put' },
+            { infinitive: 'dire', participe: 'dit', auxiliary: 'avoir', translation: 'said' },
+            { infinitive: 'écrire', participe: 'écrit', auxiliary: 'avoir', translation: 'written' },
             { infinitive: 'voir', participe: 'vu', auxiliary: 'avoir', translation: 'seen' },
+            { infinitive: 'boire', participe: 'bu', auxiliary: 'avoir', translation: 'drunk' },
+            { infinitive: 'lire', participe: 'lu', auxiliary: 'avoir', translation: 'read' },
             { infinitive: 'devoir', participe: 'dû', auxiliary: 'avoir', translation: 'had to' },
-            { infinitive: 'aller', participe: 'allé', auxiliary: 'être', translation: 'gone' },
-            { infinitive: 'venir', participe: 'venu', auxiliary: 'être', translation: 'come' },
-            { infinitive: 'naître', participe: 'né', auxiliary: 'être', translation: 'born' }
+            { infinitive: 'pouvoir', participe: 'pu', auxiliary: 'avoir', translation: 'been able' },
+            { infinitive: 'vouloir', participe: 'voulu', auxiliary: 'avoir', translation: 'wanted' },
+            { infinitive: 'savoir', participe: 'su', auxiliary: 'avoir', translation: 'known' },
+            { infinitive: 'connaître', participe: 'connu', auxiliary: 'avoir', translation: 'known' },
+            { infinitive: 'croire', participe: 'cru', auxiliary: 'avoir', translation: 'believed' },
         ];
 
         // --- DOM ELEMENTS ---
@@ -440,7 +481,7 @@
             if (currentVerb.auxiliary === 'avoir') {
                 auxiliaryExplanation.innerHTML = `<strong>Why 'avoir'?</strong> Most verbs in French use <em>avoir</em> as the auxiliary verb in the passé composé.`;
             } else {
-                auxiliaryExplanation.innerHTML = `<strong>Why 'être'?</strong> This is a verb of movement or state (from the DR MRS VANDERTRAMP list), so it uses <em>être</em> as the auxiliary verb.`;
+                auxiliaryExplanation.innerHTML = `<strong>Why 'être'?</strong> This is a verb of movement or state change (from the DR MRS VANDERTRAMP list), so it uses <em>être</em> as the auxiliary verb.`;
             }
 
             exampleList.innerHTML = generateExamples(currentVerb);
