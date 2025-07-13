@@ -111,7 +111,7 @@
             border: 1px solid #ccd0d5;
             border-radius: 8px;
             box-sizing: border-box;
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* Adjusted margin */
             text-align: center;
         }
 
@@ -119,6 +119,36 @@
             outline: none;
             border-color: #005a9c;
             box-shadow: 0 0 0 2px rgba(0, 90, 156, 0.2);
+        }
+        
+        /* Container for special character buttons */
+        .special-chars-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Special character buttons */
+        .char-btn {
+            background-color: #f0f2f5;
+            border: 1px solid #ccd0d5;
+            border-radius: 6px;
+            color: #333;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            width: 40px;
+            height: 40px;
+            line-height: 40px; /* Center text vertically */
+            padding: 0;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .char-btn:hover {
+            background-color: #e7e9ec;
+            border-color: #adb1b5;
         }
 
         /* Submit/Next Verb Button */
@@ -227,6 +257,19 @@
 
             <div id="verb-display" class="verb-display"></div>
             <input type="text" id="answer-input" class="answer-input" placeholder="Type your answer here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            
+            <div id="special-chars" class="special-chars-container">
+                <button class="char-btn">à</button>
+                <button class="char-btn">â</button>
+                <button class="char-btn">ç</button>
+                <button class="char-btn">é</button>
+                <button class="char-btn">è</button>
+                <button class="char-btn">ê</button>
+                <button class="char-btn">î</button>
+                <button class="char-btn">ô</button>
+                <button class="char-btn">û</button>
+            </div>
+
             <button id="submit-btn" class="submit-btn">Submit</button>
 
             <div id="feedback" class="feedback">
@@ -308,6 +351,7 @@
         const feedbackCorrectAnswer = document.getElementById('feedback-correct-answer');
         const auxiliaryExplanation = document.getElementById('auxiliary-explanation');
         const exampleList = document.getElementById('example-list');
+        const specialCharsContainer = document.getElementById('special-chars');
 
         let currentVerb = null;
         let isAnswered = false;
@@ -407,6 +451,16 @@
             // Allow submission with the 'Enter' key
             if (event.key === 'Enter' && !isAnswered) {
                 checkAnswer();
+            }
+        });
+
+        // Add event listener for the special character buttons
+        specialCharsContainer.addEventListener('click', (event) => {
+            // Use event delegation to check if a button was clicked
+            if (event.target.classList.contains('char-btn')) {
+                const char = event.target.textContent;
+                answerInput.value += char;
+                answerInput.focus(); // Keep the user in the input field
             }
         });
 
