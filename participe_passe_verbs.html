@@ -73,6 +73,7 @@
         .rules-frame p {
             margin-bottom: 1em;
             line-height: 1.6;
+            font-size: 0.95em;
         }
 
         .rules-frame code {
@@ -283,25 +284,30 @@
 
         <div class="rules-frame">
             <h2>Formation Rules</h2>
-            <h3>Verbs ending in -ER</h3>
-            <p>Drop the <code>-er</code> and add <code>-é</code>.</p>
-            <p>Example: <code>parler</code> → <code>parlé</code></p>
-            
-            <h3>Verbs ending in -IR</h3>
-            <p>Drop the <code>-ir</code> and add <code>-i</code>.</p>
-            <p>Example: <code>finir</code> → <code>fini</code></p>
+            <h3>Regular Verbs</h3>
+            <p><strong>-ER Verbs:</strong> Drop <code>-er</code> → <code>-é</code><br>(e.g., <code>parler</code> → <code>parlé</code>)</p>
+            <p><strong>-IR Verbs:</strong> Drop <code>-ir</code> → <code>-i</code><br>(e.g., <code>finir</code> → <code>fini</code>)</p>
+            <p><strong>-RE Verbs:</strong> Drop <code>-re</code> → <code>-u</code><br>(e.g., <code>vendre</code> → <code>vendu</code>)</p>
 
-            <h3>Verbs ending in -RE</h3>
-            <p>Drop the <code>-re</code> and add <code>-u</code>.</p>
-            <p>Example: <code>vendre</code> → <code>vendu</code></p>
-
-            <h3>Irregular Verbs</h3>
-            <p>These verbs have unique endings that must be memorized.</p>
-            <p>Examples: <br>
-                <code>avoir</code> → <code>eu</code><br>
-                <code>être</code> → <code>été</code><br>
+            <h3>Irregular Verbs & Exceptions</h3>
+            <p>Many common verbs are irregular. Some follow patterns:</p>
+            <p><strong>Ending in -is:</strong><br>
+                <code>prendre</code> → <code>pris</code><br>
+                <code>mettre</code> → <code>mis</code>
+            </p>
+            <p><strong>Ending in -it:</strong><br>
+                <code>dire</code> → <code>dit</code><br>
+                <code>écrire</code> → <code>écrit</code>
+            </p>
+            <p><strong>Ending in -u / -û:</strong><br>
+                <code>voir</code> → <code>vu</code><br>
+                <code>pouvoir</code> → <code>pu</code><br>
+                <code>devoir</code> → <code>dû</code>
+            </p>
+             <p><strong>Other common irregulars:</strong><br>
                 <code>faire</code> → <code>fait</code><br>
-                <code>prendre</code> → <code>pris</code>
+                <code>être</code> → <code>été</code><br>
+                <code>avoir</code> → <code>eu</code>
             </p>
         </div>
     </div>
@@ -330,17 +336,17 @@
             { infinitive: 'remplir', participe: 'rempli', auxiliary: 'avoir', translation: 'filled' },
             { infinitive: 'obéir', participe: 'obéi', auxiliary: 'avoir', translation: 'obeyed' },
             { infinitive: 'bâtir', participe: 'bâti', auxiliary: 'avoir', translation: 'built' },
-            { infinitive: 'rougir', participe: 'rougi', auxiliary: 'avoir', translation: 'blushed' },
-            { infinitive: 'nourrir', participe: 'nourri', auxiliary: 'avoir', translation: 'fed' },
-
+            
             // Group 3: Irregular verbs (Mixed Auxiliaries)
+            { infinitive: 'vendre', participe: 'vendu', auxiliary: 'avoir', translation: 'sold' },
+            { infinitive: 'dire', participe: 'dit', auxiliary: 'avoir', translation: 'said' },
+            { infinitive: 'mettre', participe: 'mis', auxiliary: 'avoir', translation: 'put' },
             { infinitive: 'avoir', participe: 'eu', auxiliary: 'avoir', translation: 'had' },
             { infinitive: 'être', participe: 'été', auxiliary: 'avoir', translation: 'been' },
             { infinitive: 'faire', participe: 'fait', auxiliary: 'avoir', translation: 'done' },
             { infinitive: 'prendre', participe: 'pris', auxiliary: 'avoir', translation: 'taken' },
             { infinitive: 'voir', participe: 'vu', auxiliary: 'avoir', translation: 'seen' },
             { infinitive: 'devoir', participe: 'dû', auxiliary: 'avoir', translation: 'had to' },
-            { infinitive: 'vendre', participe: 'vendu', auxiliary: 'avoir', translation: 'sold' }, // Added -re verb
             { infinitive: 'aller', participe: 'allé', auxiliary: 'être', translation: 'gone' },
             { infinitive: 'venir', participe: 'venu', auxiliary: 'être', translation: 'come' },
             { infinitive: 'naître', participe: 'né', auxiliary: 'être', translation: 'born' }
