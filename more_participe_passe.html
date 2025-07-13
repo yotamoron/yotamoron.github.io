@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Participe Passé Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple transition for feedback visibility */
+        #feedback-container {
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-lg mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        
+        <header class="text-center mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">Participe Passé Practice</h1>
+            <p class="text-slate-500 mt-1">Enter the past participle (participe passé) for the given verb.</p>
+        </header>
+
+        <main id="practice-area">
+            <!-- Verb Display -->
+            <div class="bg-slate-50 rounded-lg p-4 text-center mb-4">
+                <p class="text-slate-600 text-sm">Verb (infinitive):</p>
+                <p id="verb-display" class="text-4xl font-bold text-indigo-600"></p>
+            </div>
+
+            <!-- Input and Submission -->
+            <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                <input type="text" id="answer-input" class="flex-grow w-full px-4 py-3 text-lg border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Type past participle...">
+                <button id="submit-btn" class="w-full sm:w-auto bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">Check</button>
+            </div>
+
+            <!-- Special Characters -->
+            <div class="flex justify-center flex-wrap gap-2 mb-6">
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">é</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">è</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">ê</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">à</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">â</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">ô</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">û</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">ç</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">ï</button>
+                <button class="char-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono text-lg rounded-md w-10 h-10 transition">ü</button>
+            </div>
+
+            <!-- Feedback and Next Button -->
+            <div id="feedback-container" class="opacity-0 min-h-[120px]">
+                <div id="feedback-message" class="p-4 rounded-lg text-center">
+                    <h3 id="feedback-result" class="text-xl font-bold"></h3>
+                    <p id="feedback-correct-answer" class="text-lg mt-1"></p>
+                    <p id="feedback-translation" class="text-md text-slate-600 italic"></p>
+                </div>
+                <button id="next-btn" class="mt-4 w-full bg-slate-700 text-white font-semibold py-3 rounded-lg hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors duration-200 hidden">Next Verb →</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA: List of verbs ---
+        const verbs = [
+            { infinitive: "avoir", participle: "eu", translation: "to have" },
+            { infinitive: "être", participle: "été", translation: "to be" },
+            { infinitive: "faire", participle: "fait", translation: "to do/make" },
+            { infinitive: "aller", participle: "allé", translation: "to go" },
+            { infinitive: "manger", participle: "mangé", translation: "to eat" },
+            { infinitive: "parler", participle: "parlé", translation: "to speak" },
+            { infinitive: "offrir", participle: "offert", translation: "to offer" },
+            { infinitive: "ouvrir", participle: "ouvert", translation: "to open" },
+            { infinitive: "mourir", participle: "mort", translation: "to die" },
+            { infinitive: "naître", participle: "né", translation: "to be born" },
+            { infinitive: "choisir", participle: "choisi", translation: "to choose" },
+            { infinitive: "dormir", participle: "dormi", translation: "to sleep" },
+            { infinitive: "finir", participle: "fini", translation: "to finish" },
+            { infinitive: "partir", participle: "parti", translation: "to leave" },
+            { infinitive: "sortir", participle: "sorti", translation: "to go out" },
+            { infinitive: "rire", participle: "ri", translation: "to laugh" },
+            { infinitive: "mettre", participle: "mis", translation: "to put" },
+            { infinitive: "prendre", participle: "pris", translation: "to take" },
+            { infinitive: "(s')asseoir", participle: "assis", translation: "to sit down" },
+            { infinitive: "écrire", participle: "écrit", translation: "to write" },
+            { infinitive: "dire", participle: "dit", translation: "to say" },
+            { infinitive: "conduire", participle: "conduit", translation: "to drive" },
+            { infinitive: "construire", participle: "construit", translation: "to build" },
+            { infinitive: "traduire", participle: "traduit", translation: "to translate" },
+            { infinitive: "boire", participle: "bu", translation: "to drink" },
+            { infinitive: "croire", participle: "cru", translation: "to believe" },
+            { infinitive: "connaître", participle: "connu", translation: "to know (a person/place)" },
+            { infinitive: "devoir", participle: "dû", translation: "to have to/must" },
+            { infinitive: "lire", participle: "lu", translation: "to read" },
+            { infinitive: "pouvoir", participle: "pu", translation: "to be able to" },
+            { infinitive: "savoir", participle: "su", translation: "to know (a fact)" },
+            { infinitive: "tenir", participle: "tenu", translation: "to hold" },
+            { infinitive: "venir", participle: "venu", translation: "to come" },
+            { infinitive: "voir", participle: "vu", translation: "to see" },
+            { infinitive: "vouloir", participle: "voulu", translation: "to want" },
+            { infinitive: "attendre", participle: "attendu", translation: "to wait for" },
+            { infinitive: "courir", participle: "couru", translation: "to run" },
+            { infinitive: "descendre", participle: "descendu", translation: "to go down" },
+            { infinitive: "disparaître", participle: "disparu", translation: "to disappear" },
+            { infinitive: "entendre", participle: "entendu", translation: "to hear" },
+            { infinitive: "plaire", participle: "plu", translation: "to please" },
+            { infinitive: "pleuvoir", participle: "plu", translation: "to rain" },
+            { infinitive: "recevoir", participle: "reçu", translation: "to receive" },
+            { infinitive: "rendre", participle: "rendu", translation: "to give back" },
+            { infinitive: "répondre", participle: "répondu", translation: "to answer" },
+            { infinitive: "vendre", participle: "vendu", translation: "to sell" },
+            { infinitive: "vivre", participle: "vécu", translation: "to live" },
+            { infinitive: "éteindre", participle: "éteint", translation: "to turn off" },
+            { infinitive: "peindre", participle: "peint", translation: "to paint" },
+            { infinitive: "joindre", participle: "joint", translation: "to join" }
+        ];
+
+        // --- DOM Elements ---
+        const verbDisplay = document.getElementById('verb-display');
+        const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const feedbackResult = document.getElementById('feedback-result');
+        const feedbackCorrectAnswer = document.getElementById('feedback-correct-answer');
+        const feedbackTranslation = document.getElementById('feedback-translation');
+        const charButtons = document.querySelectorAll('.char-btn');
+
+        // --- State ---
+        let shuffledVerbs = [];
+        let currentVerbIndex = 0;
+
+        // --- Functions ---
+
+        /**
+         * Shuffles an array in place.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Displays the current verb and resets the UI for a new turn.
+         */
+        function displayVerb() {
+            if (shuffledVerbs.length === 0) {
+                verbDisplay.textContent = "All done!";
+                return;
+            }
+            
+            // Loop back to the start if we've gone through all verbs
+            if (currentVerbIndex >= shuffledVerbs.length) {
+                currentVerbIndex = 0;
+            }
+
+            const currentVerb = shuffledVerbs[currentVerbIndex];
+            verbDisplay.textContent = currentVerb.infinitive;
+            
+            // Reset UI
+            answerInput.value = '';
+            answerInput.focus();
+            answerInput.disabled = false;
+            submitBtn.disabled = false;
+            nextBtn.classList.add('hidden');
+            feedbackContainer.classList.add('opacity-0');
+        }
+
+        /**
+         * Checks the user's answer and provides feedback.
+         */
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const currentVerb = shuffledVerbs[currentVerbIndex];
+            const correctAnswer = currentVerb.participle;
+
+            // Normalize strings to handle special characters like 'û' vs 'u' if needed, though direct comparison is fine here.
+            if (userAnswer === correctAnswer) {
+                feedbackResult.textContent = 'Right!';
+                feedbackMessage.className = 'p-4 rounded-lg text-center bg-green-100 text-green-800';
+            } else {
+                feedbackResult.textContent = 'Wrong!';
+                feedbackMessage.className = 'p-4 rounded-lg text-center bg-red-100 text-red-800';
+            }
+
+            // UPDATED: Only show the past participle, not the auxiliary.
+            feedbackCorrectAnswer.innerHTML = `Correct participle: <span class="font-bold">${currentVerb.participle}</span>`;
+            feedbackTranslation.textContent = `(${currentVerb.translation})`;
+
+            // Show feedback and toggle buttons
+            feedbackContainer.classList.remove('opacity-0');
+            nextBtn.classList.remove('hidden');
+            submitBtn.disabled = true;
+            answerInput.disabled = true;
+        }
+        
+        /**
+         * Moves to the next verb in the list.
+         */
+        function nextVerb() {
+            currentVerbIndex++;
+            displayVerb();
+        }
+
+        /**
+         * Appends a special character to the input field.
+         * @param {string} char The character to append.
+         */
+        function appendCharacter(char) {
+            answerInput.value += char;
+            answerInput.focus();
+        }
+
+        /**
+         * Initializes the practice session.
+         */
+        function init() {
+            shuffledVerbs = [...verbs];
+            shuffleArray(shuffledVerbs);
+            currentVerbIndex = 0;
+            displayVerb();
+
+            // --- Event Listeners ---
+            submitBtn.addEventListener('click', checkAnswer);
+            nextBtn.addEventListener('click', nextVerb);
+            
+            // Allow submission with Enter key
+            answerInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter' && !submitBtn.disabled) {
+                    checkAnswer();
+                }
+            });
+
+            // Add listeners for all special character buttons
+            charButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    appendCharacter(button.textContent);
+                });
+            });
+        }
+
+        // --- Start the app ---
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
