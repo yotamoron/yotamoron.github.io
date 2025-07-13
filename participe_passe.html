@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Exercise: Le Participe Passé</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            display: flex;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding-right: 20px;
+            max-width: 65%;
+        }
+
+        .rules-frame {
+            width: 30%;
+            min-width: 300px;
+            height: 95vh;
+            position: sticky;
+            top: 20px;
+            border: 2px solid #005a9c;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #ffffff;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #005a9c;
+            border-bottom: 2px solid #e1e1e1;
+            padding-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 1.2em;
+        }
+
+        .verb-container {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            margin: 0 4px;
+            vertical-align: middle;
+        }
+
+        .infinitive {
+            font-style: italic;
+            color: #888;
+        }
+
+        .answer-input {
+            width: 120px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 0 5px;
+            font-size: 1em;
+        }
+
+        .check-box {
+            margin-right: 5px;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-content">
+        <h1>French Exercise</h1>
+        <p>Complete the following text with the correct <i>participe passé</i> of the verbs in parentheses. Check the box to verify your answer.</p>
+        <hr>
+        <p>
+            Il y a 5 ans, j'ai 
+            <span class="verb-container">
+                (<span class="infinitive">passer</span>)
+                <input type="text" class="answer-input" id="q1">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q1', 'passé', 'exp1')">
+            </span>
+            des vacances en Suisse en hiver. Je suis
+            <span class="verb-container">
+                (<span class="infinitive">partir</span>)
+                <input type="text" class="answer-input" id="q2">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q2', ['parti', 'partie'], 'exp2')">
+            </span>
+            de Nice en train le soir. Je n'ai pas
+            <span class="verb-container">
+                (<span class="infinitive">trouver</span>)
+                <input type="text" class="answer-input" id="q3">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q3', 'trouvé', 'exp3')">
+            </span>
+            de place à cause d'un groupe d'enfants ; ils s'étaient
+            <span class="verb-container">
+                (<span class="infinitive">s’installer</span>)
+                <input type="text" class="answer-input" id="q4">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q4', 'installés', 'exp4')">
+            </span>
+            dans tout le wagon. Ils ont
+            <span class="verb-container">
+                (<span class="infinitive">crier</span>)
+                <input type="text" class="answer-input" id="q5">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q5', 'crié', 'exp5')">
+            </span>
+            toute la nuit et je n'ai pas
+            <span class="verb-container">
+                (<span class="infinitive">pouvoir</span>)
+                <input type="text" class="answer-input" id="q6">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q6', 'pu', 'exp6')">
+            </span>
+            dormir. Le matin, je suis
+            <span class="verb-container">
+                (<span class="infinitive">arriver</span>)
+                <input type="text" class="answer-input" id="q7">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q7', ['arrivé', 'arrivée'], 'exp7')">
+            </span>
+            à Genève et j'ai
+            <span class="verb-container">
+                (<span class="infinitive">devoir</span>)
+                <input type="text" class="answer-input" id="q8">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q8', 'dû', 'exp8')">
+            </span>
+            chercher un bus pour aller à la montagne. Quand j'ai
+            <span class="verb-container">
+                (<span class="infinitive">vouloir</span>)
+                <input type="text" class="answer-input" id="q9">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q9', 'voulu', 'exp9')">
+            </span>
+            payer, j'ai
+            <span class="verb-container">
+                (<span class="infinitive">voir</span>)
+                <input type="text" class="answer-input" id="q10">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q10', 'vu', 'exp10')">
+            </span>
+            que mon portefeuille avait disparu ! Je me suis
+            <span class="verb-container">
+                (<span class="infinitive">se rappeler</span>)
+                <input type="text" class="answer-input" id="q11">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q11', ['rappelé', 'rappelée'], 'exp11')">
+            </span>
+            que j'avais rencontré un homme qui avait
+            <span class="verb-container">
+                (<span class="infinitive">faire tomber</span>)
+                <input type="text" class="answer-input" id="q12">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q12', 'fait tomber', 'exp12')">
+            </span>
+            un paquet de mouchoirs, juste devant moi. Je me suis
+            <span class="verb-container">
+                (<span class="infinitive">se pencher</span>)
+                <input type="text" class="answer-input" id="q13">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q13', ['penché', 'penchée'], 'exp13')">
+            </span>
+            pour le ramasser et pendant ce temps, il a probablement
+            <span class="verb-container">
+                (<span class="infinitive">voler</span>)
+                <input type="text" class="answer-input" id="q14">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q14', 'volé', 'exp14')">
+            </span>
+            mon portefeuille ! Heureusement, j'ai
+            <span class="verb-container">
+                (<span class="infinitive">trouver</span>)
+                <input type="text" class="answer-input" id="q15">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q15', 'trouvé', 'exp15')">
+            </span>
+            de l’argent dans ma poche et j'ai
+            <span class="verb-container">
+                (<span class="infinitive">pouvoir</span>)
+                <input type="text" class="answer-input" id="q16">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q16', 'pu', 'exp16')">
+            </span>
+            acheter un billet. À la station de ski, j'ai
+            <span class="verb-container">
+                (<span class="infinitive">découvrir</span>)
+                <input type="text" class="answer-input" id="q17">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q17', 'découvert', 'exp17')">
+            </span>
+            qu’il n'avait pas neigé pendant toutes les vacances. J'en ai
+            <span class="verb-container">
+                (<span class="infinitive">avoir marre</span>)
+                <input type="text" class="answer-input" id="q18">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q18', 'eu marre', 'exp18')">
+            </span>
+            et je suis
+            <span class="verb-container">
+                (<span class="infinitive">rentrer</span>)
+                <input type="text" class="answer-input" id="q19">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q19', ['rentré', 'rentrée'], 'exp19')">
+            </span>
+            en avion mais, comme il y a
+            <span class="verb-container">
+                (<span class="infinitive">avoir</span>)
+                <input type="text" class="answer-input" id="q20">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q20', 'eu', 'exp20')">
+            </span>
+            une grève surprise et je suis
+            <span class="verb-container">
+                (<span class="infinitive">rester</span>)
+                <input type="text" class="answer-input" id="q21">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q21', ['resté', 'restée'], 'exp21')">
+            </span>
+            bloqué six heures à Lyon. Une fois que je suis
+            <span class="verb-container">
+                (<span class="infinitive">rentrer</span>)
+                <input type="text" class="answer-input" id="q22">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q22', ['rentré', 'rentrée'], 'exp22')">
+            </span>
+            chez moi, je me suis
+            <span class="verb-container">
+                (<span class="infinitive">se rendre compte</span>)
+                <input type="text" class="answer-input" id="q23">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q23', 'rendu compte', 'exp23')">
+            </span>
+            que j'avais oublié de fermer une fenêtre et comme j'habite en Bretagne, il a
+            <span class="verb-container">
+                (<span class="infinitive">pleuvoir</span>)
+                <input type="text" class="answer-input" id="q24">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q24', 'plu', 'exp24')">
+            </span>
+            … et, évidemment, il y a
+            <span class="verb-container">
+                (<span class="infinitive">avoir</span>)
+                <input type="text" class="answer-input" id="q25">
+                <input type="checkbox" class="check-box" onclick="checkAnswer('q25', 'eu', 'exp25')">
+            </span>
+            une petite inondation dans mon salon ! Quelles belles vacances !!
+        </p>
+    </div>
+
+    <div class="rules-frame">
+        <h2>The Past Participle (Le Participe Passé): Rules</h2>
+        
+        <h3>1. With the auxiliary ÊTRE</h3>
+        <p>The past participle <strong>always</strong> agrees in gender (masculine/feminine) and number (singular/plural) with the verb's <strong>subject</strong>.</p>
+        <p><em>Ex: Elle est parti<strong>e</strong>. Ils sont allé<strong>s</strong>.</em></p>
+        <p>This applies to:</p>
+        <ul>
+            <li>Verbs of movement and state (aller, venir, partir, arriver, naître, mourir, rester...).</li>
+            <li>All pronominal verbs (se laver, se lever, etc.).</li>
+        </ul>
+
+        <h3>2. With the auxiliary AVOIR</h3>
+        <p>The past participle <strong>never</strong> agrees with the subject.</p>
+        <p><em>Ex: Elle a mang<strong>é</strong>. Ils ont mang<strong>é</strong>.</em></p>
+        <p><strong>Exception:</strong> The past participle agrees with the <strong>Direct Object (DO)</strong>, but only if the DO comes <strong>before</strong> the verb.</p>
+        <p>To find the DO, ask the question "who?" or "what?" after the verb.</p>
+        <ul>
+            <li><em>J'ai acheté les pommes.</em> (DO "les pommes" is after the verb -> no agreement: <em>acheté</em>)</li>
+            <li><em>Les pommes <strong>que</strong> j'ai acheté<strong>es</strong>.</em> (DO "que" which stands for "les pommes" comes before -> agreement: <em>achetées</em>)</li>
+        </ul>
+
+        <h3>3. Special Cases</h3>
+        <p><strong>Pronominal Verbs:</strong> They use <strong>être</strong>, so the participle usually agrees with the subject.
+        <br><em>Ex: Elle s'est lavé<strong>e</strong>.</em>
+        <br><strong>But:</strong> No agreement if the verb is followed by a Direct Object.
+        <br><em>Ex: Elle s'est lav<strong>é</strong> les mains.</em> (The DO "les mains" comes after the verb).
+        </p>
+
+        <p><strong>Fait + Infinitive:</strong> The past participle <em>fait</em> is always <strong>invariable</strong> when it is followed by a verb in the infinitive.
+        <br><em>Ex: Je les ai <strong>fait</strong> venir.</em> (I made them come.)</p>
+
+        <p><strong>Impersonal Verbs:</strong> (pleuvoir, falloir, neiger...) The past participle is always <strong>invariable</strong>.
+        <br><em>Ex: Il a <strong>plu</strong>. Il a <strong>fallu</strong>.</em> (It rained. It was necessary.)</p>
+    </div>
+
+    <script>
+        const explanations = {
+            exp1: "Rule: The past participle with the auxiliary verb AVOIR does not agree with the subject. There is no direct object placed before the verb. Correct answer: passé.",
+            exp2: "Rule: The verb 'partir' uses ÊTRE. The past participle must agree with the subject 'je'. Correct answer: parti (if 'je' is masculine) or partie (if 'je' is feminine).",
+            exp3: "Rule: With AVOIR, there is no agreement with the subject. The direct object ('de place') comes after the verb. Correct answer: trouvé.",
+            exp4: "Rule: 'S'installer' is a pronominal verb, so it uses ÊTRE. The participle agrees with the subject 'ils' (masculine plural). Correct answer: installés.",
+            exp5: "Rule: With AVOIR, no agreement. There is no direct object. Correct answer: crié.",
+            exp6: "Rule: With AVOIR, no agreement. Correct answer: pu.",
+            exp7: "Rule: The verb 'arriver' uses ÊTRE. The past participle must agree with the subject 'je'. Correct answer: arrivé (masculine) or arrivée (feminine).",
+            exp8: "Rule: With AVOIR, no agreement. The direct object ('chercher un bus...') comes after. Correct answer: dû.",
+            exp9: "Rule: With AVOIR, no agreement. Correct answer: voulu.",
+            exp10: "Rule: With AVOIR, no agreement. The direct object clause ('que mon portefeuille...') comes after. Correct answer: vu.",
+            exp11: "Rule: 'Se rappeler' is a pronominal verb (uses ÊTRE). The participle agrees with the subject 'je'. Correct answer: rappelé (masculine) or rappelée (feminine).",
+            exp12: "Rule: The past participle 'fait' when followed by an infinitive ('tomber') is always invariable. Correct answer: fait tomber.",
+            exp13: "Rule: 'Se pencher' is a pronominal verb (uses ÊTRE). The participle agrees with the subject 'je'. Correct answer: penché (masculine) or penchée (feminine).",
+            exp14: "Rule: With AVOIR, the direct object ('mon portefeuille') is placed after the verb, so there is no agreement. Correct answer: volé.",
+            exp15: "Rule: With AVOIR, the direct object ('de l’argent') comes after the verb, so there is no agreement. Correct answer: trouvé.",
+            exp16: "Rule: With AVOIR, no agreement. Correct answer: pu.",
+            exp17: "Rule: With AVOIR, the direct object clause ('qu’il n'avait pas neigé...') comes after, so there is no agreement. Correct answer: découvert.",
+            exp18: "Rule: In the expression 'en avoir marre', the participle never agrees with the pronoun 'en', even though 'en' is a direct object. Correct answer: eu marre.",
+            exp19: "Rule: The verb 'rentrer' uses ÊTRE here. The past participle must agree with the subject 'je'. Correct answer: rentré (masculine) or rentrée (feminine).",
+            exp20: "Rule: The impersonal verb 'il y a' (avoir) has an invariable past participle. Correct answer: eu.",
+            exp21: "Rule: The verb 'rester' uses ÊTRE. The past participle must agree with the subject 'je'. Correct answer: resté (masculine) or restée (feminine).",
+            exp22: "Rule: The verb 'rentrer' uses ÊTRE. The past participle must agree with the subject 'je'. Correct answer: rentré (masculine) or rentrée (feminine).",
+            exp23: "Rule: Special case for the pronominal verb 'se rendre compte'. The word 'compte' acts as an invariable direct object, so the participle never agrees with the subject. Correct answer: rendu compte.",
+            exp24: "Rule: 'Pleuvoir' (to rain) is an impersonal verb. Its past participle is always invariable. Correct answer: plu.",
+            exp25: "Rule: The impersonal verb 'il y a' (avoir) has an invariable past participle. Correct answer: eu."
+        };
+
+        function checkAnswer(inputId, correctAnswer, explanationId) {
+            const userInput = document.getElementById(inputId).value.trim();
+            // uncheck the box so the user can trigger the alert again if needed
+            event.target.checked = false; 
+
+            if (userInput === "") {
+                alert("Please enter an answer before checking.");
+                return;
+            }
+
+            const isCorrect = Array.isArray(correctAnswer) ? 
+                correctAnswer.includes(userInput.toLowerCase()) : 
+                userInput.toLowerCase() === correctAnswer.toLowerCase();
+            
+            let status = '';
+            if (isCorrect) {
+                status = 'CORRECT!';
+            } else {
+                status = 'WRONG.';
+            }
+            
+            const explanationText = explanations[explanationId] || "Explanation not available.";
+            
+            alert(status + "\n\n" + explanationText);
+        }
+    </script>
+
+</body>
+</html>
