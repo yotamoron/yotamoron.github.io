@@ -163,6 +163,10 @@
             font-size: 1.5rem;
         }
         
+        .feedback h4 {
+            margin-bottom: 10px;
+        }
+
         .feedback .correct-answer {
             font-weight: bold;
             font-style: italic;
@@ -170,6 +174,17 @@
 
         .feedback.correct h3 { color: #4caf50; }
         .feedback.incorrect h3 { color: #f44336; }
+
+        .auxiliary-explanation {
+            font-style: italic;
+            color: #333;
+            background-color: #f0f2f5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
 
         .feedback ul {
             list-style-type: none;
@@ -218,6 +233,7 @@
                 <h3 id="feedback-title"></h3>
                 <p id="feedback-correct-answer"></p>
                 <h4>Example Sentences:</h4>
+                <p id="auxiliary-explanation" class="auxiliary-explanation"></p>
                 <ul id="example-list"></ul>
             </div>
         </div>
@@ -290,6 +306,7 @@
         const feedbackEl = document.getElementById('feedback');
         const feedbackTitle = document.getElementById('feedback-title');
         const feedbackCorrectAnswer = document.getElementById('feedback-correct-answer');
+        const auxiliaryExplanation = document.getElementById('auxiliary-explanation');
         const exampleList = document.getElementById('example-list');
 
         let currentVerb = null;
@@ -363,6 +380,13 @@
                 feedbackEl.className = 'feedback incorrect';
                 feedbackTitle.textContent = 'Wrong!';
                 feedbackCorrectAnswer.innerHTML = `The correct form is: <span class="correct-answer">${currentVerb.participe}</span>`;
+            }
+            
+            // Set the auxiliary verb explanation
+            if (currentVerb.auxiliary === 'avoir') {
+                auxiliaryExplanation.innerHTML = `<strong>Why 'avoir'?</strong> Most verbs in French use <em>avoir</em> as the auxiliary verb in the passé composé.`;
+            } else {
+                auxiliaryExplanation.innerHTML = `<strong>Why 'être'?</strong> This is a verb of movement or state (from the DR MRS VANDERTRAMP list), so it uses <em>être</em> as the auxiliary verb.`;
             }
 
             exampleList.innerHTML = generateExamples(currentVerb);
