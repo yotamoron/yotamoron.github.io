@@ -55,6 +55,8 @@
             padding: 25px;
             position: sticky;
             top: 20px;
+            max-height: 95vh;
+            overflow-y: auto;
         }
 
         .rules-frame h2 {
@@ -289,8 +291,13 @@
             <p><strong>-IR Verbs:</strong> Drop <code>-ir</code> → <code>-i</code><br>(e.g., <code>finir</code> → <code>fini</code>)</p>
             <p><strong>-RE Verbs:</strong> Drop <code>-re</code> → <code>-u</code><br>(e.g., <code>vendre</code> → <code>vendu</code>)</p>
 
-            <h3>Verbs using Être</h3>
-            <p>A small group of verbs, mostly involving movement or state change, use <strong>être</strong>. Remember the mnemonic <strong>DR MRS VANDERTRAMP</strong>.</p>
+            <h3>Auxiliary Verbs</h3>
+            <p><strong>Avoir:</strong> Used for most verbs.</p>
+            <p><strong>Être:</strong> Used for a small group of verbs (DR MRS VANDERTRAMP) and ALL pronominal verbs.</p>
+
+            <h3>Pronominal Verbs (e.g., se laver)</h3>
+            <p>Always use <strong>être</strong>. The participle usually agrees with the subject (e.g., <code>Elle s'est lavé<strong>e</strong></code>).</p>
+            <p><strong>Exception:</strong> No agreement if a direct object follows the verb (e.g., <code>Elle s'est lavé <strong>les mains</strong></code>).</p>
             
             <h3>Irregular Verbs & Exceptions</h3>
             <p>Many common verbs are irregular. Some follow patterns:</p>
@@ -374,7 +381,16 @@
             { infinitive: 'mourir', participe: 'mort', auxiliary: 'être', translation: 'died' },
             { infinitive: 'partir', participe: 'parti', auxiliary: 'être', translation: 'left' },
 
-            // --- Group 5: Other Irregular Verbs (AVOIR) ---
+            // --- Group 5: Pronominal Verbs (ÊTRE) ---
+            { infinitive: 'se lever', participe: 'levé', auxiliary: 'être', type: 'pronominal', translation: 'gotten up' },
+            { infinitive: 's\'habiller', participe: 'habillé', auxiliary: 'être', type: 'pronominal', translation: 'gotten dressed' },
+            { infinitive: 'se promener', participe: 'promené', auxiliary: 'être', type: 'pronominal', translation: 'walked' },
+            { infinitive: 's\'arrêter', participe: 'arrêté', auxiliary: 'être', type: 'pronominal', translation: 'stopped' },
+            { infinitive: 'se coucher', participe: 'couché', auxiliary: 'être', type: 'pronominal', translation: 'gone to bed' },
+            { infinitive: 'se dépêcher', participe: 'dépêché', auxiliary: 'être', type: 'pronominal', translation: 'hurried' },
+            { infinitive: 'se laver', participe: 'lavé', auxiliary: 'être', type: 'pronominal', translation: 'washed oneself', cod_exception: 'les mains' },
+
+            // --- Group 6: Other Irregular Verbs (AVOIR) ---
             { infinitive: 'avoir', participe: 'eu', auxiliary: 'avoir', translation: 'had' },
             { infinitive: 'être', participe: 'été', auxiliary: 'avoir', translation: 'been' },
             { infinitive: 'faire', participe: 'fait', auxiliary: 'avoir', translation: 'done' },
@@ -415,7 +431,23 @@
          * @returns {string} - An HTML string of list items.
          */
         function generateExamples(verb) {
-            if (verb.auxiliary === 'avoir') {
+            if (verb.type === 'pronominal') {
+                const pp = verb.participe;
+                if (verb.cod_exception) {
+                    return `
+                        <li><code>Je me suis ${pp} ${verb.cod_exception}</code></li>
+                        <li><code>Elle s'est ${pp} ${verb.cod_exception}</code></li>
+                    `;
+                }
+                return `
+                    <li><code>Je me suis ${pp}(e)</code></li>
+                    <li><code>Tu t'es ${pp}(e)</code></li>
+                    <li><code>Il s'est ${pp}</code> / <code>Elle s'est ${pp}e</code></li>
+                    <li><code>Nous nous sommes ${pp}s</code></li>
+                    <li><code>Vous vous êtes ${pp}(e)(s)</code></li>
+                    <li><code>Ils se sont ${pp}s</code> / <code>Elles se sont ${pp}es</code></li>
+                `;
+            } else if (verb.auxiliary === 'avoir') {
                 return `
                     <li><code>J'ai ${verb.participe}</code> (I have ${verb.translation})</li>
                     <li><code>Tu as ${verb.participe}</code> (You have ${verb.translation})</li>
@@ -428,12 +460,10 @@
                 return `
                     <li><code>Je suis ${verb.participe}(e)</code> (I have ${verb.translation})</li>
                     <li><code>Tu es ${verb.participe}(e)</code> (You have ${verb.translation})</li>
-                    <li><code>Il est ${verb.participe}</code> (He has ${verb.translation})</li>
-                    <li><code>Elle est ${verb.participe}e</code> (She has ${verb.translation})</li>
-                    <li><code>Nous sommes ${verb.participe}s</code> (We have ${verb.translation})</li>
-                    <li><code>Vous êtes ${verb.participe}(e)(s)</code> (You have ${verb.translation})</li>
-                    <li><code>Ils sont ${verb.participe}s</code> (They have ${verb.translation})</li>
-                    <li><code>Elles sont ${verb.participe}es</code> (They have ${verb.translation})</li>
+                    <li><code>Il est ${verb.participe}</code> / <code>Elle est ${verb.participe}e</code></li>
+                    <li><code>Nous sommes ${verb.participe}s</code></li>
+                    <li><code>Vous êtes ${verb.participe}(e)(s)</code></li>
+                    <li><code>Ils sont ${verb.participe}s</code> / <code>Elles sont ${verb.participe}es</code></li>
                 `;
             }
         }
@@ -478,9 +508,17 @@
             }
             
             // Set the auxiliary verb explanation
-            if (currentVerb.auxiliary === 'avoir') {
+            if (currentVerb.type === 'pronominal') {
+                let explanationHTML = `<strong>Why 'être'?</strong> All pronominal (reflexive) verbs use <em>être</em> as the auxiliary verb.`;
+                if (currentVerb.cod_exception) {
+                    explanationHTML += `<br><strong>Agreement Rule:</strong> The participle does NOT agree here because there is a direct object (<em>${currentVerb.cod_exception}</em>) that comes after the verb.`;
+                } else {
+                    explanationHTML += `<br><strong>Agreement Rule:</strong> The participle agrees with the subject because the reflexive pronoun acts as the direct object and comes before the verb.`;
+                }
+                auxiliaryExplanation.innerHTML = explanationHTML;
+            } else if (currentVerb.auxiliary === 'avoir') {
                 auxiliaryExplanation.innerHTML = `<strong>Why 'avoir'?</strong> Most verbs in French use <em>avoir</em> as the auxiliary verb in the passé composé.`;
-            } else {
+            } else { // 'être'
                 auxiliaryExplanation.innerHTML = `<strong>Why 'être'?</strong> This is a verb of movement or state change (from the DR MRS VANDERTRAMP list), so it uses <em>être</em> as the auxiliary verb.`;
             }
 
