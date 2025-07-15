@@ -152,6 +152,7 @@
 
         /**
          * Displays the current verb and resets the UI for a new turn.
+         * The focus is set back to the input field.
          */
         function displayVerb() {
             if (shuffledVerbs.length === 0) {
@@ -159,7 +160,6 @@
                 return;
             }
             
-            // Loop back to the start if we've gone through all verbs
             if (currentVerbIndex >= shuffledVerbs.length) {
                 currentVerbIndex = 0;
             }
@@ -169,22 +169,25 @@
             
             // Reset UI
             answerInput.value = '';
-            answerInput.focus();
             answerInput.disabled = false;
             submitBtn.disabled = false;
             nextBtn.classList.add('hidden');
             feedbackContainer.classList.add('opacity-0');
+            
+            // BUG FIX: Use a timeout to focus the input. This places the focus action
+            // at the end of the event queue, after the 'keyup' event from the 'Enter'
+            // press on the 'Next' button has been processed.
+            setTimeout(() => answerInput.focus(), 0);
         }
 
         /**
-         * Checks the user's answer and provides feedback.
+         * Checks the user's answer, provides feedback, and moves focus to the "Next" button.
          */
         function checkAnswer() {
             const userAnswer = answerInput.value.trim().toLowerCase();
             const currentVerb = shuffledVerbs[currentVerbIndex];
             const correctAnswer = currentVerb.participle;
 
-            // Normalize strings to handle special characters like 'û' vs 'u' if needed, though direct comparison is fine here.
             if (userAnswer === correctAnswer) {
                 feedbackResult.textContent = 'Right!';
                 feedbackMessage.className = 'p-4 rounded-lg text-center bg-green-100 text-green-800';
@@ -193,7 +196,6 @@
                 feedbackMessage.className = 'p-4 rounded-lg text-center bg-red-100 text-red-800';
             }
 
-            // UPDATED: Only show the past participle, not the auxiliary.
             feedbackCorrectAnswer.innerHTML = `Correct participle: <span class="font-bold">${currentVerb.participle}</span>`;
             feedbackTranslation.textContent = `(${currentVerb.translation})`;
 
@@ -202,6 +204,7 @@
             nextBtn.classList.remove('hidden');
             submitBtn.disabled = true;
             answerInput.disabled = true;
+            nextBtn.focus(); // Move focus to the "Next Verb" button
         }
         
         /**
@@ -234,14 +237,12 @@
             submitBtn.addEventListener('click', checkAnswer);
             nextBtn.addEventListener('click', nextVerb);
             
-            // Allow submission with Enter key
             answerInput.addEventListener('keyup', (event) => {
                 if (event.key === 'Enter' && !submitBtn.disabled) {
                     checkAnswer();
                 }
             });
 
-            // Add listeners for all special character buttons
             charButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     appendCharacter(button.textContent);
