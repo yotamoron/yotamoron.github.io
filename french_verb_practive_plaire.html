@@ -69,8 +69,8 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- DATA ---
-        const conjugationExercises = [
+        // --- BASE DATA ---
+        const baseConjugationExercises = [
             { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : je", answer: "plais", explanation: "Correct: je plais. (I am pleasing / I please)" },
             { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : tu", answer: "plais", explanation: "Correct: tu plais. (You are pleasing / You please)" },
             { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : il", answer: "plaît", explanation: "Correct: il plaît. (He is pleasing / He pleases)" },
@@ -82,7 +82,7 @@
             { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : elles", answer: "plaisent", explanation: "Correct: elles plaisent. (They are pleasing / They please)" },
         ];
 
-        const enToFrExercises = [
+        const baseEnToFrExercises = [
             { type: 'Translate to French', prompt: "I like this song.", answer: "Cette chanson me plaît.", explanation: "Correct: Cette chanson me plaît. (Literally: This song is pleasing to me.)" },
             { type: 'Translate to French', prompt: "He likes these books.", answer: "Ces livres lui plaisent.", explanation: "Correct: Ces livres lui plaisent. (Literally: These books are pleasing to him.)" },
             { type: 'Translate to French', prompt: "She likes your idea.", answer: "Ton idée lui plaît.", explanation: "Correct: Ton idée lui plaît. (Literally: Your idea is pleasing to her.)" },
@@ -97,7 +97,7 @@
             { type: 'Translate to French', prompt: "We don't like these changes.", answer: "Ces changements ne nous plaisent pas.", explanation: "Correct: Ces changements ne nous plaisent pas." },
         ];
 
-        const frToEnExercises = [
+        const baseFrToEnExercises = [
             { type: 'Translate to English', prompt: "Ce livre me plaît.", answer: "I like this book.", explanation: "Correct: I like this book. (Literally: This book is pleasing to me.)" },
             { type: 'Translate to English', prompt: "Tu plais beaucoup à ma soeur.", answer: "My sister likes you a lot.", explanation: "Correct: My sister likes you a lot. (Literally: You are very pleasing to my sister.)" },
             { type: 'Translate to English', prompt: "Son nouveau travail lui plaît.", answer: "He likes his new job.", explanation: "Also correct: She likes her new job. 'Lui' can mean 'to him' or 'to her'." },
@@ -111,20 +111,6 @@
             { type: 'Translate to English', prompt: "La fin du film ne m'a pas plu.", answer: "I didn't like the end of the movie.", explanation: "Note: This is in the passé composé tense." },
         ];
 
-        // --- Function to generate a full set of 50 exercises for each type ---
-        function generateFullExerciseSet(baseExercises, targetCount) {
-            let fullSet = [];
-            while (fullSet.length < targetCount) {
-                fullSet = fullSet.concat(baseExercises);
-            }
-            return fullSet.slice(0, targetCount);
-        }
-
-        const allExercises = [
-            ...generateFullExerciseSet(conjugationExercises, 50),
-            ...generateFullExerciseSet(enToFrExercises, 50),
-            ...generateFullExerciseSet(frToEnExercises, 50)
-        ];
 
         // --- DOM Elements ---
         const promptEl = document.getElementById('prompt');
@@ -152,16 +138,41 @@
                 [array[i], array[j]] = [array[j], array[i]];
             }
         }
+        
+        function expandArray(baseArray, targetSize) {
+            const expanded = [];
+            for (let i = 0; i < targetSize; i++) {
+                expanded.push(baseArray[i % baseArray.length]);
+            }
+            return expanded;
+        }
 
+        // **CORRECTED FUNCTION**
+        // Normalizes string for comparison: removes accents, punctuation, extra spaces, and converts to lowercase.
         function normalizeAnswer(str) {
             return str.trim().toLowerCase()
-                .replace(/[.,?!]/g, '') // remove punctuation
-                .replace(/\s+/g, ' '); // normalize whitespace
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Removes accents/diacritics
+                .replace(/[.,?!]/g, '') // Removes punctuation
+                .replace(/\s+/g, ' '); // Normalizes whitespace
         }
         
         function startGame() {
-            exercises = [...allExercises];
-            shuffleArray(exercises);
+            const fullConjugationList = expandArray(baseConjugationExercises, 50);
+            const fullEnToFrList = expandArray(baseEnToFrExercises, 50);
+            const fullFrToEnList = expandArray(baseFrToEnExercises, 50);
+
+            shuffleArray(fullConjugationList);
+            shuffleArray(fullEnToFrList);
+            shuffleArray(fullFrToEnList);
+
+            const roundRobinExercises = [];
+            for (let i = 0; i < 50; i++) {
+                roundRobinExercises.push(fullConjugationList[i]);
+                roundRobinExercises.push(fullEnToFrList[i]);
+                roundRobinExercises.push(fullFrToEnList[i]);
+            }
+            
+            exercises = roundRobinExercises;
             currentExerciseIndex = 0;
             score = 0;
             appContainer.classList.remove('hidden');
@@ -188,7 +199,6 @@
 
             updateProgress();
             
-            // Set focus to input box
             answerInput.focus();
         }
 
@@ -202,9 +212,11 @@
 
             let isCorrect = normalizedUserAnswer === normalizedCorrectAnswer;
 
-            // For FR -> EN, allow for alternate correct answers
+            // Special case for FR -> EN where 'lui' can be 'he' or 'she'
             if (exercise.type === 'Translate to English' && exercise.prompt === 'Son nouveau travail lui plaît.') {
-                if (normalizedUserAnswer === 'she likes her new job' || normalizedUserAnswer === 'he likes his new job') {
+                const altAnswer1 = normalizeAnswer('She likes her new job');
+                const altAnswer2 = normalizeAnswer('He likes his new job');
+                if (normalizedUserAnswer === altAnswer1 || normalizedUserAnswer === altAnswer2) {
                     isCorrect = true;
                 }
             }
@@ -230,7 +242,6 @@
             checkBtn.style.display = 'none';
             nextBtn.style.display = 'inline-flex';
 
-            // Set focus to next button
             nextBtn.focus();
         }
 
@@ -260,9 +271,8 @@
 
         answerInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                // If check button is visible, click it. Otherwise, do nothing (to prevent double submission)
                 if (checkBtn.style.display !== 'none') {
-                    e.preventDefault(); // Prevent form submission
+                    e.preventDefault();
                     checkAnswer();
                 }
             }
