@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Verb Practice: Plaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .feedback-card {
+            transition: all 0.3s ease-in-out;
+            transform-origin: top;
+        }
+        .btn-primary {
+            @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500;
+        }
+        .btn-secondary {
+            @apply bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 sm:p-8">
+        <div id="app-container">
+            <header class="mb-6">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 text-center">Pratique du verbe "plaire"</h1>
+                <p class="text-center text-gray-500 mt-1">Test your knowledge of the verb 'plaire' in French.</p>
+            </header>
+
+            <div id="progress-container" class="flex justify-between items-center mb-4">
+                <span id="progress-text" class="text-sm font-medium text-gray-600"></span>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 ml-4">
+                    <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="exercise-container" class="bg-gray-50 p-6 rounded-lg text-center">
+                <p id="exercise-type" class="text-sm font-semibold text-indigo-600 uppercase tracking-wider mb-2"></p>
+                <p id="prompt" class="text-xl sm:text-2xl font-medium text-gray-900"></p>
+            </div>
+
+            <div class="mt-6">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="answer-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg" placeholder="Your answer...">
+                    <button id="check-btn" class="w-full sm:w-auto px-6 py-3 font-semibold rounded-lg shadow-sm transition-colors duration-200 btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2">Check</button>
+                    <button id="next-btn" class="w-full sm:w-auto px-6 py-3 font-semibold rounded-lg shadow-sm transition-colors duration-200 btn-secondary focus:outline-none focus:ring-2 focus:ring-offset-2" style="display: none;">Next →</button>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="mt-6"></div>
+        </div>
+        
+        <div id="completion-container" class="text-center hidden">
+             <h2 class="text-3xl font-bold text-gray-800">Félicitations!</h2>
+             <p class="mt-2 text-lg text-gray-600">You have completed all the exercises.</p>
+             <p id="final-score" class="mt-4 text-2xl font-semibold text-indigo-600"></p>
+             <button id="restart-btn" class="mt-8 px-8 py-3 font-semibold rounded-lg shadow-sm transition-colors duration-200 btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2">Practice Again</button>
+        </div>
+
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA ---
+        const conjugationExercises = [
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : je", answer: "plais", explanation: "Correct: je plais. (I am pleasing / I please)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : tu", answer: "plais", explanation: "Correct: tu plais. (You are pleasing / You please)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : il", answer: "plaît", explanation: "Correct: il plaît. (He is pleasing / He pleases)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : elle", answer: "plaît", explanation: "Correct: elle plaît. (She is pleasing / She pleases)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : on", answer: "plaît", explanation: "Correct: on plaît. (One is pleasing / One pleases)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : nous", answer: "plaisons", explanation: "Correct: nous plaisons. (We are pleasing / We please)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : vous", answer: "plaisez", explanation: "Correct: vous plaisez. (You are pleasing / You please)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : ils", answer: "plaisent", explanation: "Correct: ils plaisent. (They are pleasing / They please)" },
+            { type: 'Conjugation', prompt: "Conjuguez 'plaire' au présent pour : elles", answer: "plaisent", explanation: "Correct: elles plaisent. (They are pleasing / They please)" },
+        ];
+
+        const enToFrExercises = [
+            { type: 'Translate to French', prompt: "I like this song.", answer: "Cette chanson me plaît.", explanation: "Correct: Cette chanson me plaît. (Literally: This song is pleasing to me.)" },
+            { type: 'Translate to French', prompt: "He likes these books.", answer: "Ces livres lui plaisent.", explanation: "Correct: Ces livres lui plaisent. (Literally: These books are pleasing to him.)" },
+            { type: 'Translate to French', prompt: "She likes your idea.", answer: "Ton idée lui plaît.", explanation: "Correct: Ton idée lui plaît. (Literally: Your idea is pleasing to her.)" },
+            { type: 'Translate to French', prompt: "We like this movie.", answer: "Ce film nous plaît.", explanation: "Correct: Ce film nous plaît. (Literally: This movie is pleasing to us.)" },
+            { type: 'Translate to French', prompt: "You (formal) like the city.", answer: "La ville vous plaît.", explanation: "Correct: La ville vous plaît. (Literally: The city is pleasing to you.)" },
+            { type: 'Translate to French', prompt: "They like our car.", answer: "Notre voiture leur plaît.", explanation: "Correct: Notre voiture leur plaît. (Literally: Our car is pleasing to them.)" },
+            { type: 'Translate to French', prompt: "Do you (informal) like my gift?", answer: "Mon cadeau te plaît ?", explanation: "Correct: Mon cadeau te plaît ? (Literally: Is my gift pleasing to you?)" },
+            { type: 'Translate to French', prompt: "The children like this game.", answer: "Ce jeu plaît aux enfants.", explanation: "Correct: Ce jeu plaît aux enfants. (Literally: This game is pleasing to the children.)" },
+            { type: 'Translate to French', prompt: "My parents like you (informal).", answer: "Tu plais à mes parents.", explanation: "Correct: Tu plais à mes parents. (Literally: You are pleasing to my parents.)" },
+            { type: 'Translate to French', prompt: "I don't like this situation.", answer: "Cette situation ne me plaît pas.", explanation: "Correct: Cette situation ne me plaît pas." },
+            { type: 'Translate to French', prompt: "He doesn't like loud music.", answer: "La musique forte ne lui plaît pas.", explanation: "Correct: La musique forte ne lui plaît pas." },
+            { type: 'Translate to French', prompt: "We don't like these changes.", answer: "Ces changements ne nous plaisent pas.", explanation: "Correct: Ces changements ne nous plaisent pas." },
+        ];
+
+        const frToEnExercises = [
+            { type: 'Translate to English', prompt: "Ce livre me plaît.", answer: "I like this book.", explanation: "Correct: I like this book. (Literally: This book is pleasing to me.)" },
+            { type: 'Translate to English', prompt: "Tu plais beaucoup à ma soeur.", answer: "My sister likes you a lot.", explanation: "Correct: My sister likes you a lot. (Literally: You are very pleasing to my sister.)" },
+            { type: 'Translate to English', prompt: "Son nouveau travail lui plaît.", answer: "He likes his new job.", explanation: "Also correct: She likes her new job. 'Lui' can mean 'to him' or 'to her'." },
+            { type: 'Translate to English', prompt: "Cette maison nous plaît.", answer: "We like this house.", explanation: "Correct: We like this house." },
+            { type: 'Translate to English', prompt: "Est-ce que la France vous plaît ?", answer: "Do you like France?", explanation: "Correct: Do you like France?" },
+            { type: 'Translate to English', prompt: "Leurs idées nous plaisent.", answer: "We like their ideas.", explanation: "Correct: We like their ideas." },
+            { type: 'Translate to English', prompt: "Ces chaussures leur plaisent.", answer: "They like these shoes.", explanation: "Correct: They like these shoes." },
+            { type: 'Translate to English', prompt: "Il plaît à tout le monde.", answer: "Everybody likes him.", explanation: "Correct: Everybody likes him. (Literally: He is pleasing to everyone.)" },
+            { type: 'Translate to English', prompt: "Ça ne me plaît pas du tout.", answer: "I don't like that at all.", explanation: "Correct: I don't like that at all." },
+            { type: 'Translate to English', prompt: "Vous plaisez à mes amis.", answer: "My friends like you.", explanation: "Correct: My friends like you." },
+            { type: 'Translate to English', prompt: "La fin du film ne m'a pas plu.", answer: "I didn't like the end of the movie.", explanation: "Note: This is in the passé composé tense." },
+        ];
+
+        // --- Function to generate a full set of 50 exercises for each type ---
+        function generateFullExerciseSet(baseExercises, targetCount) {
+            let fullSet = [];
+            while (fullSet.length < targetCount) {
+                fullSet = fullSet.concat(baseExercises);
+            }
+            return fullSet.slice(0, targetCount);
+        }
+
+        const allExercises = [
+            ...generateFullExerciseSet(conjugationExercises, 50),
+            ...generateFullExerciseSet(enToFrExercises, 50),
+            ...generateFullExerciseSet(frToEnExercises, 50)
+        ];
+
+        // --- DOM Elements ---
+        const promptEl = document.getElementById('prompt');
+        const exerciseTypeEl = document.getElementById('exercise-type');
+        const answerInput = document.getElementById('answer-input');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const appContainer = document.getElementById('app-container');
+        const completionContainer = document.getElementById('completion-container');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- State ---
+        let exercises = [];
+        let currentExerciseIndex = 0;
+        let score = 0;
+
+        // --- Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase()
+                .replace(/[.,?!]/g, '') // remove punctuation
+                .replace(/\s+/g, ' '); // normalize whitespace
+        }
+        
+        function startGame() {
+            exercises = [...allExercises];
+            shuffleArray(exercises);
+            currentExerciseIndex = 0;
+            score = 0;
+            appContainer.classList.remove('hidden');
+            completionContainer.classList.add('hidden');
+            displayExercise();
+        }
+
+        function displayExercise() {
+            if (currentExerciseIndex >= exercises.length) {
+                showCompletionScreen();
+                return;
+            }
+
+            const exercise = exercises[currentExerciseIndex];
+            promptEl.textContent = exercise.prompt;
+            exerciseTypeEl.textContent = exercise.type;
+            
+            answerInput.value = '';
+            feedbackContainer.innerHTML = '';
+            answerInput.disabled = false;
+
+            checkBtn.style.display = 'inline-flex';
+            nextBtn.style.display = 'none';
+
+            updateProgress();
+            
+            // Set focus to input box
+            answerInput.focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = answerInput.value;
+            if (userAnswer.trim() === '') return;
+
+            const exercise = exercises[currentExerciseIndex];
+            const normalizedUserAnswer = normalizeAnswer(userAnswer);
+            const normalizedCorrectAnswer = normalizeAnswer(exercise.answer);
+
+            let isCorrect = normalizedUserAnswer === normalizedCorrectAnswer;
+
+            // For FR -> EN, allow for alternate correct answers
+            if (exercise.type === 'Translate to English' && exercise.prompt === 'Son nouveau travail lui plaît.') {
+                if (normalizedUserAnswer === 'she likes her new job' || normalizedUserAnswer === 'he likes his new job') {
+                    isCorrect = true;
+                }
+            }
+
+            let feedbackClass, feedbackTitle;
+            if (isCorrect) {
+                score++;
+                feedbackClass = 'bg-green-100 border-green-500 text-green-800';
+                feedbackTitle = 'Correct!';
+            } else {
+                feedbackClass = 'bg-red-100 border-red-500 text-red-800';
+                feedbackTitle = 'Incorrect';
+            }
+            
+            feedbackContainer.innerHTML = `
+                <div class="feedback-card p-4 border-l-4 rounded-r-lg ${feedbackClass}" role="alert">
+                    <h3 class="font-bold">${feedbackTitle}</h3>
+                    <p class="mt-1">${exercise.explanation}</p>
+                </div>
+            `;
+            
+            answerInput.disabled = true;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-flex';
+
+            // Set focus to next button
+            nextBtn.focus();
+        }
+
+        function nextExercise() {
+            currentExerciseIndex++;
+            displayExercise();
+        }
+        
+        function updateProgress() {
+            const progress = (currentExerciseIndex / exercises.length) * 100;
+            progressText.textContent = `Exercise ${currentExerciseIndex + 1} of ${exercises.length}`;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        function showCompletionScreen() {
+            appContainer.classList.add('hidden');
+            completionContainer.classList.remove('hidden');
+            const percentage = Math.round((score / exercises.length) * 100);
+            finalScoreEl.textContent = `Your Score: ${score} / ${exercises.length} (${percentage}%)`;
+            restartBtn.focus();
+        }
+
+        // --- Event Listeners ---
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextExercise);
+        restartBtn.addEventListener('click', startGame);
+
+        answerInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                // If check button is visible, click it. Otherwise, do nothing (to prevent double submission)
+                if (checkBtn.style.display !== 'none') {
+                    e.preventDefault(); // Prevent form submission
+                    checkAnswer();
+                }
+            }
+        });
+
+        // --- Initialisation ---
+        startGame();
+    });
+    </script>
+</body>
+</html>
