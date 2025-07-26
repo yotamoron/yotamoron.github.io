@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Vocabulary Practice 🇫🇷</title>
+    <style>
+        :root {
+            --primary-bg: #f0f4f8;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #app {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        header, footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #status-bar {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        #question-area h2 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+        #question-area h3 {
+            font-size: 2em;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--primary-color);
+        }
+        #answer-input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1.2em;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        #answer-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .mcq-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .mcq-btn {
+            padding: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .mcq-btn:hover:not(:disabled) {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        .btn {
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        #check-btn {
+            background-color: var(--primary-color);
+            width: 100%;
+            margin-top: 15px;
+        }
+        #check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        #feedback {
+            margin-top: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            height: 25px; /* Reserve space */
+        }
+        .correct {
+            color: var(--correct-color);
+        }
+        .incorrect {
+            color: var(--incorrect-color);
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+         .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-danger {
+            background-color: var(--incorrect-color);
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-success {
+            background-color: var(--correct-color);
+        }
+        .btn-success:hover {
+             background-color: #218838;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <span id="status-bar">Loading...</span>
+            <button id="level-up-btn" class="btn btn-success">Advance to Next Group</button>
+        </header>
+
+        <main id="question-area">
+            </main>
+        
+        <div id="feedback"></div>
+
+        <footer>
+            <p>Made with ❤️ by Gemini</p>
+            <button id="reset-btn" class="btn btn-danger">Reset Progress</button>
+        </footer>
+    </div>
+
+    <script>
+        const wordGroups = [
+            // Group 1
+            [{fr: "le/la/les", en: "the"}, {fr: "de", en: "of/from"}, {fr: "un/une", en: "a/an"}, {fr: "être", en: "to be"}, {fr: "et", en: "and"}, {fr: "à", en: "to/at/in"}, {fr: "il", en: "he/it"}, {fr: "avoir", en: "to have"}, {fr: "ne", en: "not"}, {fr: "je", en: "I"}],
+            // Group 2
+            [{fr: "son", en: "his/her"}, {fr: "que", en: "that/what"}, {fr: "se", en: "oneself"}, {fr: "qui", en: "who/that"}, {fr: "ce", en: "this/that"}, {fr: "dans", en: "in"}, {fr: "en", en: "in/on"}, {fr: "du", en: "of the"}, {fr: "elle", en: "she"}, {fr: "au", en: "to the"}],
+            // Group 3
+            [{fr: "de", en: "some"}, {fr: "ce", en: "this"}, {fr: "le", en: "it/him"}, {fr: "pas", en: "not"}, {fr: "pour", en: "for"}, {fr: "que", en: "that"}, {fr: "vous", en: "you"}, {fr: "par", en: "by"}, {fr: "sur", en: "on"}, {fr: "faire", en: "to do/make"}],
+            // Group 4
+            [{fr: "plus", en: "more"}, {fr: "dire", en: "to say"}, {fr: "me", en: "me"}, {fr: "on", en: "one/we"}, {fr: "mon", en: "my"}, {fr: "lui", en: "him/her"}, {fr: "nous", en: "we/us"}, {fr: "comme", en: "like/as"}, {fr: "mais", en: "but"}, {fr: "pouvoir", en: "to be able to"}],
+            // Group 5
+            [{fr: "avec", en: "with"}, {fr: "tout", en: "all/every"}, {fr: "y", en: "there"}, {fr: "aller", en: "to go"}, {fr: "voir", en: "to see"}, {fr: "en", en: "it/of it"}, {fr: "bien", en: "well"}, {fr: "où", en: "where"}, {fr: "sans", en: "without"}, {fr: "tu", en: "you"}],
+            // Group 6
+            [{fr: "ou", en: "or"}, {fr: "leur", en: "their"}, {fr: "si", en: "if/so"}, {fr: "deux", en: "two"}, {fr: "mari", en: "husband"}, {fr: "moi", en: "me"}, {fr: "vouloir", en: "to want"}, {fr: "te", en: "you"}, {fr: "femme", en: "woman/wife"}, {fr: "homme", en: "man"}],
+            // Group 7
+            [{fr: "savoir", en: "to know"}, {fr: "falloir", en: "to have to"}, {fr: "venir", en: "to come"}, {fr: "quand", en: "when"}, {fr: "grand", en: "big/tall"}, {fr: "celui", en: "that one/he"}, {fr: "notre", en: "our"}, {fr: "devoir", en: "to have to/must"}, {fr: "là", en: "there"}, {fr: "jour", en: "day"}],
+            // Group 8
+            [{fr: "prendre", en: "to take"}, {fr: "même", en: "same/even"}, {fr: "autre", en: "other"}, {fr: "trouver", en: "to find"}, {fr: "donner", en: "to give"}, {fr: "temps", en: "time/weather"}, {fr: "ça", en: "that"}, {fr: "petit", en: "small"}, {fr: "encore", en: "again/still"}, {fr: "chose", en: "thing"}],
+            // Group 9
+            [{fr: "aussi", en: "also/too"}, {fr: "quelque", en: "some"}, {fr: "bon", en: "good"}, {fr: "comprendre", en: "to understand"}, {fr: "rester", en: "to stay"}, {fr: "un", en: "one"}, {fr: "rien", en: "nothing"}, {fr: "premier", en: "first"}, {fr: "personne", en: "person/nobody"}, {fr: "heure", en: "hour/time"}],
+            // Group 10
+            [{fr: "mettre", en: "to put"}, {fr: "sous", en: "under"}, {fr: "parler", en: "to speak"}, {fr: "alors", en: "so/then"}, {fr: "maintenant", en: "now"}, {fr: "monde", en: "world"}, {fr: "votre", en: "your"}, {fr: "vie", en: "life"}, {fr: "partir", en: "to leave"}, {fr: "oeil", en: "eye"}],
+            // Group 11
+            [{fr: "très", en: "very"}, {fr: "croire", en: "to believe"}, {fr: "an", en: "year"}, {fr: "passer", en: "to pass/spend"}, {fr: "enfant", en: "child"}, {fr: "regarder", en: "to watch"}, {fr: "demander", en: "to ask"}, {fr: "nouveau", en: "new"}, {fr: "quel", en: "which/what"}, {fr: "toujours", en: "always"}],
+            // Group 12
+            [{fr: "jamais", en: "never"}, {fr: "beau", en: "beautiful"}, {fr: "seul", en: "alone/only"}, {fr: "depuis", en: "since/for"}, {fr: "penser", en: "to think"}, {fr: "moment", en: "moment"}, {fr: "arriver", en: "to arrive"}, {fr: "trop", en: "too much"}, {fr: "mot", en: "word"}, {fr: "non", en: "no"}],
+            // Group 13
+            [{fr: "suivre", en: "to follow"}, {fr: "entre", en: "between"}, {fr: "coeur", en: "heart"}, {fr: "oui", en: "yes"}, {fr: "fois", en: "time(s)"}, {fr: "ainsi", en: "thus/so"}, {fr: "soir", en: "evening"}, {fr: "nom", en: "name"}, {fr: "attendre", en: "to wait for"}, {fr: "fille", en: "girl/daughter"}],
+            // Group 14
+            [{fr: "perdre", en: "to lose"}, {fr: "main", en: "hand"}, {fr: "gens", en: "people"}, {fr: "ouvrir", en: "to open"}, {fr: "chercher", en: "to look for"}, {fr: "monsieur", en: "sir/Mr."}, {fr: "pays", en: "country"}, {fr: "dernier", en: "last"}, {fr: "cas", en: "case"}, {fr: "eau", en: "water"}],
+            // Group 15
+            [{fr: "appeler", en: "to call"}, {fr: "afin", en: "in order to"}, {fr: "sortir", en: "to go out"}, {fr: "maison", en: "house"}, {fr: "devant", en: "in front of"}, {fr: "père", en: "father"}, {fr: "mieux", en: "better"}, {fr: "jeune", en: "young"}, {fr: "air", en: "air"}, {fr: "semaine", en: "week"}],
+            // Group 16
+            [{fr: "connaître", en: "to know (person/place)"}, {fr: "paraître", en: "to seem/appear"}, {fr: "sentir", en: "to feel/smell"}, {fr: "mère", en: "mother"}, {fr: "contre", en: "against"}, {fr: "point", en: "point/not at all"}, {fr: "besoin", en: "need"}, {fr: "matin", en: "morning"}, {fr: "ami", en: "friend"}, {fr: "chaque", en: "each/every"}],
+            // Group 17
+            [{fr: "devenir", en: "to become"}, {fr: "famille", en: "family"}, {fr: "revenir", en: "to come back"}, {fr: "vivre", en: "to live"}, {fr: "histoire", en: "history/story"}, {fr: "pendant", en: "during"}, {fr: "voix", en: "voice"}, {fr: "porter", en: "to carry/wear"}, {fr: "voilà", en: "there is/are"}, {fr: "idée", en: "idea"}],
+            // Group 18
+            [{fr: "jouer", en: "to play"}, {fr: "écrire", en: "to write"}, {fr: "amour", en: "love"}, {fr: "cause", en: "cause"}, {fr: "force", en: "strength/force"}, {fr: "mort", en: "death"}, {fr: "fin", en: "end"}, {fr: "gars", en: "guy/boy"}, {fr: "arrêter", en: "to stop"}, {fr: "lieu", en: "place"}],
+            // Group 19
+            [{fr: "ville", en: "city/town"}, {fr: "gouvernement", en: "government"}, {fr: "service", en: "service"}, {fr: "travail", en: "work"}, {fr: "français", en: "French"}, {fr: "rapport", en: "report/relationship"}, {fr: "comment", en: "how"}, {fr: "essayer", en: "to try"}, {fr: "entendre", en: "to hear"}, {fr: "rendre", en: "to give back"}],
+            // Group 20
+            [{fr: "question", en: "question"}, {fr: "mois", en: "month"}, {fr: "chambre", en: "room"}, {fr: "tel", en: "such"}, {fr: "beaucoup", en: "a lot/much"}, {fr: "groupe", en: "group"}, {fr: "peu", en: "little/few"}, {fr: "long", en: "long"}, {fr: "lire", en: "to read"}, {fr: "garder", en: "to keep"}],
+            // Group 21
+            [{fr: "haut", en: "high"}, {fr: "politique", en: "politics/policy"}, {fr: "lettre", en: "letter"}, {fr: "état", en: "state/condition"}, {fr: "parti", en: "party"}, {fr: "marcher", en: "to walk"}, {fr: "tête", en: "head"}, {fr: "trois", en: "three"}, {fr: "côté", en: "side"}, {fr: "sens", en: "sense/meaning"}],
+            // Group 22
+            [{fr: "vrai", en: "true"}, {fr: "effet", en: "effect"}, {fr: "plaisir", en: "pleasure"}, {fr: "présent", en: "present"}, {fr: "affaire", en: "business/affair"}, {fr: "chemin", en: "path/way"}, {fr: "journée", en: "day"}, {fr: "répondre", en: "to answer"}, {fr: "enfant", en: "child"}, {fr: "livre", en: "book"}],
+            // Group 23
+            [{fr: "général", en: "general"}, {fr: "fils", en: "son"}, {fr: "compte", en: "account/count"}, {fr: "ciel", en: "sky"}, {fr: "frère", en: "brother"}, {fr: "noir", en: "black"}, {fr: "nuit", en: "night"}, {fr: "changer", en: "to change"}, {fr: "oeil", en: "eye"}, {fr: "vers", en: "towards"}],
+            // Group 24
+            [{fr: "jusque", en: "until/up to"}, {fr: "avant", en: "before"}, {fr: "payer", en: "to pay"}, {fr: "important", en: "important"}, {fr: "public", en: "public"}, {fr: "droit", en: "right/law"}, {fr: "sûr", en: "sure/certain"}, {fr: "recevoir", en: "to receive"}, {fr: "simple", en: "simple"}, {fr: "possible", en: "possible"}],
+            // Group 25
+            [{fr: "manger", en: "to eat"}, {fr: "blanc", en: "white"}, {fr: "société", en: "society"}, {fr: "guerre", en: "war"}, {fr: "dormir", en: "to sleep"}, {fr: "choisir", en: "to choose"}, {fr: "quatre", en: "four"}, {fr: "aider", en: "to help"}, {fr: "courir", en: "to run"}, {fr: "face", en: "face"}],
+            // Group 26
+            [{fr: "action", en: "action"}, {fr: "argent", en: "money/silver"}, {fr: "partie", en: "part"}, {fr: "difficile", en: "difficult"}, {fr: "humain", en: "human"}, {fr: "bas", en: "low"}, {fr: "manquer", en: "to miss"}, {fr: "apprendre", en: "to learn"}, {fr: "musique", en: "music"}, {fr: "après", en: "after"}],
+            // Group 27
+            [{fr: "ordre", en: "order"}, {fr: "problème", en: "problem"}, {fr: "aujourd'hui", en: "today"}, {fr: "minute", en: "minute"}, {fr: "raison", en: "reason"}, {fr: "espérer", en: "to hope"}, {fr: "travailler", en: "to work"}, {fr: "pied", en: "foot"}, {fr: "seulement", en: "only"}, {fr: "moyen", en: "means/way"}],
+            // Group 28
+            [{fr: "présenter", en: "to present"}, {fr: "entrer", en: "to enter"}, {fr: "numéro", en: "number"}, {fr: "chef", en: "chief/leader"}, {fr: "cinq", en: "five"}, {fr: "idée", en: "idea"}, {fr: "lumière", en: "light"}, {fr: "peur", en: "fear"}, {fr: "question", en: "question"}, {fr: "regard", en: "look/gaze"}],
+            // Group 29
+            [{fr: "route", en: "road"}, {fr: "terre", en: "earth/land"}, {fr: "utiliser", en: "to use"}, {fr: "mer", en: "sea"}, {fr: "mois", en: "month"}, {fr: "oublier", en: "to forget"}, {fr: "prix", en: "price"}, {fr: "rouge", en: "red"}, {fr: "silence", en: "silence"}, {fr: "soleil", en: "sun"}],
+            // Group 30
+            [{fr: "traverser", en: "to cross"}, {fr: "vieux", en: "old"}, {fr: "village", en: "village"}, {fr: "table", en: "table"}, {fr: "école", en: "school"}, {fr: "corps", en: "body"}, {fr: "rire", en: "to laugh"}, {fr: "autant", en: "as much/many"}, {fr: "fenêtre", en: "window"}, {fr: "commencer", en: "to begin/start"}],
+        ];
+
+        const state = {
+            currentGroupIndex: 0, // 0 to 29
+            wordPool: [],
+            currentQuestion: null,
+            isAnswered: false,
+        };
+
+        const statusBarEl = document.getElementById('status-bar');
+        const levelUpBtn = document.getElementById('level-up-btn');
+        const questionAreaEl = document.getElementById('question-area');
+        const feedbackEl = document.getElementById('feedback');
+        const resetBtn = document.getElementById('reset-btn');
+
+        function init() {
+            loadState();
+            buildWordPool();
+            updateStatus();
+            generateQuestion();
+            renderQuestion();
+
+            levelUpBtn.addEventListener('click', handleLevelUp);
+            resetBtn.addEventListener('click', handleReset);
+            questionAreaEl.addEventListener('click', handleAnswerInteraction);
+        }
+
+        function loadState() {
+            const savedGroupIndex = localStorage.getItem('frenchVocabGroup');
+            state.currentGroupIndex = savedGroupIndex ? parseInt(savedGroupIndex, 10) : 0;
+        }
+
+        function saveState() {
+            localStorage.setItem('frenchVocabGroup', state.currentGroupIndex);
+        }
+
+        function buildWordPool() {
+            state.wordPool = [];
+            for (let i = 0; i <= state.currentGroupIndex; i++) {
+                state.wordPool.push(...wordGroups[i]);
+            }
+        }
+
+        function updateStatus() {
+            statusBarEl.textContent = `📚 Practicing Groups: 1-${state.currentGroupIndex + 1} (${state.wordPool.length} words)`;
+            if (state.currentGroupIndex >= wordGroups.length - 1) {
+                levelUpBtn.textContent = 'All Groups Unlocked!';
+                levelUpBtn.disabled = true;
+            }
+        }
+        
+        function handleAnswerInteraction(e) {
+            if (e.target.id === 'check-btn') {
+                const input = document.getElementById('answer-input');
+                if (input.value.trim() !== '') {
+                    checkAnswer(input.value);
+                }
+            } else if (e.target.classList.contains('mcq-btn')) {
+                checkAnswer(e.target.dataset.answer);
+            } else if (e.target.id === 'next-q-btn') {
+                generateQuestion();
+                renderQuestion();
+            }
+        }
+
+        function generateQuestion() {
+            state.isAnswered = false;
+            feedbackEl.innerHTML = '';
+
+            const wordPair = state.wordPool[Math.floor(Math.random() * state.wordPool.length)];
+            const questionType = Math.floor(Math.random() * 4);
+            
+            state.currentQuestion = { wordPair, type: questionType };
+        }
+
+        function renderQuestion() {
+            const { wordPair, type } = state.currentQuestion;
+            let html = '';
+
+            switch (type) {
+                case 0: // FR -> EN (Text)
+                    html = `
+                        <h2>Translate to English:</h2>
+                        <h3>${wordPair.fr}</h3>
+                        <input type="text" id="answer-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                        <button id="check-btn" class="btn">Check Answer</button>
+                    `;
+                    break;
+                case 1: // EN -> FR (Text)
+                    html = `
+                        <h2>Translate to French:</h2>
+                        <h3>${wordPair.en}</h3>
+                        <input type="text" id="answer-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                        <button id="check-btn" class="btn">Check Answer</button>
+                    `;
+                    break;
+                case 2: // FR -> EN (MCQ)
+                    const enOptions = generateMcqOptions(wordPair, 'en');
+                    html = `
+                        <h2>Select the correct translation:</h2>
+                        <h3>${wordPair.fr}</h3>
+                        <div class="mcq-options">
+                            ${enOptions.map(opt => `<button class="mcq-btn" data-answer="${opt}">${opt}</button>`).join('')}
+                        </div>
+                    `;
+                    break;
+                case 3: // EN -> FR (MCQ)
+                    const frOptions = generateMcqOptions(wordPair, 'fr');
+                     html = `
+                        <h2>Select the correct translation:</h2>
+                        <h3>${wordPair.en}</h3>
+                        <div class="mcq-options">
+                             ${frOptions.map(opt => `<button class="mcq-btn" data-answer="${opt}">${opt}</button>`).join('')}
+                        </div>
+                    `;
+                    break;
+            }
+            questionAreaEl.innerHTML = html;
+            
+            const input = document.getElementById('answer-input');
+            if(input) {
+                input.focus();
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('check-btn').click();
+                    }
+                });
+            }
+        }
+
+        function generateMcqOptions(correctPair, targetLang) {
+            const options = new Set();
+            options.add(correctPair[targetLang]);
+
+            const distractorsPool = state.wordPool.filter(wp => wp.fr !== correctPair.fr);
+            
+            while (options.size < 4 && distractorsPool.length > 0) {
+                const randomIndex = Math.floor(Math.random() * distractorsPool.length);
+                options.add(distractorsPool[randomIndex][targetLang]);
+                distractorsPool.splice(randomIndex, 1);
+            }
+            
+            // Shuffle the options
+            return Array.from(options).sort(() => Math.random() - 0.5);
+        }
+
+        function checkAnswer(userAnswer) {
+            if (state.isAnswered) return;
+            state.isAnswered = true;
+
+            const { wordPair, type } = state.currentQuestion;
+            let isCorrect = false;
+            
+            const correctAnswer = (type === 0 || type === 2) ? wordPair.en : wordPair.fr;
+            const cleanUserAnswer = userAnswer.trim().toLowerCase();
+            
+            // For text input, we check against split values. For MCQ, we check against the full string.
+            const correctAnswers = correctAnswer.split('/').map(s => s.trim().toLowerCase());
+            if (correctAnswers.includes(cleanUserAnswer) || cleanUserAnswer === correctAnswer.toLowerCase()) {
+                isCorrect = true;
+            }
+
+            feedbackEl.textContent = isCorrect ? '✅ Correct!' : `❌ Incorrect. The answer is: ${correctAnswer}`;
+            feedbackEl.className = isCorrect ? 'correct' : 'incorrect';
+
+            const input = document.getElementById('answer-input');
+            if (input) {
+                // Logic for text input feedback
+                input.disabled = true;
+                input.style.borderColor = isCorrect ? 'var(--correct-color)' : 'var(--incorrect-color)';
+                const checkBtn = document.getElementById('check-btn');
+                checkBtn.textContent = 'Next Question →';
+                checkBtn.id = 'next-q-btn';
+            } else {
+                // Logic for MCQ feedback
+                 const buttons = questionAreaEl.querySelectorAll('.mcq-btn');
+                 buttons.forEach(btn => {
+                    btn.disabled = true;
+                    const btnAnswer = btn.dataset.answer;
+                    
+                    // **FIXED LOGIC**: Compare button's value directly to the full correct answer
+                    if (btnAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                        btn.style.backgroundColor = 'var(--correct-color)';
+                        btn.style.color = 'white';
+                    } else if (btnAnswer.toLowerCase() === cleanUserAnswer){ // This highlights the user's incorrect choice
+                        btn.style.backgroundColor = 'var(--incorrect-color)';
+                        btn.style.color = 'white';
+                    }
+                 });
+                 
+                 const nextBtn = document.createElement('button');
+                 nextBtn.textContent = 'Next Question →';
+                 nextBtn.id = 'next-q-btn';
+                 nextBtn.className = 'btn';
+                 nextBtn.style.backgroundColor = 'var(--primary-color)';
+                 nextBtn.style.marginTop = '15px';
+                 questionAreaEl.appendChild(nextBtn);
+            }
+        }
+
+        function handleLevelUp() {
+            if (state.currentGroupIndex < wordGroups.length - 1) {
+                state.currentGroupIndex++;
+                saveState();
+                buildWordPool();
+                updateStatus();
+                generateQuestion();
+                renderQuestion();
+            }
+        }
+
+        function handleReset() {
+            if (confirm('Are you sure you want to reset all your progress?')) {
+                localStorage.removeItem('frenchVocabGroup');
+                location.reload();
+            }
+        }
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+</html>
