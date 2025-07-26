@@ -103,6 +103,16 @@
             color: white;
             transition: background-color 0.3s, box-shadow 0.3s;
         }
+        #group-select {
+            padding: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background-color: white;
+            color: var(--text-color);
+            cursor: pointer;
+        }
         #check-btn {
             background-color: var(--primary-color);
             width: 100%;
@@ -123,26 +133,11 @@
         .incorrect {
             color: var(--incorrect-color);
         }
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-         .btn-secondary:hover {
-            background-color: #5a6268;
-        }
         .btn-danger {
             background-color: var(--incorrect-color);
         }
         .btn-danger:hover {
             background-color: #c82333;
-        }
-        .btn-success {
-            background-color: var(--correct-color);
-        }
-        .btn-success:hover {
-             background-color: #218838;
-        }
-        .hidden {
-            display: none;
         }
     </style>
 </head>
@@ -151,7 +146,7 @@
     <div id="app">
         <header>
             <span id="status-bar">Loading...</span>
-            <button id="level-up-btn" class="btn btn-success">Advance to Next Group</button>
+            <select id="group-select"></select>
         </header>
 
         <main id="question-area">
@@ -161,7 +156,7 @@
 
         <footer>
             <p>Made with ❤️ by Gemini</p>
-            <button id="reset-btn" class="btn btn-danger">Reset Progress</button>
+            <button id="reset-btn" class="btn btn-danger">Reset to Group 1</button>
         </footer>
     </div>
 
@@ -230,52 +225,82 @@
         ];
 
         const state = {
-            currentGroupIndex: 0, // 0 to 29
+            currentGroupIndex: 0, // 0 to 29 for specific groups, -1 for all
             wordPool: [],
             currentQuestion: null,
             isAnswered: false,
         };
 
         const statusBarEl = document.getElementById('status-bar');
-        const levelUpBtn = document.getElementById('level-up-btn');
+        const groupSelectEl = document.getElementById('group-select');
         const questionAreaEl = document.getElementById('question-area');
         const feedbackEl = document.getElementById('feedback');
         const resetBtn = document.getElementById('reset-btn');
 
         function init() {
+            // Populate dropdown
+            for (let i = 0; i < wordGroups.length; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Group ${i + 1}`;
+                groupSelectEl.appendChild(option);
+            }
+            const allOption = document.createElement('option');
+            allOption.value = -1; // Special value for all groups
+            allOption.textContent = 'All Groups';
+            groupSelectEl.appendChild(allOption);
+            
             loadState();
+            groupSelectEl.value = state.currentGroupIndex; // Set dropdown to saved state
+
             buildWordPool();
             updateStatus();
             generateQuestion();
             renderQuestion();
 
-            levelUpBtn.addEventListener('click', handleLevelUp);
+            groupSelectEl.addEventListener('change', handleGroupChange);
             resetBtn.addEventListener('click', handleReset);
             questionAreaEl.addEventListener('click', handleAnswerInteraction);
         }
 
         function loadState() {
-            const savedGroupIndex = localStorage.getItem('frenchVocabGroup');
+            const savedGroupIndex = localStorage.getItem('frenchSelectedGroup');
             state.currentGroupIndex = savedGroupIndex ? parseInt(savedGroupIndex, 10) : 0;
         }
 
         function saveState() {
-            localStorage.setItem('frenchVocabGroup', state.currentGroupIndex);
+            localStorage.setItem('frenchSelectedGroup', state.currentGroupIndex);
         }
 
         function buildWordPool() {
             state.wordPool = [];
-            for (let i = 0; i <= state.currentGroupIndex; i++) {
-                state.wordPool.push(...wordGroups[i]);
+            const selectedIndex = state.currentGroupIndex;
+
+            if (selectedIndex === -1) { // "All Groups" selected
+                state.wordPool = wordGroups.flat();
+            } else if (selectedIndex >= 0 && selectedIndex < wordGroups.length) { // A specific group is selected
+                state.wordPool = [...wordGroups[selectedIndex]];
             }
         }
-
+        
         function updateStatus() {
-            statusBarEl.textContent = `📚 Practicing Groups: 1-${state.currentGroupIndex + 1} (${state.wordPool.length} words)`;
-            if (state.currentGroupIndex >= wordGroups.length - 1) {
-                levelUpBtn.textContent = 'All Groups Unlocked!';
-                levelUpBtn.disabled = true;
+            const selectedIndex = state.currentGroupIndex;
+            let statusText = '';
+            if (selectedIndex === -1) {
+                statusText = `📚 Practicing: All Groups (${state.wordPool.length} words)`;
+            } else {
+                statusText = `📚 Practicing: Group ${selectedIndex + 1} (${state.wordPool.length} words)`;
             }
+            statusBarEl.textContent = statusText;
+        }
+
+        function handleGroupChange(e) {
+            state.currentGroupIndex = parseInt(e.target.value, 10);
+            saveState();
+            buildWordPool();
+            updateStatus();
+            generateQuestion();
+            renderQuestion();
         }
         
         function handleAnswerInteraction(e) {
@@ -296,6 +321,11 @@
             state.isAnswered = false;
             feedbackEl.innerHTML = '';
 
+            if (state.wordPool.length === 0) {
+                 questionAreaEl.innerHTML = '<h2>Select a group to start practicing!</h2>';
+                 return;
+            }
+            
             const wordPair = state.wordPool[Math.floor(Math.random() * state.wordPool.length)];
             const questionType = Math.floor(Math.random() * 4);
             
@@ -303,6 +333,8 @@
         }
 
         function renderQuestion() {
+            if (!state.currentQuestion) return;
+
             const { wordPair, type } = state.currentQuestion;
             let html = '';
 
@@ -384,7 +416,6 @@
             const correctAnswer = (type === 0 || type === 2) ? wordPair.en : wordPair.fr;
             const cleanUserAnswer = userAnswer.trim().toLowerCase();
             
-            // For text input, we check against split values. For MCQ, we check against the full string.
             const correctAnswers = correctAnswer.split('/').map(s => s.trim().toLowerCase());
             if (correctAnswers.includes(cleanUserAnswer) || cleanUserAnswer === correctAnswer.toLowerCase()) {
                 isCorrect = true;
@@ -395,24 +426,21 @@
 
             const input = document.getElementById('answer-input');
             if (input) {
-                // Logic for text input feedback
                 input.disabled = true;
                 input.style.borderColor = isCorrect ? 'var(--correct-color)' : 'var(--incorrect-color)';
                 const checkBtn = document.getElementById('check-btn');
                 checkBtn.textContent = 'Next Question →';
                 checkBtn.id = 'next-q-btn';
             } else {
-                // Logic for MCQ feedback
                  const buttons = questionAreaEl.querySelectorAll('.mcq-btn');
                  buttons.forEach(btn => {
                     btn.disabled = true;
                     const btnAnswer = btn.dataset.answer;
                     
-                    // **FIXED LOGIC**: Compare button's value directly to the full correct answer
                     if (btnAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
                         btn.style.backgroundColor = 'var(--correct-color)';
                         btn.style.color = 'white';
-                    } else if (btnAnswer.toLowerCase() === cleanUserAnswer){ // This highlights the user's incorrect choice
+                    } else if (btnAnswer.toLowerCase() === cleanUserAnswer){
                         btn.style.backgroundColor = 'var(--incorrect-color)';
                         btn.style.color = 'white';
                     }
@@ -428,20 +456,9 @@
             }
         }
 
-        function handleLevelUp() {
-            if (state.currentGroupIndex < wordGroups.length - 1) {
-                state.currentGroupIndex++;
-                saveState();
-                buildWordPool();
-                updateStatus();
-                generateQuestion();
-                renderQuestion();
-            }
-        }
-
         function handleReset() {
-            if (confirm('Are you sure you want to reset all your progress?')) {
-                localStorage.removeItem('frenchVocabGroup');
+            if (confirm('Are you sure you want to reset your selection and return to Group 1?')) {
+                localStorage.removeItem('frenchSelectedGroup');
                 location.reload();
             }
         }
