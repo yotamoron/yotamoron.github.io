@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Vocabulary Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-card {
+            min-height: 400px;
+        }
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        /* Style for radio button labels */
+        .option-label {
+            display: block;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .option-label:hover {
+            background-color: #f3f4f6;
+        }
+        /* Style for selected radio button label */
+        input[type="radio"]:checked + .option-label {
+            background-color: #e0e7ff;
+            border-color: #6366f1;
+            color: #4338ca;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <div id="app-container" class="w-full max-w-2xl mx-auto">
+        
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="bg-white p-8 rounded-xl shadow-lg">
+            <h1 class="text-3xl font-bold text-center text-gray-900 mb-2">French Vocabulary Practice</h1>
+            <p class="text-center text-gray-600 mb-8">Select a word family to begin your quiz.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="group-select" class="block text-sm font-medium text-gray-700 mb-1">Choose a group:</label>
+                    <select id="group-select" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+                <button id="start-btn" class="w-full btn bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Start with Selected Group
+                </button>
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-gray-400">OR</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+                <button id="random-btn" class="w-full btn bg-gray-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    Practice a Random Group
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden bg-white p-8 rounded-xl shadow-lg">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                <h2 id="group-title" class="text-2xl font-bold text-indigo-700 text-center sm:text-left"></h2>
+                <div id="score" class="text-lg font-semibold bg-indigo-100 text-indigo-800 px-4 py-1 rounded-full self-center">Score: 0 / 0</div>
+            </div>
+
+            <div class="quiz-card bg-gray-50 p-6 rounded-lg flex flex-col justify-center items-center text-center">
+                <div id="question-area" class="w-full">
+                    <!-- Question content will be populated by JS -->
+                </div>
+                <div id="answer-area" class="w-full mt-6">
+                    <!-- Answer options/input will be populated by JS -->
+                </div>
+            </div>
+
+            <div id="feedback-area" class="mt-4 text-center h-8 font-medium">
+                <!-- Feedback message will be populated by JS -->
+            </div>
+
+            <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                 <button id="back-to-menu-btn" class="w-full sm:w-auto btn bg-gray-200 text-gray-700 font-semibold py-2 px-5 rounded-lg hover:bg-gray-300">Back to Menu</button>
+                 <div class="w-full sm:w-auto flex justify-end">
+                    <button id="check-btn" class="w-full sm:w-auto btn bg-green-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-600">Check Answer</button>
+                    <button id="next-btn" class="hidden w-full sm:w-auto btn bg-indigo-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-indigo-600">Next Question</button>
+                 </div>
+            </div>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden bg-white p-8 rounded-xl shadow-lg text-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Quiz Complete!</h1>
+            <p id="final-score" class="text-2xl text-gray-700 mb-8"></p>
+            <button id="restart-btn" class="w-full btn bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700">Practice Another Group</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA ---
+        // The raw JSON data is embedded directly here.
+        const rawData = {
+          "famille_etre": [
+            { "word": "est", "translation": "is (Present, il/elle/on)" },
+            { "word": "suis", "translation": "am (Present, je)" },
+            { "word": "être", "translation": "to be (Infinitive)" },
+            { "word": "était", "translation": "was (Imperfect past, il/elle/on)" },
+            { "word": "es", "translation": "are (Present, tu)" },
+            { "word": "sont", "translation": "are (Present, ils/elles)" },
+            { "word": "été", "translation": "summer / been (Past Participle)" },
+            { "word": "êtes", "translation": "are (Present, vous)" },
+            { "word": "sommes", "translation": "are (Present, nous)" },
+            { "word": "serait", "translation": "would be (Conditional, il/elle/on)" },
+            { "word": "soit", "translation": "is (Subjunctive, il/elle/on)" },
+            { "word": "sois", "translation": "am (Subjunctive, je/tu) / be (Imperative, tu)" },
+            { "word": "étaient", "translation": "were (Imperfect past, ils/elles)" },
+            { "word": "serai", "translation": "will be (Future, je)" },
+            { "word": "seras", "translation": "will be (Future, tu)" },
+            { "word": "serais", "translation": "would be (Conditional, je/tu)" },
+            { "word": "seront", "translation": "will be (Future, ils/elles)" },
+            { "word": "soyez", "translation": "are (Subjunctive, vous) / be (Imperative, vous)" },
+            { "word": "fut", "translation": "was (Simple Past, il/elle/on)" },
+            { "word": "étions", "translation": "were (Imperfect past, nous)" },
+            { "word": "étiez", "translation": "were (Imperfect past, vous)" },
+            { "word": "étant", "translation": "being (Present Participle)" }
+          ],
+          "famille_avoir": [
+            { "word": "a", "translation": "have (Present, il/elle/on)" },
+            { "word": "ai", "translation": "have (Present, je)" },
+            { "word": "avoir", "translation": "to have (Infinitive)" },
+            { "word": "ont", "translation": "have (Present, ils/elles)" },
+            { "word": "avez", "translation": "have (Present, vous)" },
+            { "word": "avait", "translation": "had (Imperfect past, il/elle/on)" },
+            { "word": "avais", "translation": "had (Imperfect past, je/tu)" },
+            { "word": "eu", "translation": "had (Past Participle)" },
+            { "word": "aurais", "translation": "would have (Conditional, je/tu)" },
+            { "word": "aurait", "translation": "would have (Conditional, il/elle/on)" },
+            { "word": "aura", "translation": "will have (Future, il/elle/on)" },
+            { "word": "avions", "translation": "had (Imperfect past, nous)" },
+            { "word": "aurai", "translation": "will have (Future, je)" },
+            { "word": "auras", "translation": "will have (Future, tu)" },
+            { "word": "aviez", "translation": "had (Imperfect past, vous)" },
+            { "word": "avaient", "translation": "had (Imperfect past, ils/elles)" },
+            { "word": "aies", "translation": "have (Subjunctive, tu)" },
+            { "word": "ait", "translation": "has (Subjunctive, il/elle/on)" },
+            { "word": "ayez", "translation": "have (Subjunctive, vous) / have (Imperative, vous)" },
+            { "word": "auriez", "translation": "would have (Conditional, vous)" },
+            { "word": "aurons", "translation": "will have (Future, nous)" }
+          ],
+          "famille_faire": [
+            { "word": "fait", "translation": "fact / do/done (Present, il/elle/on) / (Past Participle)" },
+            { "word": "faire", "translation": "to make/do (Infinitive)" },
+            { "word": "fais", "translation": "do (Present, je/tu)" },
+            { "word": "faites", "translation": "make (Present, vous)" },
+            { "word": "ferai", "translation": "will do/make (Future, je)" },
+            { "word": "faisait", "translation": "was doing/making (Imperfect past, il/elle/on)" },
+            { "word": "ferais", "translation": "would do/make (Conditional, je/tu)" },
+            { "word": "fasse", "translation": "do/make (Subjunctive, je/il/elle/on)" },
+            { "word": "faisons", "translation": "do/make (Present, nous)" },
+            { "word": "faisais", "translation": "was doing/making (Imperfect past, je/tu)" },
+            { "word": "ferait", "translation": "would do/make (Conditional, il/elle/on)" },
+            { "word": "fera", "translation": "will do (Future, il/elle/on)" },
+            { "word": "font", "translation": "make (Present, ils/elles)" },
+            { "word": "parfait", "translation": "perfect" },
+            { "word": "parfaite", "translation": "perfect (feminine)" },
+            { "word": "parfaitement", "translation": "perfectly" }
+          ],
+          "famille_aller": [
+            { "word": "va", "translation": "go (Present, il/elle/on)" },
+            { "word": "vais", "translation": "am going to (Present, je)" },
+            { "word": "allez", "translation": "going (Present, vous) / go (Imperative, vous)" },
+            { "word": "aller", "translation": "to go (Infinitive)" },
+            { "word": "vas", "translation": "going (Present, tu)" },
+            { "word": "allons", "translation": "will go / let's go (Present, nous)" },
+            { "word": "allait", "translation": "was going (Imperfect past, il/elle/on)" },
+            { "word": "allé", "translation": "go / gone (Past Participle)" },
+            { "word": "allais", "translation": "was going (Imperfect past, je/tu)" },
+            { "word": "aille", "translation": "go (Subjunctive, je/il/elle/on)" },
+            { "word": "irai", "translation": "will go (Future, je)" },
+            { "word": "ira", "translation": "will go (Future, il/elle/on)" },
+            { "word": "vont", "translation": "will go (Present, ils/elles)" }
+          ],
+          "famille_dire": [
+            { "word": "dit", "translation": "said/say (Present, il/elle/on) / (Past Participle)" },
+            { "word": "dire", "translation": "to say (Infinitive)" },
+            { "word": "dis", "translation": "tell (Present, je/tu) / tell (Imperative, tu)" },
+            { "word": "dirait", "translation": "would say (Conditional, il/elle/on)" },
+            { "word": "dites", "translation": "say (Present, vous)" },
+            { "word": "disait", "translation": "said (Imperfect past, il/elle/on)" },
+            { "word": "disais", "translation": "said (Imperfect past, je/tu)" },
+            { "word": "dirai", "translation": "will tell (Future, je)" },
+            { "word": "dira", "translation": "will tell (Future, il/elle/on)" },
+            { "word": "disent", "translation": "say (Present, ils/elles)" },
+            { "word": "disant", "translation": "saying (Present Participle)" },
+            { "word": "dise", "translation": "tell (Subjunctive, je/il/elle/on)" }
+          ],
+          "famille_vouloir": [
+            { "word": "veux", "translation": "want (Present, je/tu)" },
+            { "word": "veut", "translation": "wants (Present, il/elle/on)" },
+            { "word": "voulez", "translation": "want (Present, vous)" },
+            { "word": "voulais", "translation": "wanted (Imperfect past, je/tu)" },
+            { "word": "voulait", "translation": "wanted to (Imperfect past, il/elle/on)" },
+            { "word": "voulu", "translation": "desired (Past Participle)" },
+            { "word": "veulent", "translation": "want (Present, ils/elles)" },
+            { "word": "vouloir", "translation": "to want (Infinitive)" },
+            { "word": "voudrais", "translation": "would like (Conditional, je/tu)" },
+            { "word": "vouliez", "translation": "wanted (Imperfect past, vous)" },
+            { "word": "voudrait", "translation": "would like (Conditional, il/elle/on)" },
+            { "word": "veuillez", "translation": "please (Imperative, vous)" }
+          ],
+          "famille_pouvoir": [
+            { "word": "peux", "translation": "can (Present, je/tu)" },
+            { "word": "peut", "translation": "can (Present, il/elle/on)" },
+            { "word": "pouvoir", "translation": "power / to be able to (Infinitive)" },
+            { "word": "pourrais", "translation": "could (Conditional, je/tu)" },
+            { "word": "pouvez", "translation": "can (Present, vous)" },
+            { "word": "pourrait", "translation": "could (Conditional, il/elle/on)" },
+            { "word": "pu", "translation": "could (Past Participle)" },
+            { "word": "peuvent", "translation": "can (Present, ils/elles)" },
+            { "word": "pouvais", "translation": "could (Imperfect past, je/tu)" },
+            { "word": "puisse", "translation": "can (Subjunctive, je/il/elle/on)" },
+            { "word": "pourra", "translation": "will be able to (Future, il/elle/on)" },
+            { "word": "pourrai", "translation": "will be able to (Future, je)" },
+            { "word": "pourras", "translation": "will be able to (Future, tu)" },
+            { "word": "pourriez", "translation": "might/could (Conditional, vous)" },
+            { "word": "pouvons", "translation": "can (Present, nous)" }
+          ],
+          "famille_parler": [
+            { "word": "parler", "translation": "to speak (Infinitive)" },
+            { "word": "parle", "translation": "speak (Present, je/il/elle/on)" },
+            { "word": "parlé", "translation": "spoken (Past Participle)" },
+            { "word": "parles", "translation": "talk (Present, tu)" },
+            { "word": "parlez", "translation": "speak (Present, vous) / speak (Imperative, vous)" },
+            { "word": "parole", "translation": "speech (noun)" },
+            { "word": "paroles", "translation": "lyrics (noun)" },
+            { "word": "parlais", "translation": "speaking (Imperfect past, je/tu)" },
+            { "word": "parlait", "translation": "speaking (Imperfect past, il/elle/on)" },
+            { "word": "parlons", "translation": "let’s talk (Present, nous)" }
+          ],
+          "famille_savoir": [
+            { "word": "sais", "translation": "know (Present, je/tu)" },
+            { "word": "savoir", "translation": "to know (Infinitive)" },
+            { "word": "savez", "translation": "know (Present, vous)" },
+            { "word": "sait", "translation": "know (Present, il/elle/on)" },
+            { "word": "savais", "translation": "knew (Imperfect past, je/tu)" },
+            { "word": "su", "translation": "knew (Past Participle)" },
+            { "word": "savait", "translation": "knew (Imperfect past, il/elle/on)" },
+            { "word": "savons", "translation": "know (Present, nous)" },
+            { "word": "savent", "translation": "know (Present, ils/elles)" },
+            { "word": "sache", "translation": "know (Subjunctive, je/il/elle/on)" },
+            { "word": "saura", "translation": "will know (Future, il/elle/on)" }
+          ],
+          "famille_voir": [
+            { "word": "voir", "translation": "to see (Infinitive)" },
+            { "word": "vu", "translation": "seen (Past Participle)" },
+            { "word": "vois", "translation": "see (Present, je/tu)" },
+            { "word": "voyez", "translation": "see (Present, vous)" },
+            { "word": "voit", "translation": "sees (Present, il/elle/on)" },
+            { "word": "voyons", "translation": "see (Present, nous) / let's see (Imperative)" },
+            { "word": "revoir", "translation": "to meet again (Infinitive)" },
+            { "word": "verra", "translation": "will see (Future, il/elle/on)" },
+            { "word": "vus", "translation": "seen (Past Participle, plural)" },
+            { "word": "verras", "translation": "will see (Future, tu)" },
+            { "word": "prévu", "translation": "planned (Past Participle)" },
+            { "word": "prévoir", "translation": "to foresee (Infinitive)" }
+          ],
+          "famille_croire": [
+            { "word": "crois", "translation": "think/believe (Present, je/tu)" },
+            { "word": "croire", "translation": "to believe (Infinitive)" },
+            { "word": "croyais", "translation": "thought/believed (Imperfect past, je/tu)" },
+            { "word": "croyez", "translation": "believe (Present, vous)" },
+            { "word": "cru", "translation": "raw / believed (Past Participle)" },
+            { "word": "croit", "translation": "believes (Present, il/elle/on)" },
+            { "word": "incroyable", "translation": "unbelievable" }
+          ],
+          "famille_prendre": [
+            { "word": "prendre", "translation": "to take (Infinitive)" },
+            { "word": "prends", "translation": "take (Present, je/tu)" },
+            { "word": "pris", "translation": "taken (Past Participle)" },
+            { "word": "prend", "translation": "take (Present, il/elle/on)" },
+            { "word": "prenez", "translation": "take (Present, vous)" },
+            { "word": "comprendre", "translation": "to understand (Infinitive)" },
+            { "word": "comprends", "translation": "understand (Present, je/tu)" },
+            { "word": "compris", "translation": "including / understood (Past Participle)" },
+            { "word": "apprendre", "translation": "to learn (Infinitive)" },
+            { "word": "appris", "translation": "learned (Past Participle)" },
+            { "word": "reprendre", "translation": "to resume (Infinitive)" },
+            { "word": "comprend", "translation": "understands (Present, il/elle/on)" },
+            { "word": "comprenez", "translation": "understand (Present, vous)" },
+            { "word": "surpris", "translation": "surprised (Past Participle)" },
+            { "word": "surprise", "translation": "surprise" }
+          ],
+          "famille_fin": [
+            { "word": "fin", "translation": "end" },
+            { "word": "fini", "translation": "finished (Past Participle)" },
+            { "word": "enfin", "translation": "finally" },
+            { "word": "finir", "translation": "to finish (Infinitive)" },
+            { "word": "afin", "translation": "in order to" }
+          ],
+          "famille_heure": [
+            { "word": "heure", "translation": "hour" },
+            { "word": "heures", "translation": "hours" },
+            { "word": "heureux", "translation": "happy" },
+            { "word": "heureuse", "translation": "happy (feminine)" },
+            { "word": "malheur", "translation": "misfortune" },
+            { "word": "malheureux", "translation": "unhappy" }
+          ],
+          "famille_jour": [
+            { "word": "jour", "translation": "day" },
+            { "word": "toujours", "translation": "always" },
+            { "word": "bonjour", "translation": "hello" },
+            { "word": "jours", "translation": "days" },
+            { "word": "journée", "translation": "day" },
+            { "word": "aujourd’hui", "translation": "today" },
+            { "word": "journal", "translation": "newspaper" },
+            { "word": "journaux", "translation": "newspapers" }
+          ],
+          "famille_grand": [
+            { "word": "grand", "translation": "great/big" },
+            { "word": "grande", "translation": "great/big (feminine)" },
+            { "word": "grands", "translation": "great/big (plural)" },
+            { "word": "grandes", "translation": "great/big (feminine, plural)" },
+            { "word": "grandi", "translation": "grown up (Past Participle)" }
+          ],
+          "famille_venir": [
+            { "word": "viens", "translation": "come (Present, je/tu) / come (Imperative, tu)" },
+            { "word": "venir", "translation": "to come (Infinitive)" },
+            { "word": "vient", "translation": "come (Present, il/elle/on)" },
+            { "word": "venez", "translation": "come (Present, vous)" },
+            { "word": "venu", "translation": "came (Past Participle)" },
+            { "word": "reviens", "translation": "come back (Present, je/tu)" },
+            { "word": "devenir", "translation": "to become (Infinitive)" },
+            { "word": "souvenir", "translation": "memory (noun)" },
+            { "word": "bienvenue", "translation": "welcome (noun)" },
+            { "word": "venue", "translation": "came (Past Participle, feminine)" },
+            { "word": "revenir", "translation": "to come back (Infinitive)" },
+            { "word": "devient", "translation": "becomes (Present, il/elle/on)" },
+            { "word": "devenu", "translation": "become (Past Participle)" },
+            { "word": "reviendra", "translation": "will come back (Future, il/elle/on)" },
+            { "word": "viennent", "translation": "are coming (Present, ils/elles)" },
+            { "word": "prévenir", "translation": "to warn (Infinitive)" },
+            { "word": "revenu", "translation": "returned (Past Participle)" },
+            { "word": "souvenirs", "translation": "memories (noun)" },
+            { "word": "viendra", "translation": "will come (Future, il/elle/on)" },
+            { "word": "vienne", "translation": "come (Subjunctive, je/il/elle/on)" },
+            { "word": "avenir", "translation": "future" }
+          ],
+          "famille_mort": [
+            { "word": "mort", "translation": "death (noun) / dead (adjective) / (Past Participle of mourir)" },
+            { "word": "mourir", "translation": "to die (Infinitive)" },
+            { "word": "morte", "translation": "dead (adjective, feminine)" },
+            { "word": "morts", "translation": "dead (adjective, plural)" },
+            { "word": "meurt", "translation": "dies (Present, il/elle/on)" },
+            { "word": "meurs", "translation": "die (Present, je/tu)" }
+          ],
+          "famille_mettre": [
+            { "word": "mettre", "translation": "to put (Infinitive)" },
+            { "word": "mis", "translation": "placed (Past Participle)" },
+            { "word": "mets", "translation": "put (Present, je/tu)" },
+            { "word": "met", "translation": "put (Present, il/elle/on)" },
+            { "word": "remettre", "translation": "to reset/put back (Infinitive)" },
+            { "word": "promis", "translation": "promised (Past Participle)" },
+            { "word": "promets", "translation": "promise (Present, je/tu)" },
+            { "word": "permis", "translation": "allowed (Past Participle) / permit (noun)" }
+          ],
+          "famille_penser": [
+            { "word": "pense", "translation": "think (Present, je/il/elle/on)" },
+            { "word": "penser", "translation": "to think (Infinitive)" },
+            { "word": "pensais", "translation": "thought (Imperfect past, je/tu)" },
+            { "word": "pensez", "translation": "think (Present, vous)" },
+            { "word": "pensé", "translation": "thought (Past Participle)" },
+            { "word": "penses", "translation": "think (Present, tu)" },
+            { "word": "pensent", "translation": "think (Present, ils/elles)" },
+            { "word": "pensait", "translation": "thought (Imperfect past, il/elle/on)" }
+          ],
+          "famille_trouver": [
+            { "word": "trouvé", "translation": "found (Past Participle)" },
+            { "word": "trouver", "translation": "to find (Infinitive)" },
+            { "word": "trouve", "translation": "find (Present, je/il/elle/on)" },
+            { "word": "retrouver", "translation": "to find again/meet (Infinitive)" },
+            { "word": "retrouve", "translation": "finds (Present, il/elle/on)" },
+            { "word": "trouvez", "translation": "find (Present, vous)" },
+            { "word": "retrouvé", "translation": "found (Past Participle)" },
+            { "word": "trouves", "translation": "find (Present, tu)" }
+          ],
+          "famille_passer": [
+            { "word": "passer", "translation": "to pass (Infinitive)" },
+            { "word": "passé", "translation": "past (noun) / passed (Past Participle)" },
+            { "word": "passe", "translation": "pass (Present, je/il/elle/on)" },
+            { "word": "passera", "translation": "will pass (Future, il/elle/on)" }
+          ],
+          "famille_attendre": [
+            { "word": "attends", "translation": "wait (Present, je/tu)" },
+            { "word": "attendez", "translation": "wait (Present, vous)" },
+            { "word": "attendre", "translation": "to expect/wait for (Infinitive)" },
+            { "word": "attend", "translation": "waits (Present, il/elle/on)" },
+            { "word": "attendant", "translation": "waiting (Present Participle)" },
+            { "word": "attendu", "translation": "expected (Past Participle)" },
+            { "word": "attendent", "translation": "wait (Present, ils/elles)" }
+          ],
+          "famille_rester": [
+            { "word": "reste", "translation": "stay (Present, je/il/elle/on)" },
+            { "word": "rester", "translation": "to stay (Infinitive)" },
+            { "word": "restez", "translation": "stay (Present, vous)" },
+            { "word": "restes", "translation": "remains (noun) / stay (Present, tu)" },
+            { "word": "resté", "translation": "stayed (Past Participle)" }
+          ],
+          "famille_laisser": [
+            { "word": "laisse", "translation": "let/leave (Present, je/il/elle/on)" },
+            { "word": "laisser", "translation": "to let/leave (Infinitive)" },
+            { "word": "laissez", "translation": "leave (Present, vous)" },
+            { "word": "laissé", "translation": "let go/left (Past Participle)" }
+          ],
+          "famille_chercher": [
+            { "word": "chercher", "translation": "to look for (Infinitive)" },
+            { "word": "cherche", "translation": "looking (Present, je/il/elle/on)" },
+            { "word": "cherchez", "translation": "looking (Present, vous)" },
+            { "word": "recherche", "translation": "research (noun)" }
+          ],
+          "famille_aimer": [
+            { "word": "aime", "translation": "love (Present, je/il/elle/on)" },
+            { "word": "aimerais", "translation": "would like to (Conditional, je/tu)" },
+            { "word": "aimer", "translation": "to like/love (Infinitive)" },
+            { "word": "aimes", "translation": "love (Present, tu)" },
+            { "word": "aimé", "translation": "loved (Past Participle)" },
+            { "word": "amoureux", "translation": "in love (masculine)" },
+            { "word": "amoureuse", "translation": "in love (feminine)" },
+            { "word": "aimez", "translation": "like (Present, vous)" },
+            { "word": "aimait", "translation": "loved (Imperfect past, il/elle/on)" },
+            { "word": "aiment", "translation": "like (Present, ils/elles)" }
+          ],
+          "famille_jouer": [
+            { "word": "jouer", "translation": "to play (Infinitive)" },
+            { "word": "joue", "translation": "play (Present, je/il/elle/on)" },
+            { "word": "joué", "translation": "played (Past Participle)" },
+            { "word": "jeu", "translation": "game" },
+            { "word": "jeux", "translation": "games" },
+            { "word": "joues", "translation": "play (Present, tu)" }
+          ],
+          "famille_partir": [
+            { "word": "partir", "translation": "to go/leave (Infinitive)" },
+            { "word": "parti", "translation": "left (Past Participle)" },
+            { "word": "pars", "translation": "leave (Present, je/tu)" },
+            { "word": "partez", "translation": "leave (Present, vous)" },
+            { "word": "partons", "translation": "leave (Present, nous)" },
+            { "word": "départ", "translation": "departure" }
+          ],
+          "famille_perdre": [
+            { "word": "perdu", "translation": "lost (Past Participle)" },
+            { "word": "perdre", "translation": "to lose (Infinitive)" },
+            { "word": "perds", "translation": "lose (Present, je/tu)" },
+            { "word": "perd", "translation": "loses (Present, il/elle/on)" }
+          ],
+          "famille_changer": [
+            { "word": "changer", "translation": "to change (Infinitive)" },
+            { "word": "changé", "translation": "changed (Past Participle)" },
+            { "word": "change", "translation": "exchange (noun) / change (Present, je/il/elle/on)" }
+          ],
+          "famille_compte": [
+            { "word": "compte", "translation": "account (noun) / count (Present, je/il/elle/on)" },
+            { "word": "raconter", "translation": "to tell (a story) (Infinitive)" },
+            { "word": "raconte", "translation": "recounts (Present, il/elle/on)" },
+            { "word": "compter", "translation": "to count (Infinitive)" },
+            { "word": "comptes", "translation": "accounts (noun) / count (Present, tu)" }
+          ],
+          "famille_vivre": [
+            { "word": "vivre", "translation": "to live (Infinitive)" },
+            { "word": "vie", "translation": "life" },
+            { "word": "vit", "translation": "lives (Present, il/elle/on)" },
+            { "word": "vivant", "translation": "living (Present Participle)" },
+            { "word": "vies", "translation": "lives (noun)" },
+            { "word": "vécu", "translation": "lived (Past Participle)" }
+          ],
+          "famille_famille": [
+            { "word": "famille", "translation": "family" },
+            { "word": "femme", "translation": "wife/woman" },
+            { "word": "femmes", "translation": "women" }
+          ],
+          "famille_enfant": [
+            { "word": "enfant", "translation": "child" },
+            { "word": "enfants", "translation": "children" }
+          ],
+          "famille_maison": [
+            { "word": "maison", "translation": "house" },
+            { "word": "chez", "translation": "in/at the house of" }
+          ],
+          "famille_travail": [
+            { "word": "travail", "translation": "job/work" },
+            { "word": "travailler", "translation": "to work (Infinitive)" },
+            { "word": "travaille", "translation": "work (Present, je/il/elle/on)" },
+            { "word": "travaillé", "translation": "worked (Past Participle)" }
+          ],
+          "famille_dormir": [
+            { "word": "dormir", "translation": "to sleep (Infinitive)" },
+            { "word": "dors", "translation": "sleep (Present, je/tu)" },
+            { "word": "dormi", "translation": "slept (Past Participle)" },
+            { "word": "dort", "translation": "sleeps (Present, il/elle/on)" }
+          ],
+          "famille_appel": [
+            { "word": "appelle", "translation": "call (Present, je/il/elle/on)" },
+            { "word": "appeler", "translation": "to call (Infinitive)" },
+            { "word": "appelé", "translation": "called (Past Participle)" },
+            { "word": "appel", "translation": "call (noun)" },
+            { "word": "rappeler", "translation": "to call back/remind (Infinitive)" },
+            { "word": "rappelle", "translation": "remember/remind (Present, je/il/elle/on)" },
+            { "word": "appelles", "translation": "call (Present, tu)" }
+          ],
+          "famille_guerre": [
+            { "word": "guerre", "translation": "war" },
+            { "word": "guerrier", "translation": "warrior" }
+          ],
+          "famille_sentir": [
+            { "word": "sens", "translation": "meaning/sense (noun) / feel (Present, je/tu)" },
+            { "word": "sentir", "translation": "to feel/smell (Infinitive)" },
+            { "word": "sent", "translation": "feels (Present, il/elle/on)" },
+            { "word": "sentiment", "translation": "feeling" },
+            { "word": "sentiments", "translation": "feelings" },
+            { "word": "senti", "translation": "felt (Past Participle)" }
+          ],
+          "famille_ecrire": [
+            { "word": "écrit", "translation": "written (Past Participle)" },
+            { "word": "écrire", "translation": "to write (Infinitive)" }
+          ],
+          "famille_lire": [
+            { "word": "lire", "translation": "to read (Infinitive)" },
+            { "word": "lu", "translation": "read (Past Participle)" },
+            { "word": "livre", "translation": "book" },
+            { "word": "livres", "translation": "books" },
+            { "word": "lis", "translation": "read (Present, je/tu)" }
+          ],
+          "famille_boire": [
+            { "word": "boire", "translation": "to drink (Infinitive)" },
+            { "word": "bois", "translation": "wood / drink (Present, je/tu)" },
+            { "word": "bu", "translation": "drank (Past Participle)" }
+          ],
+          "famille_connaitre": [
+            { "word": "connais", "translation": "know (Present, je/tu)" },
+            { "word": "connaître", "translation": "to know (a person/place) (Infinitive)" },
+            { "word": "connaissez", "translation": "know (Present, vous)" },
+            { "word": "connaît", "translation": "knows (Present, il/elle/on)" },
+            { "word": "connu", "translation": "known (Past Participle)" },
+            { "word": "reconnaître", "translation": "to recognize (Infinitive)" }
+          ],
+          "famille_ouvrir": [
+            { "word": "ouvre", "translation": "opens (Present, il/elle/on)" },
+            { "word": "ouvrir", "translation": "to open (Infinitive)" },
+            { "word": "ouvert", "translation": "open (Past Participle)" },
+            { "word": "ouverte", "translation": "opened (feminine)" },
+            { "word": "ouvrez", "translation": "open (Present, vous)" },
+            { "word": "découvrir", "translation": "to discover (Infinitive)" },
+            { "word": "découvert", "translation": "discovered (Past Participle)" }
+          ],
+          "famille_fermer": [
+            { "word": "ferme", "translation": "closed (adjective) / close (Present, je/il/elle/on)" },
+            { "word": "fermer", "translation": "to close (Infinitive)" },
+            { "word": "fermé", "translation": "closed (Past Participle)" }
+          ],
+          "famille_courir": [
+            { "word": "cours", "translation": "course (noun) / run (Present, je/tu)" },
+            { "word": "courir", "translation": "to run (Infinitive)" },
+            { "word": "secours", "translation": "help/aid (noun)" },
+            { "word": "discours", "translation": "speech (noun)" },
+            { "word": "cour", "translation": "court/yard" }
+          ],
+          "famille_battre": [
+            { "word": "battre", "translation": "to beat (Infinitive)" },
+            { "word": "battu", "translation": "beaten (Past Participle)" },
+            { "word": "combat", "translation": "fight (noun)" }
+          ],
+          "famille_coucher": [
+            { "word": "coucher", "translation": "to sleep/put to bed (Infinitive)" },
+            { "word": "couché", "translation": "layer / lying down (Past Participle)" }
+          ],
+          "famille_chanter": [
+            { "word": "chanter", "translation": "to sing (Infinitive)" },
+            { "word": "chanson", "translation": "song" },
+            { "word": "chante", "translation": "sung (Present, je/il/elle/on)" }
+          ],
+          "famille_servir": [
+            { "word": "service", "translation": "service" },
+            { "word": "servir", "translation": "to serve (Infinitive)" },
+            { "word": "sert", "translation": "serves (Present, il/elle/on)" },
+            { "word": "servi", "translation": "served (Past Participle)" }
+          ],
+          "famille_sortir": [
+            { "word": "sortir", "translation": "to exit/go out (Infinitive)" },
+            { "word": "sors", "translation": "go outside (Present, je/tu)" },
+            { "word": "sortez", "translation": "get out (Present, vous)" },
+            { "word": "sorti", "translation": "got out (Past Participle)" },
+            { "word": "sortie", "translation": "exit (noun)" }
+          ],
+          "famille_suivre": [
+            { "word": "suivre", "translation": "to follow (Infinitive)" },
+            { "word": "suite", "translation": "after/following" },
+            { "word": "suivant", "translation": "following (Present Participle)" },
+            { "word": "suivi", "translation": "followed (Past Participle)" }
+          ],
+          "familles_isolees": [
+            { "word": "de", "translation": "of" },
+            { "word": "je", "translation": "I" },
+            { "word": "pas", "translation": "not" },
+            { "word": "le", "translation": "the" },
+            { "word": "vous", "translation": "you" },
+            { "word": "la", "translation": "the" },
+            { "word": "tu", "translation": "you" },
+            { "word": "que", "translation": "that/than" },
+            { "word": "un", "translation": "a" },
+            { "word": "il", "translation": "he/it" },
+            { "word": "et", "translation": "and" },
+            { "word": "à", "translation": "at" },
+            { "word": "ne", "translation": "not (negation part 1)" },
+            { "word": "les", "translation": "the" },
+            { "word": "ce", "translation": "this" },
+            { "word": "en", "translation": "in" },
+            { "word": "on", "translation": "we" },
+            { "word": "ça", "translation": "it" },
+            { "word": "une", "translation": "a" },
+            { "word": "pour", "translation": "for" },
+            { "word": "des", "translation": "of the" },
+            { "word": "moi", "translation": "me" },
+            { "word": "qui", "translation": "who" },
+            { "word": "nous", "translation": "we" },
+            { "word": "mais", "translation": "but" },
+            { "word": "y", "translation": "there" },
+            { "word": "me", "translation": "me" },
+            { "word": "dans", "translation": "in" },
+            { "word": "du", "translation": "of the" },
+            { "word": "bien", "translation": "good" },
+            { "word": "elle", "translation": "she" },
+            { "word": "si", "translation": "if" },
+            { "word": "tout", "translation": "all" },
+            { "word": "plus", "translation": "more" },
+            { "word": "non", "translation": "no" },
+            { "word": "mon", "translation": "my" },
+            { "word": "te", "translation": "you" },
+            { "word": "au", "translation": "to the/at the" },
+            { "word": "avec", "translation": "with" },
+            { "word": "oui", "translation": "yes" },
+            { "word": "toi", "translation": "you" },
+            { "word": "ils", "translation": "they" },
+            { "word": "as", "translation": "ace" },
+            { "word": "se", "translation": "himself" },
+            { "word": "comme", "translation": "as" },
+            { "word": "sur", "translation": "on/sure" },
+            { "word": "quoi", "translation": "what" },
+            { "word": "ici", "translation": "right here" },
+            { "word": "lui", "translation": "him" },
+            { "word": "ma", "translation": "my" },
+            { "word": "là", "translation": "there" },
+            { "word": "rien", "translation": "nothing" },
+            { "word": "où", "translation": "where" },
+            { "word": "votre", "translation": "your" },
+            { "word": "pourquoi", "translation": "Why" },
+            { "word": "cette", "translation": "this" },
+            { "word": "quand", "translation": "when" },
+            { "word": "par", "translation": "by" },
+            { "word": "son", "translation": "his" },
+            { "word": "ton", "translation": "your" },
+            { "word": "alors", "translation": "so" },
+            { "word": "comment", "translation": "how" },
+            { "word": "bon", "translation": "good" },
+            { "word": "ou", "translation": "or" },
+            { "word": "très", "translation": "very" },
+            { "word": "même", "translation": "even" },
+            { "word": "merci", "translation": "thank you" },
+            { "word": "jamais", "translation": "never" },
+            { "word": "aussi", "translation": "also" },
+            { "word": "chose", "translation": "thing" },
+            { "word": "tous", "translation": "all" },
+            { "word": "ces", "translation": "these" },
+            { "word": "deux", "translation": "two" },
+            { "word": "sa", "translation": "her" },
+            { "word": "faut", "translation": "must (Present, il)" },
+            { "word": "ta", "translation": "your" },
+            { "word": "autre", "translation": "other" },
+            { "word": "maintenant", "translation": "now" },
+            { "word": "encore", "translation": "still/again" },
+            { "word": "peu", "translation": "little" },
+            { "word": "vraiment", "translation": "really" },
+            { "word": "m", "translation": "me" },
+            { "word": "mes", "translation": "my" },
+            { "word": "temps", "translation": "time" },
+            { "word": "notre", "translation": "our" },
+            { "word": "oh", "translation": "Oh" },
+            { "word": "juste", "translation": "just" },
+            { "word": "sans", "translation": "without" },
+            { "word": "quelque", "translation": "some" },
+            { "word": "monde", "translation": "world" },
+            { "word": "accord", "translation": "agreement" },
+            { "word": "fois", "translation": "time" },
+            { "word": "trop", "translation": "too much" },
+            { "word": "dois", "translation": "have to (Present, je/tu)" },
+            { "word": "père", "translation": "father" },
+            { "word": "dieu", "translation": "God" },
+            { "word": "homme", "translation": "man" },
+            { "word": "sûr", "translation": "sure" },
+            { "word": "aux", "translation": "to the" },
+            { "word": "leur", "translation": "their" },
+            { "word": "avant", "translation": "before" },
+            { "word": "besoin", "translation": "need" },
+            { "word": "personne", "translation": "no one" },
+            { "word": "vrai", "translation": "true" },
+            { "word": "ans", "translation": "years" },
+            { "word": "ses", "translation": "his/her" },
+            { "word": "mal", "translation": "wrong" },
+            { "word": "vos", "translation": "your" },
+            { "word": "après", "translation": "after" },
+            { "word": "ca", "translation": "it/that" },
+            { "word": "parce que", "translation": "because" },
+            { "word": "mieux", "translation": "better" },
+            { "word": "bonne", "translation": "good (feminine)" },
+            { "word": "petit", "translation": "small" },
+            { "word": "tes", "translation": "your" },
+            { "word": "beaucoup", "translation": "a lot" },
+            { "word": "monsieur", "translation": "gentleman" },
+            { "word": "voilà", "translation": "here" },
+            { "word": "depuis", "translation": "since" },
+            { "word": "doit", "translation": "must (Present, il/elle/on)" },
+            { "word": "mère", "translation": "mother" },
+            { "word": "quel", "translation": "what/which" },
+            { "word": "fille", "translation": "girl" },
+            { "word": "déjà", "translation": "already" },
+            { "word": "gens", "translation": "people" },
+            { "word": "donc", "translation": "so" },
+            { "word": "autres", "translation": "other" },
+            { "word": "soir", "translation": "evening" },
+            { "word": "toute", "translation": "all (feminine)" },
+            { "word": "ouais", "translation": "yeah" },
+            { "word": "argent", "translation": "money" },
+            { "word": "nom", "translation": "name" },
+            { "word": "nos", "translation": "our" },
+            { "word": "cela", "translation": "it" },
+            { "word": "nuit", "translation": "night" },
+            { "word": "ii", "translation": "ii" },
+            { "word": "merde", "translation": "sh*t" },
+            { "word": "cet", "translation": "this" },
+            { "word": "papa", "translation": "dad" },
+            { "word": "maman", "translation": "mom" },
+            { "word": "peur", "translation": "fear" },
+            { "word": "désolé", "translation": "sorry" },
+            { "word": "salut", "translation": "hello" },
+            { "word": "seul", "translation": "alone" },
+            { "word": "vite", "translation": "quick" },
+            { "word": "air", "translation": "air" },
+            { "word": "quelle", "translation": "what (feminine)" },
+            { "word": "trois", "translation": "three" },
+            { "word": "plaît", "translation": "please (Present, il/elle/on)" },
+            { "word": "choses", "translation": "things" },
+            { "word": "fils", "translation": "son" },
+            { "word": "ah", "translation": "ah" },
+            { "word": "bas", "translation": "low" },
+            { "word": "moins", "translation": "less" },
+            { "word": "entre", "translation": "between" },
+            { "word": "hé", "translation": "hey" },
+            { "word": "demain", "translation": "tomorrow" },
+            { "word": "tête", "translation": "head" },
+            { "word": "hein", "translation": "huh" },
+            { "word": "ok", "translation": "ok" },
+            { "word": "raison", "translation": "reason" },
+            { "word": "assez", "translation": "enough" },
+            { "word": "elles", "translation": "they (feminine)" },
+            { "word": "moment", "translation": "moment" },
+            { "word": "amour", "translation": "love" },
+            { "word": "toutes", "translation": "all (feminine, plural)" },
+            { "word": "puis", "translation": "then" },
+            { "word": "tard", "translation": "late" },
+            { "word": "tuer", "translation": "to kill (Infinitive)" },
+            { "word": "eh", "translation": "eh" },
+            { "word": "dû", "translation": "must have (Past Participle)" },
+            { "word": "ami", "translation": "friend" },
+            { "word": "petite", "translation": "small (feminine)" },
+            { "word": "hommes", "translation": "men" },
+            { "word": "aider", "translation": "to help (Infinitive)" },
+            { "word": "gars", "translation": "guys" },
+            { "word": "chance", "translation": "luck" },
+            { "word": "combien", "translation": "how much" },
+            { "word": "tant", "translation": "so" },
+            { "word": "part", "translation": "share" },
+            { "word": "voiture", "translation": "car" },
+            { "word": "problème", "translation": "problem" },
+            { "word": "coup", "translation": "stroke" },
+            { "word": "porte", "translation": "door" },
+            { "word": "seule", "translation": "alone (feminine)" },
+            { "word": "putain", "translation": "whore" },
+            { "word": "idée", "translation": "idea" },
+            { "word": "ni", "translation": "neither" },
+            { "word": "contre", "translation": "against" },
+            { "word": "entendu", "translation": "heard (Past Participle)" },
+            { "word": "pendant", "translation": "while" },
+            { "word": "quelques", "translation": "a few" },
+            { "word": "vieux", "translation": "old" },
+            { "word": "attention", "translation": "Warning" },
+            { "word": "demande", "translation": "request" },
+            { "word": "sous", "translation": "under" },
+            { "word": "voici", "translation": "here is" },
+            { "word": "sang", "translation": "blood" },
+            { "word": "histoire", "translation": "history" },
+            { "word": "amis", "translation": "friends" },
+            { "word": "question", "translation": "question" },
+            { "word": "frère", "translation": "brother" },
+            { "word": "ville", "translation": "city" },
+            { "word": "nouveau", "translation": "new" },
+            { "word": "eux", "translation": "them" },
+            { "word": "truc", "translation": "thing" },
+            { "word": "tiens", "translation": "like / here (Imperative, tu)" },
+            { "word": "yeux", "translation": "eyes" },
+            { "word": "mois", "translation": "month" },
+            { "word": "mec", "translation": "guy" },
+            { "word": "longtemps", "translation": "long time" },
+            { "word": "belle", "translation": "beautiful" },
+            { "word": "police", "translation": "police" },
+            { "word": "seulement", "translation": "only" },
+            { "word": "importe", "translation": "matter (Present, il/elle/on)" },
+            { "word": "eau", "translation": "water" },
+            { "word": "car", "translation": "because" },
+            { "word": "super", "translation": "great" },
+            { "word": "chaque", "translation": "each" },
+            { "word": "cas", "translation": "case" },
+            { "word": "tué", "translation": "killed (Past Participle)" },
+            { "word": "terre", "translation": "Earth" },
+            { "word": "place", "translation": "square" },
+            { "word": "main", "translation": "hand" },
+            { "word": "ensemble", "translation": "together" },
+            { "word": "type", "translation": "type" },
+            { "word": "beau", "translation": "beautiful" },
+            { "word": "pardon", "translation": "sorry" },
+            { "word": "vers", "translation": "towards" },
+            { "word": "aucun", "translation": "none" },
+            { "word": "partie", "translation": "part" },
+            { "word": "prie", "translation": "pray (Present, je/il/elle/on)" },
+            { "word": "devant", "translation": "in front of" },
+            { "word": "arrivé", "translation": "arrived (Past Participle)" },
+            { "word": "mme", "translation": "Mrs" },
+            { "word": "leurs", "translation": "their" },
+            { "word": "matin", "translation": "morning" },
+            { "word": "aide", "translation": "help" },
+            { "word": "dessus", "translation": "above" },
+            { "word": "genre", "translation": "kind" },
+            { "word": "jeune", "translation": "young" },
+            { "word": "chérie", "translation": "sweetheart" },
+            { "word": "premier", "translation": "first" },
+            { "word": "donne", "translation": "given (Present, je/il/elle/on)" },
+            { "word": "droit", "translation": "law" },
+            { "word": "côté", "translation": "side" },
+            { "word": "chambre", "translation": "bedroom" },
+            { "word": "loin", "translation": "far" },
+            { "word": "donner", "translation": "to give (Infinitive)" },
+            { "word": "devrais", "translation": "should (Conditional, je/tu)" },
+            { "word": "feu", "translation": "fire" },
+            { "word": "ie", "translation": "ie" },
+            { "word": "train", "translation": "train" },
+            { "word": "gros", "translation": "large" },
+            { "word": "s", "translation": "s" },
+            { "word": "donné", "translation": "given (Past Participle)" },
+            { "word": "première", "translation": "first (feminine)" },
+            { "word": "dernière", "translation": "latest" },
+            { "word": "minutes", "translation": "minutes" },
+            { "word": "aucune", "translation": "any/none" },
+            { "word": "mari", "translation": "husband" },
+            { "word": "madame", "translation": "Mrs" },
+            { "word": "façon", "translation": "way" },
+            { "word": "devrait", "translation": "should (Conditional, il/elle/on)" },
+            { "word": "film", "translation": "movie" },
+            { "word": "fort", "translation": "strong" },
+            { "word": "écoute", "translation": "listening (Present, je/il/elle/on)" },
+            { "word": "pays", "translation": "country" },
+            { "word": "affaire", "translation": "case" },
+            { "word": "endroit", "translation": "place" },
+            { "word": "corps", "translation": "body" },
+            { "word": "ia", "translation": "ia" },
+            { "word": "fou", "translation": "crazy" },
+            { "word": "prêt", "translation": "ready" },
+            { "word": "dont", "translation": "of which" },
+            { "word": "espère", "translation": "hope (Present, je/il/elle/on)" },
+            { "word": "cause", "translation": "cause" },
+            { "word": "point", "translation": "point" },
+            { "word": "filles", "translation": "girls" },
+            { "word": "dehors", "translation": "outside" },
+            { "word": "hier", "translation": "yesterday" },
+            { "word": "boulot", "translation": "job" },
+            { "word": "garçon", "translation": "boy" },
+            { "word": "près", "translation": "near" },
+            { "word": "désolée", "translation": "sorry (feminine)" },
+            { "word": "cinq", "translation": "five" },
+            { "word": "chef", "translation": "chief/chef" },
+            { "word": "h", "translation": "h" },
+            { "word": "ainsi", "translation": "so/thus" },
+            { "word": "haut", "translation": "top" },
+            { "word": "celui", "translation": "that" },
+            { "word": "demandé", "translation": "requested (Past Participle)" },
+            { "word": "bébé", "translation": "baby" },
+            { "word": "possible", "translation": "possible" },
+            { "word": "école", "translation": "school" },
+            { "word": "plein", "translation": "full" },
+            { "word": "mains", "translation": "hands" },
+            { "word": "années", "translation": "years" },
+            { "word": "nouvelle", "translation": "new" },
+            { "word": "manger", "translation": "to eat (Infinitive)" },
+            { "word": "docteur", "translation": "doctor" },
+            { "word": "tour", "translation": "tower" },
+            { "word": "ceux", "translation": "those" },
+            { "word": "quatre", "translation": "four" },
+            { "word": "plutôt", "translation": "rather" },
+            { "word": "marche", "translation": "market / walk (Present, je/il/elle/on)" },
+            { "word": "semaine", "translation": "week" },
+            { "word": "vérité", "translation": "truth" },
+            { "word": "envie", "translation": "desire" },
+            { "word": "capitaine", "translation": "captain" },
+            { "word": "e", "translation": "e" },
+            { "word": "arrêter", "translation": "to stop (Infinitive)" },
+            { "word": "affaires", "translation": "business" },
+            { "word": "bientôt", "translation": "soon" },
+            { "word": "vue", "translation": "view" },
+            { "word": "demander", "translation": "to request (Infinitive)" },
+            { "word": "dernier", "translation": "latest" },
+            { "word": "instant", "translation": "moment" },
+            { "word": "essaie", "translation": "try (Present, je/il/elle/on)" },
+            { "word": "arriver", "translation": "to arrive (Infinitive)" },
+            { "word": "tellement", "translation": "so much" },
+            { "word": "derrière", "translation": "behind" },
+            { "word": "tomber", "translation": "to fall (Infinitive)" },
+            { "word": "presque", "translation": "almost" },
+            { "word": "meilleur", "translation": "better" },
+            { "word": "numéro", "translation": "number" },
+            { "word": "dr", "translation": "dr" },
+            { "word": "dollars", "translation": "dollars" },
+            { "word": "c", "translation": "c" },
+            { "word": "confiance", "translation": "trust" },
+            { "word": "garde", "translation": "keep (Present, je/il/elle/on)" },
+            { "word": "souviens", "translation": "remember (Present, je/tu)" },
+            { "word": "dur", "translation": "hard" },
+            { "word": "bureau", "translation": "office" },
+            { "word": "abord", "translation": "on board" },
+            { "word": "important", "translation": "important" },
+            { "word": "devez", "translation": "must (Present, vous)" },
+            { "word": "ben", "translation": "ben" },
+            { "word": "peine", "translation": "trouble" },
+            { "word": "seigneur", "translation": "lord" },
+            { "word": "suffit", "translation": "enough (Present, il/elle/on)" },
+            { "word": "route", "translation": "road" },
+            { "word": "cul", "translation": "a**" },
+            { "word": "minute", "translation": "minute" },
+            { "word": "bonsoir", "translation": "good evening" },
+            { "word": "plaisir", "translation": "pleasure" },
+            { "word": "mot", "translation": "word" },
+            { "word": "musique", "translation": "music" },
+            { "word": "chien", "translation": "dog" },
+            { "word": "messieurs", "translation": "gentlemen" },
+            { "word": "calme", "translation": "calm" },
+            { "word": "parents", "translation": "parents" },
+            { "word": "o", "translation": "o" },
+            { "word": "dedans", "translation": "in" },
+            { "word": "fous", "translation": "crazy (plural)" },
+            { "word": "arrêtez", "translation": "stop (Present, vous)" },
+            { "word": "mariage", "translation": "wedding" },
+            { "word": "entrer", "translation": "to enter (Infinitive)" },
+            { "word": "rentrer", "translation": "to return (Infinitive)" },
+            { "word": "lit", "translation": "bed" },
+            { "word": "autant", "translation": "much" },
+            { "word": "coeur", "translation": "heart" },
+            { "word": "ceci", "translation": "this" },
+            { "word": "téléphone", "translation": "phone" },
+            { "word": "pauvre", "translation": "poor" },
+            { "word": "mlle", "translation": "ms" },
+            { "word": "drôle", "translation": "funny" },
+            { "word": "parfois", "translation": "sometimes" },
+            { "word": "l", "translation": "the" },
+            { "word": "retour", "translation": "return" },
+            { "word": "á", "translation": "at/to" },
+            { "word": "verre", "translation": "glass" },
+            { "word": "six", "translation": "six" },
+            { "word": "ci", "translation": "this" },
+            { "word": "impossible", "translation": "impossible" },
+            { "word": "facile", "translation": "easy" },
+            { "word": "maître", "translation": "master" },
+            { "word": "new", "translation": "new" },
+            { "word": "mauvais", "translation": "bad" },
+            { "word": "général", "translation": "general" },
+            { "word": "doute", "translation": "doubt" },
+            { "word": "prison", "translation": "jail" },
+            { "word": "adore", "translation": "love (Present, je/il/elle/on)" },
+            { "word": "faute", "translation": "fault" },
+            { "word": "entends", "translation": "hear (Present, je/tu)" },
+            { "word": "oublié", "translation": "forgot (Past Participle)" },
+            { "word": "bras", "translation": "arms" },
+            { "word": "exactement", "translation": "exactly" },
+            { "word": "fête", "translation": "party" },
+            { "word": "café", "translation": "coffee" },
+            { "word": "chéri", "translation": "darling" },
+            { "word": "gentil", "translation": "nice" },
+            { "word": "vaut", "translation": "worth (Present, il/elle/on)" },
+            { "word": "john", "translation": "john" },
+            { "word": "lieu", "translation": "place" },
+            { "word": "malade", "translation": "sick" },
+            { "word": "roi", "translation": "king" },
+            { "word": "entendre", "translation": "to hear (Infinitive)" },
+            { "word": "président", "translation": "president" },
+            { "word": "partout", "translation": "all over" },
+            { "word": "cher", "translation": "expensive" },
+            { "word": "rendre", "translation": "to return (Infinitive)" },
+            { "word": "équipe", "translation": "team" },
+            { "word": "i", "translation": "i" },
+            { "word": "sinon", "translation": "if not" },
+            { "word": "esprit", "translation": "mind" },
+            { "word": "regarder", "translation": "to watch (Infinitive)" },
+            { "word": "rentre", "translation": "returns (Present, il/elle/on)" },
+            { "word": "plan", "translation": "plan" },
+            { "word": "cœur", "translation": "heart" },
+            { "word": "montrer", "translation": "to show (Infinitive)" },
+            { "word": "propre", "translation": "clean" },
+            { "word": "année", "translation": "year" },
+            { "word": "état", "translation": "state" },
+            { "word": "essayer", "translation": "to try (Infinitive)" },
+            { "word": "dès", "translation": "from" },
+            { "word": "semble", "translation": "seems (Present, il/elle/on)" },
+            { "word": "ies", "translation": "ies" },
+            { "word": "jack", "translation": "jack" },
+            { "word": "dix", "translation": "ten" },
+            { "word": "génial", "translation": "awesome" },
+            { "word": "sécurité", "translation": "security" },
+            { "word": "tôt", "translation": "early" },
+            { "word": "rêve", "translation": "dream" },
+            { "word": "armée", "translation": "army" },
+            { "word": "d", "translation": "d" },
+            { "word": "avis", "translation": "opinion" },
+            { "word": "surtout", "translation": "mostly" },
+            { "word": "difficile", "translation": "difficult" },
+            { "word": "york", "translation": "york" },
+            { "word": "ensuite", "translation": "then" },
+            { "word": "pire", "translation": "worst" },
+            { "word": "ecoute", "translation": "listening" },
+            { "word": "simple", "translation": "simple" },
+            { "word": "paix", "translation": "peace" },
+            { "word": "arme", "translation": "armed" },
+            { "word": "sujet", "translation": "subject" },
+            { "word": "retard", "translation": "delay" },
+            { "word": "sale", "translation": "dirty" },
+            { "word": "souvent", "translation": "often" },
+            { "word": "an", "translation": "year" },
+            { "word": "sauf", "translation": "except" },
+            { "word": "choix", "translation": "choice" },
+            { "word": "sûrement", "translation": "surely" },
+            { "word": "or", "translation": "gold" },
+            { "word": "visage", "translation": "face" },
+            { "word": "ordre", "translation": "order" },
+            { "word": "essayé", "translation": "tried (Past Participle)" },
+            { "word": "noir", "translation": "black" },
+            { "word": "dîner", "translation": "having dinner" },
+            { "word": "âge", "translation": "age" },
+            { "word": "chemin", "translation": "path" },
+            { "word": "bout", "translation": "end" },
+            { "word": "face", "translation": "face" },
+            { "word": "rue", "translation": "street" },
+            { "word": "inquiète", "translation": "worry (Present, je/il/elle/on)" },
+            { "word": "photo", "translation": "photo" },
+            { "word": "personnes", "translation": "people" },
+            { "word": "sérieux", "translation": "serious" },
+            { "word": "ciel", "translation": "sky" },
+            { "word": "honneur", "translation": "honor" },
+            { "word": "amie", "translation": "friend (feminine)" },
+            { "word": "questions", "translation": "questions" },
+            { "word": "force", "translation": "strength" },
+            { "word": "j", "translation": "j" },
+            { "word": "garder", "translation": "to keep (Infinitive)" },
+            { "word": "petits", "translation": "small (plural)" },
+            { "word": "tirer", "translation": "to shoot (Infinitive)" },
+            { "word": "millions", "translation": "million" },
+            { "word": "grave", "translation": "serious" },
+            { "word": "marché", "translation": "market" },
+            { "word": "nouvelles", "translation": "new (feminine, plural)" },
+            { "word": "voix", "translation": "voice" },
+            { "word": "semaines", "translation": "weeks" },
+            { "word": "courant", "translation": "current" },
+            { "word": "propos", "translation": "about" },
+            { "word": "bateau", "translation": "boat" },
+            { "word": "oublie", "translation": "forget it (Present, je/il/elle/on)" },
+            { "word": "con", "translation": "dumb" },
+            { "word": "celle", "translation": "that (feminine)" },
+            { "word": "gauche", "translation": "left" },
+            { "word": "content", "translation": "happy" },
+            { "word": "prix", "translation": "price" },
+            { "word": "rouge", "translation": "red" },
+            { "word": "faim", "translation": "hunger" },
+            { "word": "avion", "translation": "plane" },
+            { "word": "devoir", "translation": "must do (Infinitive)" },
+            { "word": "prochaine", "translation": "next (feminine)" },
+            { "word": "acheter", "translation": "to buy (Infinitive)" },
+            { "word": "voyage", "translation": "trip" },
+            { "word": "sorte", "translation": "kind" },
+            { "word": "long", "translation": "long" },
+            { "word": "espèce", "translation": "species" },
+            { "word": "idiot", "translation": "idiot" },
+            { "word": "gueule", "translation": "mouth" },
+            { "word": "début", "translation": "beginning" },
+            { "word": "bouge", "translation": "moves (Present, je/il/elle/on)" },
+            { "word": "hôpital", "translation": "hospital" },
+            { "word": "sort", "translation": "go out (Present, il/elle/on)" },
+            { "word": "grâce", "translation": "grace" },
+            { "word": "problèmes", "translation": "problems" },
+            { "word": "message", "translation": "message" },
+            { "word": "certains", "translation": "some" },
+            { "word": "patron", "translation": "boss" },
+            { "word": "sûre", "translation": "safe (feminine)" },
+            { "word": "reçu", "translation": "received (Past Participle)" },
+            { "word": "trucs", "translation": "stuff" },
+            { "word": "the", "translation": "tea" },
+            { "word": "oncle", "translation": "uncle" },
+            { "word": "euh", "translation": "uh" },
+            { "word": "devons", "translation": "must (Present, nous)" },
+            { "word": "occupe", "translation": "occupied (Present, je/il/elle/on)" },
+            { "word": "camp", "translation": "camp" },
+            { "word": "manque", "translation": "lack" },
+            { "word": "soleil", "translation": "sun" },
+            { "word": "devait", "translation": "must have (Imperfect past, il/elle/on)" },
+            { "word": "pouvait", "translation": "could (Imperfect past, il/elle/on)" },
+            { "word": "cheveux", "translation": "hair" },
+            { "word": "armes", "translation": "weapons" },
+            { "word": "salle", "translation": "room" },
+            { "word": "bizarre", "translation": "weird" },
+            { "word": "gagner", "translation": "to win (Infinitive)" },
+            { "word": "commencé", "translation": "begun (Past Participle)" },
+            { "word": "fond", "translation": "background" },
+            { "word": "sauver", "translation": "to save (Infinitive)" },
+            { "word": "pièce", "translation": "piece" },
+            { "word": "erreur", "translation": "error" },
+            { "word": "ailleurs", "translation": "elsewhere" },
+            { "word": "rapport", "translation": "report" },
+            { "word": "froid", "translation": "cold" },
+            { "word": "scène", "translation": "scene" },
+            { "word": "secret", "translation": "secret" },
+            { "word": "sac", "translation": "bag" },
+            { "word": "seconde", "translation": "second" },
+            { "word": "allô", "translation": "hello" },
+            { "word": "hôtel", "translation": "hotel" },
+            { "word": "soirée", "translation": "evening" },
+            { "word": "soeur", "translation": "sister" },
+            { "word": "pieds", "translation": "feet" },
+            { "word": "carte", "translation": "map" },
+            { "word": "jolie", "translation": "pretty" },
+            { "word": "n", "translation": "n" },
+            { "word": "pied", "translation": "foot" },
+            { "word": "groupe", "translation": "group" },
+            { "word": "monte", "translation": "mounted (Present, je/il/elle/on)" },
+            { "word": "agent", "translation": "agent" },
+            { "word": "fallait", "translation": "needed (Imperfect past, il)" },
+            { "word": "effet", "translation": "effect" },
+            { "word": "libre", "translation": "free" },
+            { "word": "foutre", "translation": "to do (vulgar) (Infinitive)" },
+            { "word": "bordel", "translation": "mess" },
+            { "word": "mots", "translation": "words" },
+            { "word": "neuf", "translation": "new" },
+            { "word": "tire", "translation": "drawn (Present, je/il/elle/on)" },
+            { "word": "faux", "translation": "false" },
+            { "word": "situation", "translation": "situation" },
+            { "word": "tue", "translation": "kill (Present, je/il/elle/on)" },
+            { "word": "lumière", "translation": "light" },
+            { "word": "vieille", "translation": "old (feminine)" },
+            { "word": "droite", "translation": "right" },
+            { "word": "debout", "translation": "standing" },
+            { "word": "noël", "translation": "Christmas" },
+            { "word": "cheval", "translation": "horse" },
+            { "word": "intérieur", "translation": "inside" },
+            { "word": "écoutez", "translation": "listen (Present, vous)" },
+            { "word": "joli", "translation": "pretty" },
+            { "word": "gagné", "translation": "won (Past Participle)" },
+            { "word": "loi", "translation": "law" },
+            { "word": "entrez", "translation": "come in (Present, vous)" },
+            { "word": "lettre", "translation": "letter" },
+            { "word": "présent", "translation": "present" },
+            { "word": "occuper", "translation": "to occupy (Infinitive)" },
+            { "word": "absolument", "translation": "absolutely" },
+            { "word": "dame", "translation": "lady" },
+            { "word": "professeur", "translation": "professor" },
+            { "word": "fric", "translation": "money" },
+            { "word": "george", "translation": "george" },
+            { "word": "coin", "translation": "corner" },
+            { "word": "table", "translation": "table" },
+            { "word": "colonel", "translation": "colonel" },
+            { "word": "âme", "translation": "soul" },
+            { "word": "dos", "translation": "back" },
+            { "word": "magnifique", "translation": "magnificent" },
+            { "word": "rencontrer", "translation": "to meet (Infinitive)" },
+            { "word": "réussi", "translation": "successful (Past Participle)" },
+            { "word": "meilleure", "translation": "best (feminine)" },
+            { "word": "tranquille", "translation": "quiet" },
+            { "word": "chaud", "translation": "hot" },
+            { "word": "mr", "translation": "mr" },
+            { "word": "commencer", "translation": "to start (Infinitive)" },
+            { "word": "sœur", "translation": "sister" },
+            { "word": "agit", "translation": "act (Present, il/elle/on)" },
+            { "word": "cool", "translation": "cool" },
+            { "word": "doucement", "translation": "slowly" },
+            { "word": "pareil", "translation": "the same" },
+            { "word": "jeunes", "translation": "youth" },
+            { "word": "joe", "translation": "joe" },
+            { "word": "accident", "translation": "accident" },
+            { "word": "anniversaire", "translation": "birthday/anniversary" },
+            { "word": "blanc", "translation": "white" },
+            { "word": "risqué", "translation": "risk" },
+            { "word": "doivent", "translation": "have to (Present, ils/elles)" },
+            { "word": "moyen", "translation": "way" },
+            { "word": "terminé", "translation": "completed (Past Participle)" },
+            { "word": "complètement", "translation": "completely" },
+            { "word": "clair", "translation": "clear" },
+            { "word": "meurtre", "translation": "murder" },
+            { "word": "sam", "translation": "sam" },
+            { "word": "ordres", "translation": "orders" },
+            { "word": "touche", "translation": "touch (Present, je/il/elle/on)" },
+            { "word": "frank", "translation": "frank" },
+            { "word": "prêts", "translation": "loans" },
+            { "word": "déjeuner", "translation": "lunch" },
+            { "word": "envoyé", "translation": "sent (Past Participle)" },
+            { "word": "tombe", "translation": "falls (Present, il/elle/on)" },
+            { "word": "marcher", "translation": "to walk (Infinitive)" },
+            { "word": "avance", "translation": "advanced (Present, je/il/elle/on)" },
+            { "word": "déteste", "translation": "hated (Present, je/il/elle/on)" },
+            { "word": "forme", "translation": "form" },
+            { "word": "â", "translation": "a" },
+            { "word": "mauvaise", "translation": "bad (feminine)" },
+            { "word": "bord", "translation": "edge" },
+            { "word": "décidé", "translation": "decided (Past Participle)" },
+            { "word": "mer", "translation": "sea" },
+            { "word": "médecin", "translation": "doctor" },
+            { "word": "midi", "translation": "midday" },
+            { "word": "montre", "translation": "watch" },
+            { "word": "porter", "translation": "to carry (Infinitive)" },
+            { "word": "vraie", "translation": "real (feminine)" },
+            { "word": "ignore", "translation": "ignore/unknown (Present, je/il/elle/on)" },
+            { "word": "charlie", "translation": "charlie" },
+            { "word": "silence", "translation": "silence" },
+            { "word": "diable", "translation": "devil" },
+            { "word": "tom", "translation": "tom" },
+            { "word": "cadeau", "translation": "gift" },
+            { "word": "suppose", "translation": "assumed (Present, je/il/elle/on)" },
+            { "word": "b", "translation": "b" },
+            { "word": "flics", "translation": "cops" },
+            { "word": "avocat", "translation": "lawyer" },
+            { "word": "jure", "translation": "sworn (Present, je/il/elle/on)" },
+            { "word": "anglais", "translation": "English" },
+            { "word": "sept", "translation": "seven" },
+            { "word": "devriez", "translation": "should (Conditional, vous)" },
+            { "word": "moitié", "translation": "half" },
+            { "word": "chacun", "translation": "each" },
+            { "word": "exact", "translation": "exact" },
+            { "word": "commandant", "translation": "commanding officer" },
+            { "word": "télé", "translation": "TV" },
+            { "word": "autour", "translation": "around" },
+            { "word": "disparu", "translation": "faded away (Past Participle)" },
+            { "word": "ligne", "translation": "line" },
+            { "word": "expliquer", "translation": "to explain (Infinitive)" },
+            { "word": "arrivée", "translation": "arrival" },
+            { "word": "grosse", "translation": "big (feminine)" },
+            { "word": "simplement", "translation": "simply" },
+            { "word": "mission", "translation": "mission" },
+            { "word": "monter", "translation": "to ascend (Infinitive)" },
+            { "word": "tenir", "translation": "to hold (Infinitive)" },
+            { "word": "bons", "translation": "good (plural)" },
+            { "word": "balle", "translation": "ball" },
+            { "word": "quitter", "translation": "to leave (Infinitive)" },
+            { "word": "selon", "translation": "according to" },
+            { "word": "classe", "translation": "class" },
+            { "word": "paris", "translation": "Paris" },
+            { "word": "mange", "translation": "eat (Present, je/il/elle/on)" },
+            { "word": "peuple", "translation": "people" },
+            { "word": "habitude", "translation": "habit" },
+            { "word": "voie", "translation": "way" },
+            { "word": "dangereux", "translation": "dangerous" },
+            { "word": "pote", "translation": "mate" },
+            { "word": "contrôle", "translation": "control" },
+            { "word": "prête", "translation": "ready (feminine)" },
+            { "word": "honte", "translation": "shame" },
+            { "word": "rencontré", "translation": "met (Past Participle)" },
+            { "word": "photos", "translation": "pics" },
+            { "word": "impression", "translation": "impression" },
+            { "word": "folle", "translation": "crazy (feminine)" },
+            { "word": "oublier", "translation": "to forget (Infinitive)" },
+            { "word": "retourner", "translation": "to return (Infinitive)" },
+            { "word": "offre", "translation": "offer" },
+            { "word": "envoie", "translation": "send (Present, je/il/elle/on)" },
+            { "word": "trou", "translation": "hole" },
+            { "word": "arrière", "translation": "back" },
+            { "word": "poste", "translation": "post" },
+            { "word": "amérique", "translation": "America" },
+            { "word": "huit", "translation": "eight" },
+            { "word": "radio", "translation": "radio" },
+            { "word": "paul", "translation": "paul" },
+            { "word": "ressemble", "translation": "looks like (Present, il/elle/on)" },
+            { "word": "attaque", "translation": "attack" },
+            { "word": "arrêté", "translation": "stopped (Past Participle)" },
+            { "word": "baiser", "translation": "to kiss (Infinitive)" },
+            { "word": "pourtant", "translation": "however" },
+            { "word": "réponse", "translation": "reply" },
+            { "word": "k", "translation": "k" },
+            { "word": "connard", "translation": "a**hole" },
+            { "word": "pute", "translation": "b*tch" },
+            { "word": "bande", "translation": "gang" },
+            { "word": "enfer", "translation": "hell" },
+            { "word": "tenez", "translation": "hold (Present, vous)" },
+            { "word": "rend", "translation": "makes (Present, il/elle/on)" },
+            { "word": "triste", "translation": "sad" },
+            { "word": "tel", "translation": "such" },
+            { "word": "bravo", "translation": "bravo" },
+            { "word": "david", "translation": "david" },
+            { "word": "plusieurs", "translation": "many" },
+            { "word": "existe", "translation": "exist (Present, il/elle/on)" },
+            { "word": "rire", "translation": "to laugh (Infinitive)" },
+            { "word": "compagnie", "translation": "company" },
+            { "word": "étrange", "translation": "strange" },
+            { "word": "exemple", "translation": "example" },
+            { "word": "devais", "translation": "had to (Imperfect past, je/tu)" },
+            { "word": "visite", "translation": "visit" },
+            { "word": "michael", "translation": "michael" },
+            { "word": "imagine", "translation": "conceived (Present, je/il/elle/on)" },
+            { "word": "bob", "translation": "bob" },
+            { "word": "merveilleux", "translation": "wonderful" },
+            { "word": "continuer", "translation": "to carry on (Infinitive)" },
+            { "word": "volé", "translation": "stolen (Past Participle)" },
+            { "word": "lune", "translation": "moon" },
+            { "word": "bouche", "translation": "mouth" },
+            { "word": "sud", "translation": "south" },
+            { "word": "danse", "translation": "dance" },
+            { "word": "ennuis", "translation": "trouble" },
+            { "word": "but", "translation": "goal" },
+            { "word": "aie", "translation": "ouch" },
+            { "word": "hors", "translation": "except" },
+            { "word": "boîte", "translation": "box" },
+            { "word": "vol", "translation": "flight" },
+            { "word": "public", "translation": "public" },
+            { "word": "lieutenant", "translation": "lieutenant" },
+            { "word": "écouter", "translation": "to listen (Infinitive)" },
+            { "word": "présente", "translation": "present (feminine)" },
+            { "word": "système", "translation": "system" },
+            { "word": "époque", "translation": "time" },
+            { "word": "retourne", "translation": "return (Present, je/il/elle/on)" },
+            { "word": "certain", "translation": "certain" },
+            { "word": "bête", "translation": "stupid" },
+            { "word": "vendre", "translation": "to sell (Infinitive)" },
+            { "word": "coups", "translation": "shots" },
+            { "word": "santé", "translation": "health" },
+            { "word": "envoyer", "translation": "to send (Infinitive)" },
+            { "word": "cuisine", "translation": "kitchen" },
+            { "word": "normal", "translation": "normal" },
+            { "word": "danger", "translation": "danger" },
+            { "word": "gouvernement", "translation": "government" },
+            { "word": "village", "translation": "town" },
+            { "word": "poser", "translation": "to pose (Infinitive)" },
+            { "word": "approche", "translation": "approach" },
+            { "word": "faudra", "translation": "will have to (Future, il)" },
+            { "word": "dommage", "translation": "pity" },
+            { "word": "peau", "translation": "skin" },
+            { "word": "pleine", "translation": "full (feminine)" },
+            { "word": "voler", "translation": "to steal (Infinitive)" },
+            { "word": "nez", "translation": "nose" },
+            { "word": "danser", "translation": "to dance (Infinitive)" },
+            { "word": "sympa", "translation": "friendly" },
+            { "word": "bonnes", "translation": "good (feminine, plural)" },
+            { "word": "mille", "translation": "thousand" },
+            { "word": "héros", "translation": "hero" },
+            { "word": "banque", "translation": "bank" },
+            { "word": "sergent", "translation": "sergeant" },
+            { "word": "clé", "translation": "key" },
+            { "word": "secondes", "translation": "seconds" },
+            { "word": "nord", "translation": "North" },
+            { "word": "inspecteur", "translation": "inspector" },
+            { "word": "hey", "translation": "hey" },
+            { "word": "liberté", "translation": "freedom" },
+            { "word": "salaud", "translation": "b**tard" },
+            { "word": "plait", "translation": "please (Present, il/elle/on)" },
+            { "word": "juge", "translation": "judge" },
+            { "word": "bruit", "translation": "noise" },
+            { "word": "flic", "translation": "cop" },
+            { "word": "tient", "translation": "is holding (Present, il/elle/on)" },
+            { "word": "terrible", "translation": "terrible" },
+            { "word": "paraît", "translation": "seems (Present, il/elle/on)" },
+            { "word": "crime", "translation": "crime" },
+            { "word": "prochain", "translation": "next" },
+            { "word": "assis", "translation": "seated" },
+            { "word": "thé", "translation": "tea" },
+            { "word": "bonheur", "translation": "happiness" },
+            { "word": "payé", "translation": "paid (Past Participle)" },
+            { "word": "tas", "translation": "heap" },
+            { "word": "travers", "translation": "through" },
+            { "word": "stupide", "translation": "dumb" },
+            { "word": "blague", "translation": "joke" },
+            { "word": "préfère", "translation": "prefer (Present, je/il/elle/on)" },
+            { "word": "conseil", "translation": "advice" },
+            { "word": "robe", "translation": "dress" },
+            { "word": "tiré", "translation": "drawn (Past Participle)" },
+            { "word": "protéger", "translation": "to protect (Infinitive)" },
+            { "word": "rêves", "translation": "dreams" },
+            { "word": "seuls", "translation": "only (plural)" },
+            { "word": "pitié", "translation": "pity" },
+            { "word": "oeil", "translation": "eye" },
+            { "word": "mêmes", "translation": "same" },
+            { "word": "vin", "translation": "wine" },
+            { "word": "don", "translation": "gift" },
+            { "word": "sol", "translation": "ground" },
+            { "word": "vent", "translation": "wind" },
+            { "word": "club", "translation": "club" },
+            { "word": "garçons", "translation": "boys" },
+            { "word": "gamin", "translation": "kid" },
+            { "word": "tante", "translation": "aunt" },
+            { "word": "mesdames", "translation": "ladies" },
+            { "word": "bar", "translation": "bar" },
+            { "word": "milieu", "translation": "middle" },
+            { "word": "reine", "translation": "queen" },
+            { "word": "signe", "translation": "sign" },
+            { "word": "centre", "translation": "center" },
+            { "word": "probablement", "translation": "probably" },
+            { "word": "bière", "translation": "beer" },
+            { "word": "dingue", "translation": "crazy" },
+            { "word": "inutile", "translation": "useless" },
+            { "word": "nulle", "translation": "nothing (feminine)" },
+            { "word": "mike", "translation": "mike" },
+            { "word": "différent", "translation": "different" },
+            { "word": "emmener", "translation": "to bring (Infinitive)" },
+            { "word": "prise", "translation": "taking" },
+            { "word": "vêtements", "translation": "clothing" },
+            { "word": "liste", "translation": "listing" },
+            { "word": "unis", "translation": "united" },
+            { "word": "société", "translation": "business/society" },
+            { "word": "chère", "translation": "dear (feminine)" },
+            { "word": "soin", "translation": "care" },
+            { "word": "pierre", "translation": "Pierre" },
+            { "word": "appelez", "translation": "call (Present, vous)" },
+            { "word": "utiliser", "translation": "to use (Infinitive)" },
+            { "word": "acheté", "translation": "bought (Past Participle)" },
+            { "word": "laquelle", "translation": "which (feminine)" },
+            { "word": "fiche", "translation": "plug" },
+            { "word": "mecs", "translation": "guys" },
+            { "word": "marier", "translation": "to marry (Infinitive)" },
+            { "word": "ennemi", "translation": "enemy" },
+            { "word": "spectacle", "translation": "show" },
+            { "word": "choisi", "translation": "selected (Past Participle)" },
+            { "word": "you", "translation": "you" },
+            { "word": "pose", "translation": "pose (Present, je/il/elle/on)" },
+            { "word": "films", "translation": "movies" },
+            { "word": "intérêt", "translation": "interest" },
+            { "word": "intéresse", "translation": "interested (Present, je/il/elle/on)" },
+            { "word": "rôle", "translation": "role" },
+            { "word": "johnny", "translation": "johnny" },
+            { "word": "félicitations", "translation": "congratulations" },
+            { "word": "descendre", "translation": "to go down (Infinitive)" },
+            { "word": "harry", "translation": "harry" },
+            { "word": "tourne", "translation": "turned (Present, je/il/elle/on)" },
+            { "word": "position", "translation": "position" },
+            { "word": "blessé", "translation": "injured (Past Participle)" },
+            { "word": "humain", "translation": "human" },
+            { "word": "asseoir", "translation": "to seat (Infinitive)" },
+            { "word": "match", "translation": "match" },
+            { "word": "coupable", "translation": "guilty" },
+            { "word": "environ", "translation": "about" },
+            { "word": "art", "translation": "art" },
+            { "word": "mise", "translation": "setting" },
+            { "word": "londres", "translation": "London" },
+            { "word": "espoir", "translation": "hope" },
+            { "word": "quitté", "translation": "quit (Past Participle)" },
+            { "word": "lequel", "translation": "which" },
+            { "word": "mur", "translation": "wall" },
+            { "word": "peter", "translation": "to fart (Infinitive)" },
+            { "word": "église", "translation": "church" },
+            { "word": "salope", "translation": "sl*t" },
+            { "word": "beauté", "translation": "beauty" },
+            { "word": "lâche", "translation": "loose" },
+            { "word": "adresse", "translation": "address" },
+            { "word": "mademoiselle", "translation": "miss" },
+            { "word": "petites", "translation": "small (feminine, plural)" },
+            { "word": "sauter", "translation": "to jump (Infinitive)" },
+            { "word": "colère", "translation": "anger" },
+            { "word": "directeur", "translation": "director" },
+            { "word": "adieu", "translation": "farewell" },
+            { "word": "jimmy", "translation": "jimmy" },
+            { "word": "parie", "translation": "bet (Present, je/il/elle/on)" },
+            { "word": "entrée", "translation": "entrance" },
+            { "word": "tort", "translation": "wrong" },
+            { "word": "conduire", "translation": "to drive (Infinitive)" },
+            { "word": "américain", "translation": "American" },
+            { "word": "f", "translation": "f" },
+            { "word": "justice", "translation": "justice" },
+            { "word": "soldat", "translation": "soldier" },
+            { "word": "expérience", "translation": "experience" },
+            { "word": "cerveau", "translation": "brain" },
+            { "word": "fenêtre", "translation": "window" },
+            { "word": "quartier", "translation": "district" }
+          ]
+        };
+
+        // --- APPLICATION LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            let currentGroupKey = '';
+            let currentGroupData = [];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let currentQuestion = null;
+            let quizType = 0; // 0: fr-en (mcq), 1: en-fr (text), 2: en-fr (mcq)
+            
+            // --- DOM ELEMENTS ---
+            const setupScreen = document.getElementById('setup-screen');
+            const quizScreen = document.getElementById('quiz-screen');
+            const endScreen = document.getElementById('end-screen');
+            const groupSelect = document.getElementById('group-select');
+            const startBtn = document.getElementById('start-btn');
+            const randomBtn = document.getElementById('random-btn');
+            const groupTitle = document.getElementById('group-title');
+            const scoreDisplay = document.getElementById('score');
+            const questionArea = document.getElementById('question-area');
+            const answerArea = document.getElementById('answer-area');
+            const feedbackArea = document.getElementById('feedback-area');
+            const checkBtn = document.getElementById('check-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            const backToMenuBtn = document.getElementById('back-to-menu-btn');
+
+            // --- DATA PROCESSING ---
+            // Process raw data into chunks of 30 for large families
+            const processedData = {};
+            const CHUNK_SIZE = 30;
+
+            for (const key in rawData) {
+                const words = rawData[key];
+                if (words.length > CHUNK_SIZE) {
+                    let chunkIndex = 1;
+                    for (let i = 0; i < words.length; i += CHUNK_SIZE) {
+                        const chunk = words.slice(i, i + CHUNK_SIZE);
+                        processedData[`${key}_${chunkIndex}`] = chunk;
+                        chunkIndex++;
+                    }
+                } else {
+                    processedData[key] = words;
+                }
+            }
+            
+            const allWords = Object.values(processedData).flat();
+
+            // --- FUNCTIONS ---
+            
+            // Populate the dropdown with processed group names
+            function populateGroupSelect() {
+                const groupKeys = Object.keys(processedData).sort();
+                groupSelect.innerHTML = groupKeys.map(key => `<option value="${key}">${key.replace(/_/g, ' ')}</option>`).join('');
+            }
+
+            // Shuffle an array
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // Start the quiz with a given group key
+            function startQuiz(groupKey) {
+                currentGroupKey = groupKey;
+                currentGroupData = shuffleArray([...processedData[groupKey]]);
+                currentQuestionIndex = 0;
+                score = 0;
+                
+                setupScreen.classList.add('hidden');
+                endScreen.classList.add('hidden');
+                quizScreen.classList.remove('hidden');
+                
+                groupTitle.textContent = currentGroupKey.replace(/_/g, ' ');
+                displayQuestion();
+                updateScore();
+            }
+
+            // Display the current question
+            function displayQuestion() {
+                if (currentQuestionIndex >= currentGroupData.length) {
+                    showEndScreen();
+                    return;
+                }
+                
+                currentQuestion = currentGroupData[currentQuestionIndex];
+                quizType = Math.floor(Math.random() * 3);
+
+                questionArea.innerHTML = '';
+                answerArea.innerHTML = '';
+                feedbackArea.innerHTML = '';
+                checkBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+
+                switch(quizType) {
+                    case 0: // French to English (MCQ)
+                        generateFrEnMCQ();
+                        break;
+                    case 1: // English to French (Text Input)
+                        generateEnFrText();
+                        break;
+                    case 2: // English to French (MCQ)
+                        generateEnFrMCQ();
+                        break;
+                }
+                updateScore();
+            }
+            
+            // Generate French to English Multiple Choice Question
+            function generateFrEnMCQ() {
+                questionArea.innerHTML = `<p class="text-lg text-gray-600 mb-2">What is the meaning of:</p><h3 class="text-4xl font-bold text-gray-900">${currentQuestion.word}</h3>`;
+                
+                const options = getMCQOptions('translation', currentQuestion);
+                
+                answerArea.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${options.map((opt, index) => `
+                    <div>
+                        <input type="radio" name="mcq-option" id="option${index}" value="${opt}" class="hidden">
+                        <label for="option${index}" class="option-label">${opt}</label>
+                    </div>
+                `).join('')}</div>`;
+            }
+
+            // Generate English to French Text Input Question
+            function generateEnFrText() {
+                questionArea.innerHTML = `<p class="text-lg text-gray-600 mb-2">How do you write this in French?</p><h3 class="text-2xl font-bold text-gray-900">${currentQuestion.translation}</h3>`;
+                answerArea.innerHTML = `<input type="text" id="text-answer" class="w-full max-w-sm p-3 border border-gray-300 rounded-lg text-center text-lg focus:ring-2 focus:ring-indigo-500" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
+                document.getElementById('text-answer').focus();
+            }
+
+            // Generate English to French Multiple Choice Question
+            function generateEnFrMCQ() {
+                questionArea.innerHTML = `<p class="text-lg text-gray-600 mb-2">Which word means:</p><h3 class="text-2xl font-bold text-gray-900">${currentQuestion.translation}</h3>`;
+
+                const options = getMCQOptions('word', currentQuestion);
+
+                answerArea.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${options.map((opt, index) => `
+                    <div>
+                        <input type="radio" name="mcq-option" id="option${index}" value="${opt}" class="hidden">
+                        <label for="option${index}" class="option-label">${opt}</label>
+                    </div>
+                `).join('')}</div>`;
+            }
+
+            // Get multiple choice options
+            function getMCQOptions(field, correctItem) {
+                let options = [correctItem[field]];
+                let distractors = allWords.filter(item => item[field] !== correctItem[field]);
+                shuffleArray(distractors);
+                
+                for(let i = 0; options.length < 4 && i < distractors.length; i++) {
+                    if (!options.includes(distractors[i][field])) {
+                        options.push(distractors[i][field]);
+                    }
+                }
+
+                // Ensure there are always 4 options, even with duplicates if necessary
+                while (options.length < 4) {
+                    options.push(distractors[options.length].field);
+                }
+
+                return shuffleArray(options);
+            }
+
+            // Check the user's answer
+            function checkAnswer() {
+                let userAnswer;
+                let isCorrect = false;
+
+                if (quizType === 1) { // Text input
+                    userAnswer = document.getElementById('text-answer').value.trim().toLowerCase();
+                    isCorrect = userAnswer === currentQuestion.word.toLowerCase();
+                } else { // MCQ
+                    const selectedOption = document.querySelector('input[name="mcq-option"]:checked');
+                    if (!selectedOption) {
+                        feedbackArea.textContent = "Please select an answer.";
+                        feedbackArea.className = "mt-4 text-center h-8 font-medium text-yellow-600";
+                        return;
+                    }
+                    userAnswer = selectedOption.value;
+                    const correctAnswer = (quizType === 0) ? currentQuestion.translation : currentQuestion.word;
+                    isCorrect = userAnswer === correctAnswer;
+                }
+
+                if (isCorrect) {
+                    score++;
+                    feedbackArea.textContent = "Correct!";
+                    feedbackArea.className = "mt-4 text-center h-8 font-medium text-green-600";
+                } else {
+                    const correctAnswer = (quizType === 1) ? currentQuestion.word : (quizType === 0 ? currentQuestion.translation : currentQuestion.word);
+                    feedbackArea.innerHTML = `Incorrect. The correct answer is: <strong class="font-bold">${correctAnswer}</strong>`;
+                    feedbackArea.className = "mt-4 text-center h-8 font-medium text-red-600";
+                }
+
+                checkBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                updateScore();
+            }
+
+            // Update the score display
+            function updateScore() {
+                scoreDisplay.textContent = `Score: ${score} / ${currentGroupData.length}`;
+            }
+
+            // Show the final score screen
+            function showEndScreen() {
+                quizScreen.classList.add('hidden');
+                endScreen.classList.remove('hidden');
+                finalScore.textContent = `Your final score is ${score} out of ${currentGroupData.length}.`;
+            }
+
+            // --- EVENT LISTENERS ---
+            startBtn.addEventListener('click', () => {
+                const selectedGroup = groupSelect.value;
+                startQuiz(selectedGroup);
+            });
+
+            randomBtn.addEventListener('click', () => {
+                const groupKeys = Object.keys(processedData);
+                const randomKey = groupKeys[Math.floor(Math.random() * groupKeys.length)];
+                startQuiz(randomKey);
+            });
+
+            checkBtn.addEventListener('click', checkAnswer);
+
+            answerArea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && quizType === 1) {
+                    checkAnswer();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentQuestionIndex++;
+                displayQuestion();
+            });
+
+            restartBtn.addEventListener('click', () => {
+                endScreen.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+            });
+
+            backToMenuBtn.addEventListener('click', () => {
+                quizScreen.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+            });
+
+            // --- INITIALIZATION ---
+            populateGroupSelect();
+        });
+    </script>
+</body>
+</html>
+
