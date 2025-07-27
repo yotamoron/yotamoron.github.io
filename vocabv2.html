@@ -89,8 +89,8 @@
                 </div>
             </div>
 
-            <div id="feedback-area" class="mt-4 text-center h-8 font-medium">
-                <!-- Feedback message will be populated by JS -->
+            <div id="feedback-area" class="mt-4 text-center min-h-[6rem] font-medium">
+                <!-- Feedback message and example sentence will be populated by JS -->
             </div>
 
             <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -116,52 +116,68 @@
         // The raw JSON data is embedded directly here.
         const rawData = {
           "famille_etre": [
-            { "word": "est", "translation": "is (Present, il/elle/on)" },
-            { "word": "suis", "translation": "am (Present, je)" },
-            { "word": "être", "translation": "to be (Infinitive)" },
-            { "word": "était", "translation": "was (Imperfect past, il/elle/on)" },
-            { "word": "es", "translation": "are (Present, tu)" },
-            { "word": "sont", "translation": "are (Present, ils/elles)" },
-            { "word": "été", "translation": "summer / been (Past Participle)" },
-            { "word": "êtes", "translation": "are (Present, vous)" },
-            { "word": "sommes", "translation": "are (Present, nous)" },
-            { "word": "serait", "translation": "would be (Conditional, il/elle/on)" },
-            { "word": "soit", "translation": "is (Subjunctive, il/elle/on)" },
-            { "word": "sois", "translation": "am (Subjunctive, je/tu) / be (Imperative, tu)" },
-            { "word": "étaient", "translation": "were (Imperfect past, ils/elles)" },
-            { "word": "serai", "translation": "will be (Future, je)" },
-            { "word": "seras", "translation": "will be (Future, tu)" },
-            { "word": "serais", "translation": "would be (Conditional, je/tu)" },
-            { "word": "seront", "translation": "will be (Future, ils/elles)" },
-            { "word": "soyez", "translation": "are (Subjunctive, vous) / be (Imperative, vous)" },
-            { "word": "fut", "translation": "was (Simple Past, il/elle/on)" },
-            { "word": "étions", "translation": "were (Imperfect past, nous)" },
-            { "word": "étiez", "translation": "were (Imperfect past, vous)" },
-            { "word": "étant", "translation": "being (Present Participle)" }
+            { "word": "est", "translation": "is (Present, il/elle/on)", "sentence_fr": "Il est mon ami.", "sentence_en": "He is my friend." },
+            { "word": "suis", "translation": "am (Present, je)", "sentence_fr": "Je suis content.", "sentence_en": "I am happy." },
+            { "word": "être", "translation": "to be (Infinitive)", "sentence_fr": "Il faut être patient.", "sentence_en": "One must be patient." },
+            { "word": "était", "translation": "was (Imperfect past, il/elle/on)", "sentence_fr": "Le temps était magnifique.", "sentence_en": "The weather was magnificent." },
+            { "word": "es", "translation": "are (Present, tu)", "sentence_fr": "Tu es en retard.", "sentence_en": "You are late." },
+            { "word": "sont", "translation": "are (Present, ils/elles)", "sentence_fr": "Ils sont prêts.", "sentence_en": "They are ready." },
+            { "word": "été", "translation": "summer / been (Past Participle)", "sentence_fr": "J'ai été surpris.", "sentence_en": "I was surprised." },
+            { "word": "êtes", "translation": "are (Present, vous)", "sentence_fr": "Vous êtes les bienvenus.", "sentence_en": "You are welcome." },
+            { "word": "sommes", "translation": "are (Present, nous)", "sentence_fr": "Nous sommes ici.", "sentence_en": "We are here." },
+            { "word": "serait", "translation": "would be (Conditional, il/elle/on)", "sentence_fr": "Ce serait une bonne idée.", "sentence_en": "That would be a good idea." },
+            { "word": "soit", "translation": "is (Subjunctive, il/elle/on)", "sentence_fr": "Il faut que je sois là.", "sentence_en": "I have to be there." },
+            { "word": "sois", "translation": "am (Subjunctive, je/tu) / be (Imperative, tu)", "sentence_fr": "Sois sage.", "sentence_en": "Be good." },
+            { "word": "étaient", "translation": "were (Imperfect past, ils/elles)", "sentence_fr": "Elles étaient fatiguées.", "sentence_en": "They were tired." },
+            { "word": "serai", "translation": "will be (Future, je)", "sentence_fr": "Je serai là demain.", "sentence_en": "I will be there tomorrow." },
+            { "word": "seras", "translation": "will be (Future, tu)", "sentence_fr": "Tu seras content.", "sentence_en": "You will be happy." },
+            { "word": "serais", "translation": "would be (Conditional, je/tu)", "sentence_fr": "Je serais ravi de venir.", "sentence_en": "I would be delighted to come." },
+            { "word": "seront", "translation": "will be (Future, ils/elles)", "sentence_fr": "Ils seront en vacances.", "sentence_en": "They will be on vacation." },
+            { "word": "soyez", "translation": "are (Subjunctive, vous) / be (Imperative, vous)", "sentence_fr": "Soyez prudents.", "sentence_en": "Be careful." },
+            { "word": "fut", "translation": "was (Simple Past, il/elle/on)", "sentence_fr": "Ce fut une grande surprise.", "sentence_en": "It was a big surprise." },
+            { "word": "étions", "translation": "were (Imperfect past, nous)", "sentence_fr": "Nous étions jeunes.", "sentence_en": "We were young." },
+            { "word": "étiez", "translation": "were (Imperfect past, vous)", "sentence_fr": "Vous étiez en avance.", "sentence_en": "You were early." },
+            { "word": "étant", "translation": "being (Present Participle)", "sentence_fr": "Étant malade, il n'est pas venu.", "sentence_en": "Being sick, he did not come." }
           ],
           "famille_avoir": [
-            { "word": "a", "translation": "have (Present, il/elle/on)" },
-            { "word": "ai", "translation": "have (Present, je)" },
-            { "word": "avoir", "translation": "to have (Infinitive)" },
-            { "word": "ont", "translation": "have (Present, ils/elles)" },
-            { "word": "avez", "translation": "have (Present, vous)" },
-            { "word": "avait", "translation": "had (Imperfect past, il/elle/on)" },
-            { "word": "avais", "translation": "had (Imperfect past, je/tu)" },
-            { "word": "eu", "translation": "had (Past Participle)" },
-            { "word": "aurais", "translation": "would have (Conditional, je/tu)" },
-            { "word": "aurait", "translation": "would have (Conditional, il/elle/on)" },
-            { "word": "aura", "translation": "will have (Future, il/elle/on)" },
-            { "word": "avions", "translation": "had (Imperfect past, nous)" },
-            { "word": "aurai", "translation": "will have (Future, je)" },
-            { "word": "auras", "translation": "will have (Future, tu)" },
-            { "word": "aviez", "translation": "had (Imperfect past, vous)" },
-            { "word": "avaient", "translation": "had (Imperfect past, ils/elles)" },
-            { "word": "aies", "translation": "have (Subjunctive, tu)" },
-            { "word": "ait", "translation": "has (Subjunctive, il/elle/on)" },
-            { "word": "ayez", "translation": "have (Subjunctive, vous) / have (Imperative, vous)" },
-            { "word": "auriez", "translation": "would have (Conditional, vous)" },
-            { "word": "aurons", "translation": "will have (Future, nous)" }
+            { "word": "a", "translation": "have (Present, il/elle/on)", "sentence_fr": "Elle a un chat.", "sentence_en": "She has a cat." },
+            { "word": "ai", "translation": "have (Present, je)", "sentence_fr": "J'ai faim.", "sentence_en": "I am hungry." },
+            { "word": "avoir", "translation": "to have (Infinitive)", "sentence_fr": "Il est important d'avoir des amis.", "sentence_en": "It is important to have friends." },
+            { "word": "ont", "translation": "have (Present, ils/elles)", "sentence_fr": "Ils ont une voiture.", "sentence_en": "They have a car." },
+            { "word": "avez", "translation": "have (Present, vous)", "sentence_fr": "Vous avez raison.", "sentence_en": "You are right." },
+            { "word": "avait", "translation": "had (Imperfect past, il/elle/on)", "sentence_fr": "Il avait un chien.", "sentence_en": "He had a dog." },
+            { "word": "avais", "translation": "had (Imperfect past, je/tu)", "sentence_fr": "Tu avais l'air fatigué.", "sentence_en": "You seemed tired." },
+            { "word": "eu", "translation": "had (Past Participle)", "sentence_fr": "J'ai eu de la chance.", "sentence_en": "I was lucky." },
+            { "word": "aurais", "translation": "would have (Conditional, je/tu)", "sentence_fr": "J'aurais aimé le savoir.", "sentence_en": "I would have liked to know." },
+            { "word": "aurait", "translation": "would have (Conditional, il/elle/on)", "sentence_fr": "Il aurait dû appeler.", "sentence_en": "He should have called." },
+            { "word": "aura", "translation": "will have (Future, il/elle/on)", "sentence_fr": "Elle aura une surprise.", "sentence_en": "She will have a surprise." },
+            { "word": "avions", "translation": "had (Imperfect past, nous)", "sentence_fr": "Nous avions un plan.", "sentence_en": "We had a plan." },
+            { "word": "aurai", "translation": "will have (Future, je)", "sentence_fr": "J'aurai besoin d'aide.", "sentence_en": "I will need help." },
+            { "word": "auras", "translation": "will have (Future, tu)", "sentence_fr": "Tu auras du succès.", "sentence_en": "You will have success." },
+            { "word": "aviez", "translation": "had (Imperfect past, vous)", "sentence_fr": "Vous aviez promis.", "sentence_en": "You had promised." },
+            { "word": "avaient", "translation": "had (Imperfect past, ils/elles)", "sentence_fr": "Ils avaient beaucoup de travail.", "sentence_en": "They had a lot of work." },
+            { "word": "aies", "translation": "have (Subjunctive, tu)", "sentence_fr": "Il faut que tu aies du courage.", "sentence_en": "You must have courage." },
+            { "word": "ait", "translation": "has (Subjunctive, il/elle/on)", "sentence_fr": "Je doute qu'il ait la réponse.", "sentence_en": "I doubt he has the answer." },
+            { "word": "ayez", "translation": "have (Subjunctive, vous) / have (Imperative, vous)", "sentence_fr": "N'ayez pas peur.", "sentence_en": "Don't be afraid." },
+            { "word": "auriez", "translation": "would have (Conditional, vous)", "sentence_fr": "Vous auriez pu gagner.", "sentence_en": "You could have won." },
+            { "word": "aurons", "translation": "will have (Future, nous)", "sentence_fr": "Nous aurons bientôt fini.", "sentence_en": "We will be finished soon." }
           ],
+          "famille_aller": [
+            { "word": "va", "translation": "go (Present, il/elle/on)", "sentence_fr": "Elle va au marché.", "sentence_en": "She goes to the market." },
+            { "word": "vais", "translation": "am going to (Present, je)", "sentence_fr": "Je vais à l'école.", "sentence_en": "I am going to school." },
+            { "word": "allez", "translation": "going (Present, vous) / go (Imperative, vous)", "sentence_fr": "Vous allez trop vite.", "sentence_en": "You are going too fast." },
+            { "word": "aller", "translation": "to go (Infinitive)", "sentence_fr": "J'aime aller au cinéma.", "sentence_en": "I like to go to the cinema." },
+            { "word": "vas", "translation": "going (Present, tu)", "sentence_fr": "Où vas-tu ?", "sentence_en": "Where are you going?" },
+            { "word": "allons", "translation": "will go / let's go (Present, nous)", "sentence_fr": "Allons-y !", "sentence_en": "Let's go!" },
+            { "word": "allait", "translation": "was going (Imperfect past, il/elle/on)", "sentence_fr": "Il allait partir.", "sentence_en": "He was about to leave." },
+            { "word": "allé", "translation": "go / gone (Past Participle)", "sentence_fr": "Je suis allé en France.", "sentence_en": "I went to France." },
+            { "word": "allais", "translation": "was going (Imperfect past, je/tu)", "sentence_fr": "J'allais t'appeler.", "sentence_en": "I was going to call you." },
+            { "word": "aille", "translation": "go (Subjunctive, je/il/elle/on)", "sentence_fr": "Il faut que j'y aille.", "sentence_en": "I have to go there." },
+            { "word": "irai", "translation": "will go (Future, je)", "sentence_fr": "J'irai te voir demain.", "sentence_en": "I will go see you tomorrow." },
+            { "word": "ira", "translation": "will go (Future, il/elle/on)", "sentence_fr": "Il ira à la fête.", "sentence_en": "He will go to the party." },
+            { "word": "vont", "translation": "will go (Present, ils/elles)", "sentence_fr": "Ils vont en France.", "sentence_en": "They are going to France." }
+          ],
+          // ... (rest of the data remains the same)
           "famille_faire": [
             { "word": "fait", "translation": "fact / do/done (Present, il/elle/on) / (Past Participle)" },
             { "word": "faire", "translation": "to make/do (Infinitive)" },
@@ -179,21 +195,6 @@
             { "word": "parfait", "translation": "perfect" },
             { "word": "parfaite", "translation": "perfect (feminine)" },
             { "word": "parfaitement", "translation": "perfectly" }
-          ],
-          "famille_aller": [
-            { "word": "va", "translation": "go (Present, il/elle/on)" },
-            { "word": "vais", "translation": "am going to (Present, je)" },
-            { "word": "allez", "translation": "going (Present, vous) / go (Imperative, vous)" },
-            { "word": "aller", "translation": "to go (Infinitive)" },
-            { "word": "vas", "translation": "going (Present, tu)" },
-            { "word": "allons", "translation": "will go / let's go (Present, nous)" },
-            { "word": "allait", "translation": "was going (Imperfect past, il/elle/on)" },
-            { "word": "allé", "translation": "go / gone (Past Participle)" },
-            { "word": "allais", "translation": "was going (Imperfect past, je/tu)" },
-            { "word": "aille", "translation": "go (Subjunctive, je/il/elle/on)" },
-            { "word": "irai", "translation": "will go (Future, je)" },
-            { "word": "ira", "translation": "will go (Future, il/elle/on)" },
-            { "word": "vont", "translation": "will go (Present, ils/elles)" }
           ],
           "famille_dire": [
             { "word": "dit", "translation": "said/say (Present, il/elle/on) / (Past Participle)" },
@@ -1528,7 +1529,6 @@
             const backToMenuBtn = document.getElementById('back-to-menu-btn');
 
             // --- DATA PROCESSING ---
-            // Process raw data into chunks of 30 for large families
             const processedData = {};
             const CHUNK_SIZE = 30;
 
@@ -1550,13 +1550,11 @@
 
             // --- FUNCTIONS ---
             
-            // Populate the dropdown with processed group names
             function populateGroupSelect() {
                 const groupKeys = Object.keys(processedData).sort();
                 groupSelect.innerHTML = groupKeys.map(key => `<option value="${key}">${key.replace(/_/g, ' ')}</option>`).join('');
             }
 
-            // Shuffle an array
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -1565,7 +1563,6 @@
                 return array;
             }
 
-            // Start the quiz with a given group key
             function startQuiz(groupKey) {
                 currentGroupKey = groupKey;
                 currentGroupData = shuffleArray([...processedData[groupKey]]);
@@ -1581,7 +1578,6 @@
                 updateScore();
             }
 
-            // Display the current question
             function displayQuestion() {
                 if (currentQuestionIndex >= currentGroupData.length) {
                     showEndScreen();
@@ -1598,25 +1594,16 @@
                 nextBtn.classList.add('hidden');
 
                 switch(quizType) {
-                    case 0: // French to English (MCQ)
-                        generateFrEnMCQ();
-                        break;
-                    case 1: // English to French (Text Input)
-                        generateEnFrText();
-                        break;
-                    case 2: // English to French (MCQ)
-                        generateEnFrMCQ();
-                        break;
+                    case 0: generateFrEnMCQ(); break;
+                    case 1: generateEnFrText(); break;
+                    case 2: generateEnFrMCQ(); break;
                 }
                 updateScore();
             }
             
-            // Generate French to English Multiple Choice Question
             function generateFrEnMCQ() {
                 questionArea.innerHTML = `<p class="text-lg text-gray-600 mb-2">What is the meaning of:</p><h3 class="text-4xl font-bold text-gray-900">${currentQuestion.word}</h3>`;
-                
                 const options = getMCQOptions('translation', currentQuestion);
-                
                 answerArea.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${options.map((opt, index) => `
                     <div>
                         <input type="radio" name="mcq-option" id="option${index}" value="${opt}" class="hidden">
@@ -1625,19 +1612,15 @@
                 `).join('')}</div>`;
             }
 
-            // Generate English to French Text Input Question
             function generateEnFrText() {
                 questionArea.innerHTML = `<p class="text-lg text-gray-600 mb-2">How do you write this in French?</p><h3 class="text-2xl font-bold text-gray-900">${currentQuestion.translation}</h3>`;
                 answerArea.innerHTML = `<input type="text" id="text-answer" class="w-full max-w-sm p-3 border border-gray-300 rounded-lg text-center text-lg focus:ring-2 focus:ring-indigo-500" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
                 document.getElementById('text-answer').focus();
             }
 
-            // Generate English to French Multiple Choice Question
             function generateEnFrMCQ() {
                 questionArea.innerHTML = `<p class="text-lg text-gray-600 mb-2">Which word means:</p><h3 class="text-2xl font-bold text-gray-900">${currentQuestion.translation}</h3>`;
-
                 const options = getMCQOptions('word', currentQuestion);
-
                 answerArea.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${options.map((opt, index) => `
                     <div>
                         <input type="radio" name="mcq-option" id="option${index}" value="${opt}" class="hidden">
@@ -1646,30 +1629,25 @@
                 `).join('')}</div>`;
             }
 
-            // Get multiple choice options
             function getMCQOptions(field, correctItem) {
                 let options = [correctItem[field]];
                 let distractors = allWords.filter(item => item[field] !== correctItem[field]);
                 shuffleArray(distractors);
-                
                 for(let i = 0; options.length < 4 && i < distractors.length; i++) {
                     if (!options.includes(distractors[i][field])) {
                         options.push(distractors[i][field]);
                     }
                 }
-
-                // Ensure there are always 4 options, even with duplicates if necessary
                 while (options.length < 4) {
-                    options.push(distractors[options.length].field);
+                    options.push(distractors[Math.floor(Math.random() * distractors.length)][field]);
                 }
-
                 return shuffleArray(options);
             }
 
-            // Check the user's answer
             function checkAnswer() {
                 let userAnswer;
                 let isCorrect = false;
+                let feedbackHTML = '';
 
                 if (quizType === 1) { // Text input
                     userAnswer = document.getElementById('text-answer').value.trim().toLowerCase();
@@ -1678,7 +1656,7 @@
                     const selectedOption = document.querySelector('input[name="mcq-option"]:checked');
                     if (!selectedOption) {
                         feedbackArea.textContent = "Please select an answer.";
-                        feedbackArea.className = "mt-4 text-center h-8 font-medium text-yellow-600";
+                        feedbackArea.className = "mt-4 text-center min-h-[6rem] font-medium text-yellow-600";
                         return;
                     }
                     userAnswer = selectedOption.value;
@@ -1688,25 +1666,32 @@
 
                 if (isCorrect) {
                     score++;
-                    feedbackArea.textContent = "Correct!";
-                    feedbackArea.className = "mt-4 text-center h-8 font-medium text-green-600";
+                    feedbackHTML = `<p class="text-green-600">Correct!</p>`;
                 } else {
                     const correctAnswer = (quizType === 1) ? currentQuestion.word : (quizType === 0 ? currentQuestion.translation : currentQuestion.word);
-                    feedbackArea.innerHTML = `Incorrect. The correct answer is: <strong class="font-bold">${correctAnswer}</strong>`;
-                    feedbackArea.className = "mt-4 text-center h-8 font-medium text-red-600";
+                    feedbackHTML = `<p class="text-red-600">Incorrect. The correct answer is: <strong class="font-bold">${correctAnswer}</strong></p>`;
                 }
+
+                // Add example sentence if it exists
+                if (currentQuestion.sentence_fr && currentQuestion.sentence_en) {
+                    feedbackHTML += `<div class="mt-4 p-3 bg-gray-100 rounded-lg text-sm text-left">
+                        <p class="font-semibold">Example:</p>
+                        <p class="text-gray-800">"${currentQuestion.sentence_fr}"</p>
+                        <p class="text-gray-600 italic">"${currentQuestion.sentence_en}"</p>
+                    </div>`;
+                }
+                
+                feedbackArea.innerHTML = feedbackHTML;
 
                 checkBtn.classList.add('hidden');
                 nextBtn.classList.remove('hidden');
                 updateScore();
             }
 
-            // Update the score display
             function updateScore() {
                 scoreDisplay.textContent = `Score: ${score} / ${currentGroupData.length}`;
             }
 
-            // Show the final score screen
             function showEndScreen() {
                 quizScreen.classList.add('hidden');
                 endScreen.classList.remove('hidden');
@@ -1728,8 +1713,15 @@
             checkBtn.addEventListener('click', checkAnswer);
 
             answerArea.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && quizType === 1) {
+                if (e.key === 'Enter' && quizType === 1 && !checkBtn.classList.contains('hidden')) {
                     checkAnswer();
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                 if (e.key === 'Enter' && !nextBtn.classList.contains('hidden')) {
+                    currentQuestionIndex++;
+                    displayQuestion();
                 }
             });
 
@@ -1754,4 +1746,3 @@
     </script>
 </body>
 </html>
-
