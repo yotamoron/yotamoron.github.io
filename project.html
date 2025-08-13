@@ -28,8 +28,8 @@
         .multi-select-dropdown {
             height: 100px;
         }
-        /* Styles for Gantt Chart Modal */
-        .gantt-modal-overlay {
+        /* Styles for Modals */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -41,12 +41,11 @@
             justify-content: center;
             z-index: 1000;
         }
-        .gantt-modal-content {
+        .modal-content {
             background: white;
             padding: 2rem;
             border-radius: 0.75rem;
             width: 90%;
-            max-width: 1200px;
             max-height: 90vh;
             overflow: auto;
         }
@@ -190,9 +189,9 @@
                     </div>
 
                     <div class="md:col-span-2">
-                        <label for="item-files" class="block text-sm font-medium text-gray-700 mb-1">7. Attach Files (optional)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">7. Attach Files (optional)</label>
                         <input type="file" id="item-files" multiple class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <div id="existing-files-list" class="mt-2 text-sm"></div>
+                        <div id="existing-files-list" class="mt-2 text-sm space-y-2"></div>
                     </div>
 
                     <div class="md:col-span-2 flex items-center justify-end space-x-3">
@@ -218,8 +217,8 @@
     </div>
 
     <!-- Gantt Chart Modal -->
-    <div id="gantt-modal" class="gantt-modal-overlay hidden">
-        <div class="gantt-modal-content">
+    <div id="gantt-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-6xl">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Gantt Chart</h2>
                 <button id="close-gantt-btn" class="text-2xl font-bold">&times;</button>
@@ -227,6 +226,25 @@
             <div id="gantt-chart-container" class="overflow-x-auto">
                 <!-- Gantt chart will be rendered here -->
             </div>
+        </div>
+    </div>
+    
+    <!-- File Note Modal -->
+    <div id="file-note-modal" class="modal-overlay hidden">
+        <div class="modal-content max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Edit Note for File</h2>
+                <button id="close-file-note-btn" class="text-2xl font-bold">&times;</button>
+            </div>
+            <p id="file-note-modal-filename" class="font-semibold mb-2"></p>
+            <form id="file-note-form">
+                <input type="hidden" id="file-note-item-id">
+                <input type="hidden" id="file-note-file-index">
+                <textarea id="file-note-textarea" rows="4" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Add a note for this file..."></textarea>
+                <div class="mt-4 text-right">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">Save Note</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -318,6 +336,13 @@
             const notesList = document.getElementById('notes-list');
             const newNoteTextInput = document.getElementById('new-note-text');
             const addNoteBtn = document.getElementById('add-note-btn');
+            const fileNoteModal = document.getElementById('file-note-modal');
+            const closeFileNoteBtn = document.getElementById('close-file-note-btn');
+            const fileNoteForm = document.getElementById('file-note-form');
+            const fileNoteModalFilename = document.getElementById('file-note-modal-filename');
+            const fileNoteItemIdInput = document.getElementById('file-note-item-id');
+            const fileNoteFileIndexInput = document.getElementById('file-note-file-index');
+            const fileNoteTextarea = document.getElementById('file-note-textarea');
 
             let currentProjectName = null;
             let objectUrls = []; // For memory management of file URLs
@@ -389,7 +414,12 @@
                 const existingItem = existingItemIndex > -1 ? items[existingItemIndex] : null;
                 
                 const existingFiles = existingItem ? existingItem.files || [] : [];
-                const newFiles = Array.from(itemFilesInput.files).map(file => ({ name: file.name, type: file.type, data: file }));
+                const newFiles = Array.from(itemFilesInput.files).map(file => ({ 
+                    name: file.name, 
+                    type: file.type, 
+                    data: file,
+                    note: '' // Initialize with empty note
+                }));
 
                 const newItem = {
                     id: itemId,
@@ -435,26 +465,34 @@
                     if (option) option.selected = true;
                 });
 
-                // Render files
-                existingFilesList.innerHTML = '';
-                if (item.files && item.files.length > 0) {
-                    existingFilesList.innerHTML = '<p class="font-medium mt-2">Existing files:</p>';
-                    item.files.forEach((file, index) => {
-                        const fileEl = document.createElement('div');
-                        fileEl.className = 'flex items-center justify-between text-sm';
-                        fileEl.innerHTML = `
-                            <span>${file.name}</span>
-                            <button type="button" class="remove-file-btn text-red-500 hover:text-red-700" data-item-id="${item.id}" data-file-index="${index}">&times;</button>
-                        `;
-                        existingFilesList.appendChild(fileEl);
-                    });
-                }
+                renderExistingFiles(item);
                 
-                // Show and render notes
                 notesSection.classList.remove('hidden');
                 renderNotes(item.id, item.notes || []);
 
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            };
+
+            const renderExistingFiles = (item) => {
+                existingFilesList.innerHTML = '';
+                if (item.files && item.files.length > 0) {
+                    existingFilesList.innerHTML = '<p class="font-medium">Existing files:</p>';
+                    item.files.forEach((file, index) => {
+                        const fileEl = document.createElement('div');
+                        fileEl.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
+                        fileEl.innerHTML = `
+                            <div>
+                                <span class="font-medium">${file.name}</span>
+                                <p class="text-xs text-gray-500">${file.note || 'No note'}</p>
+                            </div>
+                            <div>
+                                <button type="button" class="edit-file-note-btn text-sm text-blue-600 hover:text-blue-800 mr-3" data-item-id="${item.id}" data-file-index="${index}">Edit Note</button>
+                                <button type="button" class="remove-file-btn text-red-500 hover:text-red-700 font-bold" data-item-id="${item.id}" data-file-index="${index}">&times;</button>
+                            </div>
+                        `;
+                        existingFilesList.appendChild(fileEl);
+                    });
+                }
             };
 
             const removeFile = async (itemId, fileIndex) => {
@@ -596,6 +634,41 @@
                 renderNotes(itemId, items[itemIndex].notes);
             };
 
+            // --- File Note Modal Logic ---
+            const openFileNoteModal = async (itemId, fileIndex) => {
+                const items = await dbGet(currentProjectName);
+                const item = items.find(i => i.id === itemId);
+                const file = item?.files?.[fileIndex];
+                if (!file) return;
+
+                fileNoteModalFilename.textContent = file.name;
+                fileNoteTextarea.value = file.note || '';
+                fileNoteItemIdInput.value = itemId;
+                fileNoteFileIndexInput.value = fileIndex;
+                fileNoteModal.classList.remove('hidden');
+            };
+
+            const closeFileNoteModal = () => {
+                fileNoteModal.classList.add('hidden');
+                fileNoteForm.reset();
+            };
+
+            const saveFileNote = async (event) => {
+                event.preventDefault();
+                const itemId = fileNoteItemIdInput.value;
+                const fileIndex = parseInt(fileNoteFileIndexInput.value, 10);
+                const noteText = fileNoteTextarea.value;
+
+                const items = await dbGet(currentProjectName);
+                const itemIndex = items.findIndex(i => i.id === itemId);
+                if (itemIndex > -1 && items[itemIndex].files[fileIndex]) {
+                    items[itemIndex].files[fileIndex].note = noteText;
+                    await dbSet(currentProjectName, items);
+                    closeFileNoteModal();
+                    await editItem(itemId); // Refresh the edit form
+                    await renderItemsTable(); // Refresh the table to update accordion
+                }
+            };
 
             // --- Dependency Logic ---
             const hasCircularDependency = (currentItemId, newDependencies, items) => {
@@ -753,7 +826,12 @@
                     ? item.files.map(file => {
                         const url = URL.createObjectURL(file.data);
                         objectUrls.push(url); // Track for cleanup
-                        return `<a href="${url}" download="${file.name}" class="text-blue-600 hover:underline block">${file.name}</a>`;
+                        return `
+                            <div class="border-t pt-2 mt-2">
+                                <a href="${url}" download="${file.name}" class="text-blue-600 hover:underline font-medium">${file.name}</a>
+                                <p class="text-sm text-gray-600 pl-2 mt-1">${file.note || 'No note'}</p>
+                            </div>
+                        `;
                     }).join('')
                     : '<p>No files attached.</p>';
                 
@@ -782,10 +860,10 @@
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-700">Files</h4>
-                            <div class="mt-1 text-gray-600">${filesHtml}</div>
+                            <div class="mt-1 text-gray-600 space-y-2">${filesHtml}</div>
                         </div>
                         <div class="md:col-span-2">
-                            <h4 class="font-semibold text-gray-700">Notes</h4>
+                            <h4 class="font-semibold text-gray-700">Item Notes</h4>
                             <div class="mt-1 text-gray-600 space-y-2">${notesHtml}</div>
                         </div>
                     </div>
@@ -811,6 +889,7 @@
                     const fileCount = (item.files || []).length;
 
                     const row = document.createElement('tr');
+                    row.dataset.rowId = item.id;
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-pre-wrap max-w-xs">${item.content}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${item.owner || 'N/A'}</td>
@@ -862,6 +941,9 @@
             closeGanttBtn.addEventListener('click', hideGanttChart);
             ganttModal.addEventListener('click', (e) => e.target === ganttModal && hideGanttChart());
             addNoteBtn.addEventListener('click', addNote);
+            fileNoteForm.addEventListener('submit', saveFileNote);
+            closeFileNoteBtn.addEventListener('click', closeFileNoteModal);
+            fileNoteModal.addEventListener('click', (e) => e.target === fileNoteModal && closeFileNoteModal());
 
             projectsList.addEventListener('click', (e) => {
                 if (e.target.classList.contains('select-project-btn')) {
@@ -883,22 +965,28 @@
                 } else if (button.classList.contains('view-item-btn')) {
                     const openAccordion = document.querySelector('tr[data-accordion-id]:not(.hidden)');
                     const targetAccordion = document.querySelector(`tr[data-accordion-id="${itemId}"]`);
-
-                    if (openAccordion) {
+                    
+                    // If there's an open accordion and it's not the one we're targeting, close it.
+                    if (openAccordion && openAccordion !== targetAccordion) {
                         openAccordion.classList.add('hidden');
                     }
                     
-                    if (openAccordion !== targetAccordion) {
-                        targetAccordion.classList.remove('hidden');
-                    }
+                    // Toggle the target accordion.
+                    targetAccordion.classList.toggle('hidden');
                 }
             });
 
             existingFilesList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-file-btn')) {
-                    const itemId = e.target.dataset.itemId;
-                    const fileIndex = parseInt(e.target.dataset.fileIndex, 10);
+                const button = e.target.closest('button');
+                if (!button) return;
+
+                const itemId = button.dataset.itemId;
+                const fileIndex = parseInt(button.dataset.fileIndex, 10);
+
+                if (button.classList.contains('remove-file-btn')) {
                     removeFile(itemId, fileIndex);
+                } else if (button.classList.contains('edit-file-note-btn')) {
+                    openFileNoteModal(itemId, fileIndex);
                 }
             });
             
