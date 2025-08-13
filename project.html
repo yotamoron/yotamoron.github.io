@@ -28,6 +28,60 @@
         .multi-select-dropdown {
             height: 100px;
         }
+        /* Styles for Gantt Chart Modal */
+        .gantt-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .gantt-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: auto;
+        }
+        .gantt-chart-grid {
+            display: grid;
+            gap: 4px;
+        }
+        .gantt-header, .gantt-task-name, .gantt-bar-container {
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .gantt-task-name {
+            text-align: left;
+            border-right: 1px solid #e5e7eb;
+            font-weight: 500;
+        }
+        .gantt-bar-container {
+            position: relative;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .gantt-bar {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            background-color: #3b82f6;
+            border-radius: 4px;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -80,22 +134,22 @@
 
                     <div>
                         <label for="item-owner" class="block text-sm font-medium text-gray-700 mb-1">2. Who will do the work?</label>
-                        <input type="text" id="item-owner" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Owner's name" required>
+                        <input type="text" id="item-owner" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Owner's name">
                     </div>
 
                     <div>
                         <label for="item-cost" class="block text-sm font-medium text-gray-700 mb-1">3. What is the cost?</label>
-                        <input type="number" id="item-cost" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01" required>
+                        <input type="number" id="item-cost" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01">
                     </div>
 
                     <div>
                         <label for="item-start-date" class="block text-sm font-medium text-gray-700 mb-1">4. When will it start?</label>
-                        <input type="date" id="item-start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input type="date" id="item-start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
                         <label for="item-duration" class="block text-sm font-medium text-gray-700 mb-1">5. How long will it take (days)?</label>
-                        <input type="number" id="item-duration" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Number of days" min="1" required>
+                        <input type="number" id="item-duration" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Number of days" min="1">
                     </div>
 
                     <div class="md:col-span-2">
@@ -115,7 +169,10 @@
 
             <!-- Items Table -->
             <div class="bg-white p-6 rounded-xl shadow-md">
-                <h2 class="text-2xl font-semibold mb-4">Project Items</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold">Project Items</h2>
+                    <button id="gantt-chart-btn" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">Gantt Chart</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -137,6 +194,20 @@
             </div>
         </div>
     </div>
+
+    <!-- Gantt Chart Modal -->
+    <div id="gantt-modal" class="gantt-modal-overlay hidden">
+        <div class="gantt-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Gantt Chart</h2>
+                <button id="close-gantt-btn" class="text-2xl font-bold">&times;</button>
+            </div>
+            <div id="gantt-chart-container" class="overflow-x-auto">
+                <!-- Gantt chart will be rendered here -->
+            </div>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -160,6 +231,10 @@
             const saveItemBtn = document.getElementById('save-item-btn');
             const clearFormBtn = document.getElementById('clear-form-btn');
             const itemsTableBody = document.getElementById('items-table-body');
+            const ganttChartBtn = document.getElementById('gantt-chart-btn');
+            const ganttModal = document.getElementById('gantt-modal');
+            const closeGanttBtn = document.getElementById('close-gantt-btn');
+            const ganttChartContainer = document.getElementById('gantt-chart-container');
 
             let currentProjectName = null;
 
@@ -219,6 +294,11 @@
             // --- Item Management ---
             const saveItem = (event) => {
                 event.preventDefault();
+                if (itemContentInput.value.trim() === '') {
+                    alert('Content / Description cannot be empty.');
+                    return;
+                }
+
                 const projects = getProjects();
                 const items = projects[currentProjectName];
 
@@ -235,9 +315,9 @@
                     id: itemId,
                     content: itemContentInput.value.trim(),
                     owner: itemOwnerInput.value.trim(),
-                    cost: parseFloat(itemCostInput.value),
+                    cost: itemCostInput.value ? parseFloat(itemCostInput.value) : null,
                     startDate: itemStartDateInput.value,
-                    duration: parseInt(itemDurationInput.value),
+                    duration: itemDurationInput.value ? parseInt(itemDurationInput.value, 10) : null,
                     dependencies: selectedDependencies,
                 };
 
@@ -265,14 +345,13 @@
                 itemIdInput.value = item.id;
                 itemContentInput.value = item.content;
                 itemOwnerInput.value = item.owner;
-                itemCostInput.value = item.cost;
+                itemCostInput.value = item.cost !== null ? item.cost : '';
                 itemStartDateInput.value = item.startDate;
-                itemDurationInput.value = item.duration;
+                itemDurationInput.value = item.duration !== null ? item.duration : '';
                 
-                // We need to re-populate dependencies before setting the value
                 populateDependenciesDropdown(item.id); 
                 
-                item.dependencies.forEach(depId => {
+                (item.dependencies || []).forEach(depId => {
                     const option = itemDependenciesSelect.querySelector(`option[value="${depId}"]`);
                     if (option) option.selected = true;
                 });
@@ -286,6 +365,14 @@
                 }
                 const projects = getProjects();
                 projects[currentProjectName] = projects[currentProjectName].filter(item => item.id !== itemId);
+                
+                // Also remove this item from any other item's dependency list
+                projects[currentProjectName].forEach(item => {
+                    if (item.dependencies && item.dependencies.includes(itemId)) {
+                        item.dependencies = item.dependencies.filter(depId => depId !== itemId);
+                    }
+                });
+
                 saveProjects(projects);
                 renderItemsTable();
                 populateDependenciesDropdown();
@@ -302,13 +389,11 @@
             // --- Dependency Logic ---
             const hasCircularDependency = (currentItemId, newDependencies, items) => {
                 const dependencyMap = new Map(items.map(item => [item.id, item.dependencies || []]));
-                // Temporarily update the map with the potential new dependencies for the current item
                 dependencyMap.set(currentItemId, newDependencies);
 
                 const visited = new Set();
                 const recursionStack = new Set();
 
-                // DFS function to detect cycles
                 const detectCycle = (itemId) => {
                     visited.add(itemId);
                     recursionStack.add(itemId);
@@ -316,11 +401,9 @@
                     const dependencies = dependencyMap.get(itemId) || [];
                     for (const depId of dependencies) {
                         if (!visited.has(depId)) {
-                            if (detectCycle(depId)) {
-                                return true; // Cycle found in a downstream path
-                            }
+                            if (detectCycle(depId)) return true;
                         } else if (recursionStack.has(depId)) {
-                            return true; // Cycle detected directly
+                            return true;
                         }
                     }
 
@@ -328,18 +411,122 @@
                     return false;
                 };
 
-                // Check for cycles starting from each item.
-                // It's important to check all nodes in case the graph is not fully connected.
                 for (const itemId of dependencyMap.keys()) {
                     if (!visited.has(itemId)) {
-                        if (detectCycle(itemId)) {
-                            return true;
-                        }
+                        if (detectCycle(itemId)) return true;
                     }
                 }
 
                 return false;
             };
+
+            // --- Gantt Chart Logic ---
+            const showGanttChart = () => {
+                renderGanttChart();
+                ganttModal.classList.remove('hidden');
+            };
+
+            const hideGanttChart = () => {
+                ganttModal.classList.add('hidden');
+            };
+
+            const renderGanttChart = () => {
+                const projects = getProjects();
+                const items = projects[currentProjectName] || [];
+                
+                // 1. Filter for schedulable items and prepare data
+                const schedulableItems = items
+                    .filter(item => item.startDate && item.duration > 0)
+                    .map(item => ({...item, startDate: new Date(item.startDate + 'T00:00:00')})); // Ensure date objects
+
+                if (schedulableItems.length === 0) {
+                    ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">No schedulable items with both a start date and duration.</p>';
+                    return;
+                }
+
+                const itemMap = new Map(schedulableItems.map(item => [item.id, item]));
+                
+                // 2. Calculate effective start and end dates based on dependencies
+                const calculatedItems = new Map();
+                let itemsToProcess = [...schedulableItems];
+                
+                // Iteratively calculate dates to resolve dependency chain
+                for (let i = 0; i < schedulableItems.length && itemsToProcess.length > 0; i++) {
+                    itemsToProcess = itemsToProcess.filter(item => {
+                        const deps = item.dependencies || [];
+                        const allDepsCalculated = deps.every(depId => calculatedItems.has(depId));
+
+                        if (allDepsCalculated) {
+                            let effectiveStartDate = item.startDate;
+                            deps.forEach(depId => {
+                                const dep = calculatedItems.get(depId);
+                                if (dep.effectiveEndDate > effectiveStartDate) {
+                                    effectiveStartDate = dep.effectiveEndDate;
+                                }
+                            });
+                            
+                            const effectiveEndDate = new Date(effectiveStartDate);
+                            effectiveEndDate.setDate(effectiveEndDate.getDate() + item.duration);
+
+                            calculatedItems.set(item.id, {...item, effectiveStartDate, effectiveEndDate});
+                            return false; // remove from processing list
+                        }
+                        return true; // keep for next iteration
+                    });
+                }
+
+                const finalItems = Array.from(calculatedItems.values());
+
+                // 3. Determine chart boundaries
+                const projectStartDate = new Date(Math.min(...finalItems.map(item => item.effectiveStartDate)));
+                const projectEndDate = new Date(Math.max(...finalItems.map(item => item.effectiveEndDate)));
+                
+                const dayInMillis = 1000 * 60 * 60 * 24;
+                const totalDays = Math.ceil((projectEndDate - projectStartDate) / dayInMillis);
+
+                if (totalDays <= 0 || !isFinite(totalDays)) {
+                     ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">Could not calculate project date range.</p>';
+                    return;
+                }
+
+                // 4. Render the chart grid
+                ganttChartContainer.innerHTML = '';
+                const grid = document.createElement('div');
+                grid.className = 'gantt-chart-grid';
+                grid.style.gridTemplateColumns = `200px repeat(${totalDays}, minmax(30px, 1fr))`;
+                
+                // Header
+                grid.innerHTML += '<div class="gantt-header font-semibold">Task</div>';
+                for (let i = 0; i < totalDays; i++) {
+                    const date = new Date(projectStartDate);
+                    date.setDate(date.getDate() + i);
+                    grid.innerHTML += `<div class="gantt-header bg-gray-100">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>`;
+                }
+
+                // Task Rows
+                finalItems.sort((a,b) => a.effectiveStartDate - b.effectiveStartDate).forEach(item => {
+                    const offsetDays = Math.floor((item.effectiveStartDate - projectStartDate) / dayInMillis);
+                    const startColumn = offsetDays + 2; // +1 for task name col, +1 for 1-based index
+                    
+                    const taskNameDiv = `<div class="gantt-task-name">${item.content}</div>`;
+                    const barContainerDiv = document.createElement('div');
+                    barContainerDiv.className = 'gantt-bar-container';
+                    barContainerDiv.style.gridColumn = `${startColumn} / span ${totalDays - offsetDays}`;
+
+                    const barDiv = document.createElement('div');
+                    barDiv.className = 'gantt-bar';
+                    const barWidth = (item.duration / (totalDays - offsetDays)) * 100;
+                    barDiv.style.width = `${barWidth}%`;
+                    barDiv.textContent = `${item.duration}d`;
+
+                    barContainerDiv.appendChild(barDiv);
+                    grid.innerHTML += taskNameDiv;
+                    grid.appendChild(barContainerDiv);
+                });
+
+                ganttChartContainer.appendChild(grid);
+            };
+
 
             // --- Rendering Functions ---
             const renderProjectsList = () => {
@@ -383,10 +570,10 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-pre-wrap max-w-xs">${item.content}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${item.owner}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${item.cost.toFixed(2)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${item.startDate}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${item.duration}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${item.owner || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${item.cost !== null ? item.cost.toFixed(2) : 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${item.startDate || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${item.duration || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-pre-wrap max-w-xs">${dependenciesText || 'None'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button class="edit-item-btn text-indigo-600 hover:text-indigo-900 mr-3" data-id="${item.id}">Edit</button>
@@ -402,7 +589,6 @@
                 const items = projects[currentProjectName] || [];
                 itemDependenciesSelect.innerHTML = '';
                 items.forEach(item => {
-                    // An item cannot depend on itself
                     if (item.id !== currentItemId) {
                         const option = document.createElement('option');
                         option.value = item.id;
@@ -417,26 +603,29 @@
             backToProjectsBtn.addEventListener('click', showProjectsView);
             itemForm.addEventListener('submit', saveItem);
             clearFormBtn.addEventListener('click', clearForm);
+            ganttChartBtn.addEventListener('click', showGanttChart);
+            closeGanttBtn.addEventListener('click', hideGanttChart);
+            ganttModal.addEventListener('click', (e) => {
+                if (e.target === ganttModal) { // Close if clicking on the overlay
+                    hideGanttChart();
+                }
+            });
 
             projectsList.addEventListener('click', (e) => {
                 if (e.target.classList.contains('select-project-btn')) {
-                    const projectName = e.target.dataset.project;
-                    showProjectDetailView(projectName);
+                    showProjectDetailView(e.target.dataset.project);
                 }
                 if (e.target.classList.contains('delete-project-btn')) {
-                    const projectName = e.target.dataset.project;
-                    deleteProject(projectName);
+                    deleteProject(e.target.dataset.project);
                 }
             });
 
             itemsTableBody.addEventListener('click', (e) => {
                 if (e.target.classList.contains('edit-item-btn')) {
-                    const itemId = e.target.dataset.id;
-                    editItem(itemId);
+                    editItem(e.target.dataset.id);
                 }
                 if (e.target.classList.contains('delete-item-btn')) {
-                    const itemId = e.target.dataset.id;
-                    deleteItem(itemId);
+                    deleteItem(e.target.dataset.id);
                 }
             });
 
