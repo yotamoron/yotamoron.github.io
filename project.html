@@ -160,6 +160,13 @@
                         <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple items.</p>
                     </div>
 
+                    <div class="md:col-span-2">
+                        <label for="item-files" class="block text-sm font-medium text-gray-700 mb-1">7. Attach Files (optional)</label>
+                        <input type="file" id="item-files" multiple class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <div id="existing-files-list" class="mt-2 text-sm"></div>
+                    </div>
+
+
                     <div class="md:col-span-2 flex items-center justify-end space-x-3">
                         <button type="button" id="clear-form-btn" class="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition duration-300">Clear</button>
                         <button type="submit" id="save-item-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Save Item</button>
@@ -179,10 +186,10 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration (Days)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencies</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Files</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -211,6 +218,61 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DB Setup ---
+            const DB_NAME = 'ProjectManagementToolDB';
+            const DB_VERSION = 1;
+            const STORE_NAME = 'projects';
+            let db;
+
+            function openDb() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    request.onerror = () => reject("Error opening DB");
+                    request.onsuccess = () => {
+                        db = request.result;
+                        resolve(db);
+                    };
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        db.createObjectStore(STORE_NAME);
+                    };
+                });
+            }
+
+            // --- DB Helper Functions ---
+            const dbGet = (key) => new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+
+            const dbSet = (key, val) => new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(val, key);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+            
+            const dbDelete = (key) => new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(key);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+
+            const dbGetAllKeys = () => new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAllKeys();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+
+
             // --- DOM Elements ---
             const projectsView = document.getElementById('projects-view');
             const projectDetailView = document.getElementById('project-detail-view');
@@ -228,6 +290,8 @@
             const itemStartDateInput = document.getElementById('item-start-date');
             const itemDurationInput = document.getElementById('item-duration');
             const itemDependenciesSelect = document.getElementById('item-dependencies');
+            const itemFilesInput = document.getElementById('item-files');
+            const existingFilesList = document.getElementById('existing-files-list');
             const saveItemBtn = document.getElementById('save-item-btn');
             const clearFormBtn = document.getElementById('clear-form-btn');
             const itemsTableBody = document.getElementById('items-table-body');
@@ -237,79 +301,74 @@
             const ganttChartContainer = document.getElementById('gantt-chart-container');
 
             let currentProjectName = null;
-
-            // --- Storage Functions ---
-            const getProjects = () => JSON.parse(localStorage.getItem('projects')) || {};
-            const saveProjects = (projects) => localStorage.setItem('projects', JSON.stringify(projects));
+            let objectUrls = []; // For memory management of file URLs
 
             // --- UUID Generation ---
             const generateUUID = () => crypto.randomUUID();
 
             // --- View Management ---
-            const showProjectsView = () => {
+            const showProjectsView = async () => {
                 projectsView.classList.remove('hidden');
                 projectDetailView.classList.add('hidden');
                 currentProjectName = null;
-                renderProjectsList();
+                await renderProjectsList();
             };
 
-            const showProjectDetailView = (projectName) => {
+            const showProjectDetailView = async (projectName) => {
                 projectsView.classList.add('hidden');
                 projectDetailView.classList.remove('hidden');
                 currentProjectName = projectName;
                 projectNameHeader.textContent = projectName;
-                renderItemsTable();
-                populateDependenciesDropdown();
+                await renderItemsTable();
+                await populateDependenciesDropdown();
                 clearForm();
             };
 
             // --- Project Management ---
-            const createProject = () => {
+            const createProject = async () => {
                 const projectName = newProjectNameInput.value.trim();
                 if (!projectName) {
                     alert('Project name cannot be empty.');
                     return;
                 }
-                const projects = getProjects();
-                if (projects[projectName]) {
+                const existingProject = await dbGet(projectName);
+                if (existingProject) {
                     alert('A project with this name already exists.');
                     return;
                 }
-                projects[projectName] = [];
-                saveProjects(projects);
+                await dbSet(projectName, []);
                 newProjectNameInput.value = '';
-                renderProjectsList();
+                await renderProjectsList();
             };
             
-            const deleteProject = (projectName) => {
+            const deleteProject = async (projectName) => {
                 if (!confirm(`Are you sure you want to delete the project "${projectName}" and all its items?`)) {
                     return;
                 }
-                const projects = getProjects();
-                delete projects[projectName];
-                saveProjects(projects);
-                renderProjectsList();
+                await dbDelete(projectName);
+                await renderProjectsList();
             };
 
             // --- Item Management ---
-            const saveItem = (event) => {
+            const saveItem = async (event) => {
                 event.preventDefault();
                 if (itemContentInput.value.trim() === '') {
                     alert('Content / Description cannot be empty.');
                     return;
                 }
 
-                const projects = getProjects();
-                const items = projects[currentProjectName];
-
-                const selectedDependencies = Array.from(itemDependenciesSelect.selectedOptions).map(opt => opt.value);
+                const items = await dbGet(currentProjectName) || [];
                 const itemId = itemIdInput.value || generateUUID();
+                const selectedDependencies = Array.from(itemDependenciesSelect.selectedOptions).map(opt => opt.value);
 
-                // Circular dependency check
                 if (hasCircularDependency(itemId, selectedDependencies, items)) {
                     alert('Error: This creates a circular dependency. Please revise the dependencies.');
                     return;
                 }
+                
+                const existingItemIndex = items.findIndex(item => item.id === itemId);
+                const existingFiles = existingItemIndex > -1 ? items[existingItemIndex].files || [] : [];
+                const newFiles = Array.from(itemFilesInput.files).map(file => ({ name: file.name, type: file.type, data: file }));
 
                 const newItem = {
                     id: itemId,
@@ -319,26 +378,24 @@
                     startDate: itemStartDateInput.value,
                     duration: itemDurationInput.value ? parseInt(itemDurationInput.value, 10) : null,
                     dependencies: selectedDependencies,
+                    files: [...existingFiles, ...newFiles]
                 };
 
-                const existingItemIndex = items.findIndex(item => item.id === itemId);
                 if (existingItemIndex > -1) {
-                    // Update existing item
                     items[existingItemIndex] = newItem;
                 } else {
-                    // Add new item
                     items.push(newItem);
                 }
 
-                saveProjects(projects);
-                renderItemsTable();
-                populateDependenciesDropdown();
+                await dbSet(currentProjectName, items);
+                await renderItemsTable();
+                await populateDependenciesDropdown();
                 clearForm();
             };
 
-            const editItem = (itemId) => {
-                const projects = getProjects();
-                const item = projects[currentProjectName].find(i => i.id === itemId);
+            const editItem = async (itemId) => {
+                const items = await dbGet(currentProjectName) || [];
+                const item = items.find(i => i.id === itemId);
                 if (!item) return;
 
                 formTitle.textContent = 'Edit Item';
@@ -349,39 +406,64 @@
                 itemStartDateInput.value = item.startDate;
                 itemDurationInput.value = item.duration !== null ? item.duration : '';
                 
-                populateDependenciesDropdown(item.id); 
+                await populateDependenciesDropdown(item.id); 
                 
                 (item.dependencies || []).forEach(depId => {
                     const option = itemDependenciesSelect.querySelector(`option[value="${depId}"]`);
                     if (option) option.selected = true;
                 });
 
+                // Display existing files and add a way to remove them
+                existingFilesList.innerHTML = '';
+                if (item.files && item.files.length > 0) {
+                    existingFilesList.innerHTML = '<p class="font-medium mt-2">Existing files:</p>';
+                    item.files.forEach((file, index) => {
+                        const fileEl = document.createElement('div');
+                        fileEl.className = 'flex items-center justify-between text-sm';
+                        fileEl.innerHTML = `
+                            <span>${file.name}</span>
+                            <button type="button" class="remove-file-btn text-red-500 hover:text-red-700" data-item-id="${item.id}" data-file-index="${index}">&times;</button>
+                        `;
+                        existingFilesList.appendChild(fileEl);
+                    });
+                }
+
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
-            const deleteItem = (itemId) => {
+            const removeFile = async (itemId, fileIndex) => {
+                 const items = await dbGet(currentProjectName) || [];
+                 const itemIndex = items.findIndex(i => i.id === itemId);
+                 if (itemIndex > -1 && items[itemIndex].files) {
+                     items[itemIndex].files.splice(fileIndex, 1);
+                     await dbSet(currentProjectName, items);
+                     await editItem(itemId); // Refresh the form view
+                 }
+            };
+
+            const deleteItem = async (itemId) => {
                 if (!confirm('Are you sure you want to delete this item?')) {
                     return;
                 }
-                const projects = getProjects();
-                projects[currentProjectName] = projects[currentProjectName].filter(item => item.id !== itemId);
+                let items = await dbGet(currentProjectName) || [];
+                items = items.filter(item => item.id !== itemId);
                 
-                // Also remove this item from any other item's dependency list
-                projects[currentProjectName].forEach(item => {
+                items.forEach(item => {
                     if (item.dependencies && item.dependencies.includes(itemId)) {
                         item.dependencies = item.dependencies.filter(depId => depId !== itemId);
                     }
                 });
 
-                saveProjects(projects);
-                renderItemsTable();
-                populateDependenciesDropdown();
+                await dbSet(currentProjectName, items);
+                await renderItemsTable();
+                await populateDependenciesDropdown();
                 clearForm();
             };
 
             const clearForm = () => {
                 itemForm.reset();
                 itemIdInput.value = '';
+                existingFilesList.innerHTML = '';
                 formTitle.textContent = 'Add New Item';
                 populateDependenciesDropdown();
             };
@@ -390,14 +472,11 @@
             const hasCircularDependency = (currentItemId, newDependencies, items) => {
                 const dependencyMap = new Map(items.map(item => [item.id, item.dependencies || []]));
                 dependencyMap.set(currentItemId, newDependencies);
-
                 const visited = new Set();
                 const recursionStack = new Set();
-
                 const detectCycle = (itemId) => {
                     visited.add(itemId);
                     recursionStack.add(itemId);
-
                     const dependencies = dependencyMap.get(itemId) || [];
                     for (const depId of dependencies) {
                         if (!visited.has(depId)) {
@@ -406,23 +485,20 @@
                             return true;
                         }
                     }
-
                     recursionStack.delete(itemId);
                     return false;
                 };
-
                 for (const itemId of dependencyMap.keys()) {
                     if (!visited.has(itemId)) {
                         if (detectCycle(itemId)) return true;
                     }
                 }
-
                 return false;
             };
 
             // --- Gantt Chart Logic ---
-            const showGanttChart = () => {
-                renderGanttChart();
+            const showGanttChart = async () => {
+                await renderGanttChart();
                 ganttModal.classList.remove('hidden');
             };
 
@@ -430,27 +506,21 @@
                 ganttModal.classList.add('hidden');
             };
 
-            const renderGanttChart = () => {
-                const projects = getProjects();
-                const items = projects[currentProjectName] || [];
-                
-                // 1. Filter for schedulable items and prepare data
+            const renderGanttChart = async () => {
+                const items = await dbGet(currentProjectName) || [];
+                // ... (rest of Gantt logic is the same, just needs async data)
                 const schedulableItems = items
                     .filter(item => item.startDate && item.duration > 0)
-                    .map(item => ({...item, startDate: new Date(item.startDate + 'T00:00:00')})); // Ensure date objects
+                    .map(item => ({...item, startDate: new Date(item.startDate + 'T00:00:00')}));
 
                 if (schedulableItems.length === 0) {
                     ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">No schedulable items with both a start date and duration.</p>';
                     return;
                 }
 
-                const itemMap = new Map(schedulableItems.map(item => [item.id, item]));
-                
-                // 2. Calculate effective start and end dates based on dependencies
                 const calculatedItems = new Map();
                 let itemsToProcess = [...schedulableItems];
                 
-                // Iteratively calculate dates to resolve dependency chain
                 for (let i = 0; i < schedulableItems.length && itemsToProcess.length > 0; i++) {
                     itemsToProcess = itemsToProcess.filter(item => {
                         const deps = item.dependencies || [];
@@ -469,33 +539,31 @@
                             effectiveEndDate.setDate(effectiveEndDate.getDate() + item.duration);
 
                             calculatedItems.set(item.id, {...item, effectiveStartDate, effectiveEndDate});
-                            return false; // remove from processing list
+                            return false;
                         }
-                        return true; // keep for next iteration
+                        return true;
                     });
                 }
-
                 const finalItems = Array.from(calculatedItems.values());
-
-                // 3. Determine chart boundaries
+                if (finalItems.length === 0) {
+                    ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">Could not calculate dates for any items. Check for dependency loops on items without start dates.</p>';
+                    return;
+                }
                 const projectStartDate = new Date(Math.min(...finalItems.map(item => item.effectiveStartDate)));
                 const projectEndDate = new Date(Math.max(...finalItems.map(item => item.effectiveEndDate)));
-                
                 const dayInMillis = 1000 * 60 * 60 * 24;
-                const totalDays = Math.ceil((projectEndDate - projectStartDate) / dayInMillis);
+                const totalDays = Math.ceil((projectEndDate - projectStartDate) / dayInMillis) + 1;
 
                 if (totalDays <= 0 || !isFinite(totalDays)) {
                      ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">Could not calculate project date range.</p>';
                     return;
                 }
 
-                // 4. Render the chart grid
                 ganttChartContainer.innerHTML = '';
                 const grid = document.createElement('div');
                 grid.className = 'gantt-chart-grid';
-                grid.style.gridTemplateColumns = `200px repeat(${totalDays}, minmax(30px, 1fr))`;
+                grid.style.gridTemplateColumns = `200px repeat(${totalDays}, minmax(35px, 1fr))`;
                 
-                // Header
                 grid.innerHTML += '<div class="gantt-header font-semibold">Task</div>';
                 for (let i = 0; i < totalDays; i++) {
                     const date = new Date(projectStartDate);
@@ -503,20 +571,21 @@
                     grid.innerHTML += `<div class="gantt-header bg-gray-100">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>`;
                 }
 
-                // Task Rows
                 finalItems.sort((a,b) => a.effectiveStartDate - b.effectiveStartDate).forEach(item => {
                     const offsetDays = Math.floor((item.effectiveStartDate - projectStartDate) / dayInMillis);
-                    const startColumn = offsetDays + 2; // +1 for task name col, +1 for 1-based index
+                    const startColumn = offsetDays + 2;
                     
                     const taskNameDiv = `<div class="gantt-task-name">${item.content}</div>`;
                     const barContainerDiv = document.createElement('div');
                     barContainerDiv.className = 'gantt-bar-container';
-                    barContainerDiv.style.gridColumn = `${startColumn} / span ${totalDays - offsetDays}`;
+                    barContainerDiv.style.gridColumn = `2 / span ${totalDays}`;
 
                     const barDiv = document.createElement('div');
                     barDiv.className = 'gantt-bar';
-                    const barWidth = (item.duration / (totalDays - offsetDays)) * 100;
+                    const barWidth = (item.duration / totalDays) * 100;
+                    const barOffset = (offsetDays / totalDays) * 100;
                     barDiv.style.width = `${barWidth}%`;
+                    barDiv.style.left = `${barOffset}%`;
                     barDiv.textContent = `${item.duration}d`;
 
                     barContainerDiv.appendChild(barDiv);
@@ -527,16 +596,15 @@
                 ganttChartContainer.appendChild(grid);
             };
 
-
             // --- Rendering Functions ---
-            const renderProjectsList = () => {
-                const projects = getProjects();
+            const renderProjectsList = async () => {
+                const projectKeys = await dbGetAllKeys();
                 projectsList.innerHTML = '';
-                if (Object.keys(projects).length === 0) {
+                if (projectKeys.length === 0) {
                     projectsList.innerHTML = '<p class="text-center text-gray-500">No projects yet. Create one above!</p>';
                     return;
                 }
-                Object.keys(projects).forEach(projectName => {
+                projectKeys.forEach(projectName => {
                     const projectDiv = document.createElement('div');
                     projectDiv.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
                     projectDiv.innerHTML = `
@@ -550,31 +618,38 @@
                 });
             };
 
-            const renderItemsTable = () => {
-                const projects = getProjects();
-                const items = projects[currentProjectName] || [];
+            const renderItemsTable = async () => {
+                // Clean up old file URLs to prevent memory leaks
+                objectUrls.forEach(URL.revokeObjectURL);
+                objectUrls = [];
+
+                const items = await dbGet(currentProjectName) || [];
                 itemsTableBody.innerHTML = '';
 
                 if (items.length === 0) {
-                    itemsTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500">No items in this project yet.</td></tr>';
+                    itemsTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">No items in this project yet.</td></tr>`;
                     return;
                 }
                 
                 const itemMap = new Map(items.map(item => [item.id, item.content]));
 
                 items.forEach(item => {
-                    const dependenciesText = (item.dependencies || [])
-                        .map(depId => itemMap.get(depId) || 'Unknown Item')
-                        .join(', ');
+                    const dependenciesText = (item.dependencies || []).map(depId => itemMap.get(depId) || 'Unknown').join(', ');
+                    
+                    const fileLinks = (item.files || []).map(file => {
+                        const url = URL.createObjectURL(file.data);
+                        objectUrls.push(url); // Track for cleanup
+                        return `<a href="${url}" download="${file.name}" class="text-blue-600 hover:underline block">${file.name}</a>`;
+                    }).join('');
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-pre-wrap max-w-xs">${item.content}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${item.owner || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${item.cost !== null ? item.cost.toFixed(2) : 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${item.startDate || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${item.duration || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-pre-wrap max-w-xs">${dependenciesText || 'None'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${fileLinks || 'None'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button class="edit-item-btn text-indigo-600 hover:text-indigo-900 mr-3" data-id="${item.id}">Edit</button>
                             <button class="delete-item-btn text-red-600 hover:text-red-900" data-id="${item.id}">Delete</button>
@@ -584,9 +659,8 @@
                 });
             };
 
-            const populateDependenciesDropdown = (currentItemId = null) => {
-                const projects = getProjects();
-                const items = projects[currentProjectName] || [];
+            const populateDependenciesDropdown = async (currentItemId = null) => {
+                const items = await dbGet(currentProjectName) || [];
                 itemDependenciesSelect.innerHTML = '';
                 items.forEach(item => {
                     if (item.id !== currentItemId) {
@@ -605,11 +679,7 @@
             clearFormBtn.addEventListener('click', clearForm);
             ganttChartBtn.addEventListener('click', showGanttChart);
             closeGanttBtn.addEventListener('click', hideGanttChart);
-            ganttModal.addEventListener('click', (e) => {
-                if (e.target === ganttModal) { // Close if clicking on the overlay
-                    hideGanttChart();
-                }
-            });
+            ganttModal.addEventListener('click', (e) => e.target === ganttModal && hideGanttChart());
 
             projectsList.addEventListener('click', (e) => {
                 if (e.target.classList.contains('select-project-btn')) {
@@ -629,8 +699,21 @@
                 }
             });
 
+            existingFilesList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-file-btn')) {
+                    const itemId = e.target.dataset.itemId;
+                    const fileIndex = parseInt(e.target.dataset.fileIndex, 10);
+                    removeFile(itemId, fileIndex);
+                }
+            });
+
             // --- Initial Load ---
-            showProjectsView();
+            openDb().then(() => {
+                showProjectsView();
+            }).catch(err => {
+                console.error(err);
+                alert('Could not initialize the database. Please ensure you are not in private browsing mode and that your browser supports IndexedDB.');
+            });
         });
     </script>
 </body>
