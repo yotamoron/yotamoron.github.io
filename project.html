@@ -82,6 +82,9 @@
             justify-content: center;
             overflow: hidden;
         }
+        .accordion-content {
+            background-color: #f9fafb;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -740,6 +743,54 @@
                     projectsList.appendChild(projectDiv);
                 });
             };
+            
+            const createAccordionContent = (item, itemMap) => {
+                const dependenciesHtml = (item.dependencies && item.dependencies.length > 0)
+                    ? `<ul>${item.dependencies.map(id => `<li class="list-disc ml-4">${itemMap.get(id) || 'Unknown Item'}</li>`).join('')}</ul>`
+                    : '<p>None</p>';
+
+                const filesHtml = (item.files && item.files.length > 0)
+                    ? item.files.map(file => {
+                        const url = URL.createObjectURL(file.data);
+                        objectUrls.push(url); // Track for cleanup
+                        return `<a href="${url}" download="${file.name}" class="text-blue-600 hover:underline block">${file.name}</a>`;
+                    }).join('')
+                    : '<p>No files attached.</p>';
+                
+                const notesHtml = (item.notes && item.notes.length > 0)
+                    ? item.notes.sort((a,b) => new Date(a.createdDate) - new Date(b.createdDate)).map(note => `
+                        <div class="border-t pt-2 mt-2">
+                            <p class="text-gray-800 whitespace-pre-wrap">${note.text}</p>
+                            <p class="text-xs text-gray-400 mt-1">${new Date(note.createdDate).toLocaleString()}</p>
+                        </div>
+                    `).join('')
+                    : '<p>No notes for this item.</p>';
+
+                return `
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Full Description</h4>
+                            <p class="mt-1 text-gray-600 whitespace-pre-wrap">${item.content}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Cost</h4>
+                            <p class="mt-1 text-gray-600">${item.cost !== null ? item.cost.toFixed(2) : 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Dependencies</h4>
+                            <div class="mt-1 text-gray-600">${dependenciesHtml}</div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Files</h4>
+                            <div class="mt-1 text-gray-600">${filesHtml}</div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="font-semibold text-gray-700">Notes</h4>
+                            <div class="mt-1 text-gray-600 space-y-2">${notesHtml}</div>
+                        </div>
+                    </div>
+                `;
+            };
 
             const renderItemsTable = async () => {
                 objectUrls.forEach(URL.revokeObjectURL);
@@ -756,13 +807,8 @@
                 const itemMap = new Map(items.map(item => [item.id, item.content]));
 
                 items.forEach(item => {
-                    const dependenciesText = (item.dependencies || []).map(depId => itemMap.get(depId) || 'Unknown').join(', ');
                     const notesCount = (item.notes || []).length;
-                    const fileLinks = (item.files || []).map(file => {
-                        const url = URL.createObjectURL(file.data);
-                        objectUrls.push(url);
-                        return `<a href="${url}" download="${file.name}" class="text-blue-600 hover:underline block">${file.name}</a>`;
-                    }).join('');
+                    const fileCount = (item.files || []).length;
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -771,13 +817,26 @@
                         <td class="px-6 py-4 whitespace-nowrap">${item.startDate || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${item.duration || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${notesCount}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${fileLinks || 'None'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${fileCount}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="view-item-btn text-green-600 hover:text-green-900 mr-3" data-id="${item.id}">View</button>
                             <button class="edit-item-btn text-indigo-600 hover:text-indigo-900 mr-3" data-id="${item.id}">Edit</button>
                             <button class="delete-item-btn text-red-600 hover:text-red-900" data-id="${item.id}">Delete</button>
                         </td>
                     `;
+                    
+                    const accordionRow = document.createElement('tr');
+                    accordionRow.classList.add('hidden');
+                    accordionRow.dataset.accordionId = item.id;
+                    
+                    const accordionCell = document.createElement('td');
+                    accordionCell.colSpan = 7;
+                    accordionCell.className = 'accordion-content';
+                    accordionCell.innerHTML = createAccordionContent(item, itemMap);
+
+                    accordionRow.appendChild(accordionCell);
                     itemsTableBody.appendChild(row);
+                    itemsTableBody.appendChild(accordionRow);
                 });
             };
 
@@ -814,11 +873,24 @@
             });
 
             itemsTableBody.addEventListener('click', (e) => {
-                if (e.target.classList.contains('edit-item-btn')) {
-                    editItem(e.target.dataset.id);
-                }
-                if (e.target.classList.contains('delete-item-btn')) {
-                    deleteItem(e.target.dataset.id);
+                const button = e.target;
+                const itemId = button.dataset.id;
+
+                if (button.classList.contains('edit-item-btn')) {
+                    editItem(itemId);
+                } else if (button.classList.contains('delete-item-btn')) {
+                    deleteItem(itemId);
+                } else if (button.classList.contains('view-item-btn')) {
+                    const openAccordion = document.querySelector('tr[data-accordion-id]:not(.hidden)');
+                    const targetAccordion = document.querySelector(`tr[data-accordion-id="${itemId}"]`);
+
+                    if (openAccordion) {
+                        openAccordion.classList.add('hidden');
+                    }
+                    
+                    if (openAccordion !== targetAccordion) {
+                        targetAccordion.classList.remove('hidden');
+                    }
                 }
             });
 
