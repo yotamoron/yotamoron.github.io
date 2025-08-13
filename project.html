@@ -88,399 +88,399 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8">
+<div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8">
 
-        <!-- Main Projects View -->
-        <div id="projects-view">
-            <header class="mb-8 text-center">
-                <h1 class="text-4xl font-bold text-gray-800">Project Management Tool</h1>
-                <p class="text-gray-600 mt-2">Create and manage your projects and tasks.</p>
-            </header>
-            
-            <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md">
-                <h2 class="text-2xl font-semibold mb-4">Create New Project</h2>
-                <div class="flex space-x-2">
-                    <input type="text" id="new-project-name" class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter project name...">
-                    <button id="create-project-btn" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Create</button>
-                </div>
-            </div>
+    <!-- Main Projects View -->
+    <div id="projects-view">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-800">Project Management Tool</h1>
+            <p class="text-gray-600 mt-2">Create and manage your projects and tasks.</p>
+        </header>
 
-            <div class="mt-10 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold mb-4 text-center">Existing Projects</h2>
-                <div id="projects-list" class="space-y-3">
-                    <!-- Projects will be listed here -->
-                </div>
+        <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-2xl font-semibold mb-4">Create New Project</h2>
+            <div class="flex space-x-2">
+                <input type="text" id="new-project-name" class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter project name...">
+                <button id="create-project-btn" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Create</button>
             </div>
         </div>
 
-        <!-- Single Project View -->
-        <div id="project-detail-view" class="hidden">
-            <header class="mb-8 flex items-center justify-between">
+        <div class="mt-10 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-semibold mb-4 text-center">Existing Projects</h2>
+            <div id="projects-list" class="space-y-3">
+                <!-- Projects will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Single Project View -->
+    <div id="project-detail-view" class="hidden">
+        <header class="mb-8 flex items-center justify-between">
+            <div>
+                <button id="back-to-projects" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition duration-300">&larr; Back to Projects</button>
+            </div>
+            <h1 id="project-name-header" class="text-3xl font-bold text-center"></h1>
+            <div></div>
+        </header>
+
+        <!-- Items Table -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">Project Items</h2>
+                <button id="gantt-chart-btn" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">Gantt Chart</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Files</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="items-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Items will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add/Edit Item Form -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 id="form-title" class="text-2xl font-semibold mb-4">Add New Item</h2>
+            <form id="item-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="hidden" id="item-id">
+
+                <div class="md:col-span-2">
+                    <label for="item-content" class="block text-sm font-medium text-gray-700 mb-1">1. Content / Description</label>
+                    <textarea id="item-content" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="A short description of the work item..." required></textarea>
+                </div>
+
                 <div>
-                    <button id="back-to-projects" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition duration-300">&larr; Back to Projects</button>
+                    <label for="item-owner" class="block text-sm font-medium text-gray-700 mb-1">2. Who will do the work?</label>
+                    <input type="text" id="item-owner" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Owner's name">
                 </div>
-                <h1 id="project-name-header" class="text-3xl font-bold text-center"></h1>
-                <div></div>
-            </header>
 
-            <!-- Items Table -->
-            <div class="bg-white p-6 rounded-xl shadow-md mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold">Project Items</h2>
-                    <button id="gantt-chart-btn" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">Gantt Chart</button>
+                <div>
+                    <label for="item-cost" class="block text-sm font-medium text-gray-700 mb-1">3. What is the cost?</label>
+                    <input type="number" id="item-cost" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01">
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Files</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="items-table-body" class="bg-white divide-y divide-gray-200">
-                            <!-- Items will be populated here -->
-                        </tbody>
-                    </table>
+
+                <div>
+                    <label for="item-start-date" class="block text-sm font-medium text-gray-700 mb-1">4. When will it start?</label>
+                    <input type="date" id="item-start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-            </div>
 
-            <!-- Add/Edit Item Form -->
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <h2 id="form-title" class="text-2xl font-semibold mb-4">Add New Item</h2>
-                <form id="item-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <input type="hidden" id="item-id">
-                    
-                    <div class="md:col-span-2">
-                        <label for="item-content" class="block text-sm font-medium text-gray-700 mb-1">1. Content / Description</label>
-                        <textarea id="item-content" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="A short description of the work item..." required></textarea>
-                    </div>
-
-                    <div>
-                        <label for="item-owner" class="block text-sm font-medium text-gray-700 mb-1">2. Who will do the work?</label>
-                        <input type="text" id="item-owner" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Owner's name">
-                    </div>
-
-                    <div>
-                        <label for="item-cost" class="block text-sm font-medium text-gray-700 mb-1">3. What is the cost?</label>
-                        <input type="number" id="item-cost" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01">
-                    </div>
-
-                    <div>
-                        <label for="item-start-date" class="block text-sm font-medium text-gray-700 mb-1">4. When will it start?</label>
-                        <input type="date" id="item-start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div>
-                        <label for="item-duration" class="block text-sm font-medium text-gray-700 mb-1">5. How long will it take (days)?</label>
-                        <input type="number" id="item-duration" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Number of days" min="1">
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label for="item-dependencies" class="block text-sm font-medium text-gray-700 mb-1">6. Dependencies (optional)</label>
-                        <select id="item-dependencies" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 multi-select-dropdown">
-                            <!-- Dependency options will be populated here -->
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple items.</p>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">7. Attach Files (optional)</label>
-                        <input type="file" id="item-files" multiple class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <div id="existing-files-list" class="mt-2 text-sm space-y-2"></div>
-                    </div>
-
-                    <div class="md:col-span-2 flex items-center justify-end space-x-3">
-                        <button type="button" id="clear-form-btn" class="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition duration-300">Clear</button>
-                        <button type="submit" id="save-item-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Save Item</button>
-                    </div>
-                </form>
-
-                <!-- Notes Section -->
-                <div id="notes-section" class="hidden mt-8 pt-6 border-t border-gray-200">
-                    <h3 class="text-xl font-semibold mb-4">Notes</h3>
-                    <div id="notes-list" class="space-y-4 mb-6">
-                        <!-- Notes will be rendered here -->
-                    </div>
-                    <div>
-                        <label for="new-note-text" class="block text-sm font-medium text-gray-700 mb-1">Add a new note</label>
-                        <textarea id="new-note-text" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your note..."></textarea>
-                        <button type="button" id="add-note-btn" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Add Note</button>
-                    </div>
+                <div>
+                    <label for="item-duration" class="block text-sm font-medium text-gray-700 mb-1">5. How long will it take (days)?</label>
+                    <input type="number" id="item-duration" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Number of days" min="1">
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Gantt Chart Modal -->
-    <div id="gantt-modal" class="modal-overlay hidden">
-        <div class="modal-content max-w-6xl">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Gantt Chart</h2>
-                <button id="close-gantt-btn" class="text-2xl font-bold">&times;</button>
-            </div>
-            <div id="gantt-chart-container" class="overflow-x-auto">
-                <!-- Gantt chart will be rendered here -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- File Note Modal -->
-    <div id="file-note-modal" class="modal-overlay hidden">
-        <div class="modal-content max-w-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Edit Note for File</h2>
-                <button id="close-file-note-btn" class="text-2xl font-bold">&times;</button>
-            </div>
-            <p id="file-note-modal-filename" class="font-semibold mb-2"></p>
-            <form id="file-note-form">
-                <input type="hidden" id="file-note-item-id">
-                <input type="hidden" id="file-note-file-index">
-                <textarea id="file-note-textarea" rows="4" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Add a note for this file..."></textarea>
-                <div class="mt-4 text-right">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">Save Note</button>
+                <div class="md:col-span-2">
+                    <label for="item-dependencies" class="block text-sm font-medium text-gray-700 mb-1">6. Dependencies (optional)</label>
+                    <select id="item-dependencies" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 multi-select-dropdown">
+                        <!-- Dependency options will be populated here -->
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple items.</p>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">7. Attach Files (optional)</label>
+                    <input type="file" id="item-files" multiple class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <div id="existing-files-list" class="mt-2 text-sm space-y-2"></div>
+                </div>
+
+                <div class="md:col-span-2 flex items-center justify-end space-x-3">
+                    <button type="button" id="clear-form-btn" class="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition duration-300">Clear</button>
+                    <button type="submit" id="save-item-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Save Item</button>
                 </div>
             </form>
+
+            <!-- Notes Section -->
+            <div id="notes-section" class="hidden mt-8 pt-6 border-t border-gray-200">
+                <h3 class="text-xl font-semibold mb-4">Notes</h3>
+                <div id="notes-list" class="space-y-4 mb-6">
+                    <!-- Notes will be rendered here -->
+                </div>
+                <div>
+                    <label for="new-note-text" class="block text-sm font-medium text-gray-700 mb-1">Add a new note</label>
+                    <textarea id="new-note-text" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your note..."></textarea>
+                    <button type="button" id="add-note-btn" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Add Note</button>
+                </div>
+            </div>
         </div>
     </div>
+</div>
+
+<!-- Gantt Chart Modal -->
+<div id="gantt-modal" class="modal-overlay hidden">
+    <div class="modal-content max-w-6xl">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">Gantt Chart</h2>
+            <button id="close-gantt-btn" class="text-2xl font-bold">&times;</button>
+        </div>
+        <div id="gantt-chart-container" class="overflow-x-auto">
+            <!-- Gantt chart will be rendered here -->
+        </div>
+    </div>
+</div>
+
+<!-- File Note Modal -->
+<div id="file-note-modal" class="modal-overlay hidden">
+    <div class="modal-content max-w-lg">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">Edit Note for File</h2>
+            <button id="close-file-note-btn" class="text-2xl font-bold">&times;</button>
+        </div>
+        <p id="file-note-modal-filename" class="font-semibold mb-2"></p>
+        <form id="file-note-form">
+            <input type="hidden" id="file-note-item-id">
+            <input type="hidden" id="file-note-file-index">
+            <textarea id="file-note-textarea" rows="4" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Add a note for this file..."></textarea>
+            <div class="mt-4 text-right">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">Save Note</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DB Setup ---
-            const DB_NAME = 'ProjectManagementToolDB';
-            const DB_VERSION = 1;
-            const STORE_NAME = 'projects';
-            let db;
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DB Setup ---
+        const DB_NAME = 'ProjectManagementToolDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'projects';
+        let db;
 
-            function openDb() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(DB_NAME, DB_VERSION);
-                    request.onerror = () => reject("Error opening DB");
-                    request.onsuccess = () => {
-                        db = request.result;
-                        resolve(db);
-                    };
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        db.createObjectStore(STORE_NAME);
-                    };
-                });
+        function openDb() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = () => reject("Error opening DB");
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    db.createObjectStore(STORE_NAME);
+                };
+            });
+        }
+
+        // --- DB Helper Functions ---
+        const dbGet = (key) => new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        const dbSet = (key, val) => new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.put(val, key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        const dbDelete = (key) => new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.delete(key);
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+
+        const dbGetAllKeys = () => new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAllKeys();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+
+        // --- DOM Elements ---
+        const projectsView = document.getElementById('projects-view');
+        const projectDetailView = document.getElementById('project-detail-view');
+        const createProjectBtn = document.getElementById('create-project-btn');
+        const newProjectNameInput = document.getElementById('new-project-name');
+        const projectsList = document.getElementById('projects-list');
+        const backToProjectsBtn = document.getElementById('back-to-projects');
+        const projectNameHeader = document.getElementById('project-name-header');
+        const itemForm = document.getElementById('item-form');
+        const formTitle = document.getElementById('form-title');
+        const itemIdInput = document.getElementById('item-id');
+        const itemContentInput = document.getElementById('item-content');
+        const itemOwnerInput = document.getElementById('item-owner');
+        const itemCostInput = document.getElementById('item-cost');
+        const itemStartDateInput = document.getElementById('item-start-date');
+        const itemDurationInput = document.getElementById('item-duration');
+        const itemDependenciesSelect = document.getElementById('item-dependencies');
+        const itemFilesInput = document.getElementById('item-files');
+        const existingFilesList = document.getElementById('existing-files-list');
+        const saveItemBtn = document.getElementById('save-item-btn');
+        const clearFormBtn = document.getElementById('clear-form-btn');
+        const itemsTableBody = document.getElementById('items-table-body');
+        const ganttChartBtn = document.getElementById('gantt-chart-btn');
+        const ganttModal = document.getElementById('gantt-modal');
+        const closeGanttBtn = document.getElementById('close-gantt-btn');
+        const ganttChartContainer = document.getElementById('gantt-chart-container');
+        const notesSection = document.getElementById('notes-section');
+        const notesList = document.getElementById('notes-list');
+        const newNoteTextInput = document.getElementById('new-note-text');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const fileNoteModal = document.getElementById('file-note-modal');
+        const closeFileNoteBtn = document.getElementById('close-file-note-btn');
+        const fileNoteForm = document.getElementById('file-note-form');
+        const fileNoteModalFilename = document.getElementById('file-note-modal-filename');
+        const fileNoteItemIdInput = document.getElementById('file-note-item-id');
+        const fileNoteFileIndexInput = document.getElementById('file-note-file-index');
+        const fileNoteTextarea = document.getElementById('file-note-textarea');
+
+        let currentProjectName = null;
+        let objectUrls = []; // For memory management of file URLs
+
+        // --- UUID Generation ---
+        const generateUUID = () => crypto.randomUUID();
+
+        // --- View Management ---
+        const showProjectsView = async () => {
+            projectsView.classList.remove('hidden');
+            projectDetailView.classList.add('hidden');
+            currentProjectName = null;
+            await renderProjectsList();
+        };
+
+        const showProjectDetailView = async (projectName) => {
+            projectsView.classList.add('hidden');
+            projectDetailView.classList.remove('hidden');
+            currentProjectName = projectName;
+            projectNameHeader.textContent = projectName;
+            await renderItemsTable();
+            await populateDependenciesDropdown();
+            clearForm();
+        };
+
+        // --- Project Management ---
+        const createProject = async () => {
+            const projectName = newProjectNameInput.value.trim();
+            if (!projectName) {
+                alert('Project name cannot be empty.');
+                return;
+            }
+            const existingProject = await dbGet(projectName);
+            if (existingProject) {
+                alert('A project with this name already exists.');
+                return;
+            }
+            await dbSet(projectName, []);
+            newProjectNameInput.value = '';
+            await renderProjectsList();
+        };
+
+        const deleteProject = async (projectName) => {
+            if (!confirm(`Are you sure you want to delete the project "${projectName}" and all its items?`)) {
+                return;
+            }
+            await dbDelete(projectName);
+            await renderProjectsList();
+        };
+
+        // --- Item Management ---
+        const saveItem = async (event) => {
+            event.preventDefault();
+            if (itemContentInput.value.trim() === '') {
+                alert('Content / Description cannot be empty.');
+                return;
             }
 
-            // --- DB Helper Functions ---
-            const dbGet = (key) => new Promise((resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readonly');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.get(key);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
+            const items = await dbGet(currentProjectName) || [];
+            const itemId = itemIdInput.value || generateUUID();
+            const selectedDependencies = Array.from(itemDependenciesSelect.selectedOptions).map(opt => opt.value);
+
+            if (hasCircularDependency(itemId, selectedDependencies, items)) {
+                alert('Error: This creates a circular dependency. Please revise the dependencies.');
+                return;
+            }
+
+            const existingItemIndex = items.findIndex(item => item.id === itemId);
+            const existingItem = existingItemIndex > -1 ? items[existingItemIndex] : null;
+
+            const existingFiles = existingItem ? existingItem.files || [] : [];
+            const newFiles = Array.from(itemFilesInput.files).map(file => ({
+                name: file.name,
+                type: file.type,
+                data: file,
+                note: '' // Initialize with empty note
+            }));
+
+            const newItem = {
+                id: itemId,
+                content: itemContentInput.value.trim(),
+                owner: itemOwnerInput.value.trim(),
+                cost: itemCostInput.value ? parseFloat(itemCostInput.value) : null,
+                startDate: itemStartDateInput.value,
+                duration: itemDurationInput.value ? parseInt(itemDurationInput.value, 10) : null,
+                dependencies: selectedDependencies,
+                files: [...existingFiles, ...newFiles],
+                notes: existingItem ? existingItem.notes || [] : [] // Preserve existing notes
+            };
+
+            if (existingItemIndex > -1) {
+                items[existingItemIndex] = newItem;
+            } else {
+                items.push(newItem);
+            }
+
+            await dbSet(currentProjectName, items);
+            await renderItemsTable();
+            await populateDependenciesDropdown();
+            clearForm();
+        };
+
+        const editItem = async (itemId) => {
+            const items = await dbGet(currentProjectName) || [];
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+
+            formTitle.textContent = 'Edit Item';
+            itemIdInput.value = item.id;
+            itemContentInput.value = item.content;
+            itemOwnerInput.value = item.owner;
+            itemCostInput.value = item.cost !== null ? item.cost : '';
+            itemStartDateInput.value = item.startDate;
+            itemDurationInput.value = item.duration !== null ? item.duration : '';
+
+            await populateDependenciesDropdown(item.id);
+
+            (item.dependencies || []).forEach(depId => {
+                const option = itemDependenciesSelect.querySelector(`option[value="${depId}"]`);
+                if (option) option.selected = true;
             });
 
-            const dbSet = (key, val) => new Promise((resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.put(val, key);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-            
-            const dbDelete = (key) => new Promise((resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.delete(key);
-                request.onsuccess = () => resolve();
-                request.onerror = () => reject(request.error);
-            });
+            renderExistingFiles(item);
 
-            const dbGetAllKeys = () => new Promise((resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readonly');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.getAllKeys();
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
+            notesSection.classList.remove('hidden');
+            renderNotes(item.id, item.notes || []);
 
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        };
 
-            // --- DOM Elements ---
-            const projectsView = document.getElementById('projects-view');
-            const projectDetailView = document.getElementById('project-detail-view');
-            const createProjectBtn = document.getElementById('create-project-btn');
-            const newProjectNameInput = document.getElementById('new-project-name');
-            const projectsList = document.getElementById('projects-list');
-            const backToProjectsBtn = document.getElementById('back-to-projects');
-            const projectNameHeader = document.getElementById('project-name-header');
-            const itemForm = document.getElementById('item-form');
-            const formTitle = document.getElementById('form-title');
-            const itemIdInput = document.getElementById('item-id');
-            const itemContentInput = document.getElementById('item-content');
-            const itemOwnerInput = document.getElementById('item-owner');
-            const itemCostInput = document.getElementById('item-cost');
-            const itemStartDateInput = document.getElementById('item-start-date');
-            const itemDurationInput = document.getElementById('item-duration');
-            const itemDependenciesSelect = document.getElementById('item-dependencies');
-            const itemFilesInput = document.getElementById('item-files');
-            const existingFilesList = document.getElementById('existing-files-list');
-            const saveItemBtn = document.getElementById('save-item-btn');
-            const clearFormBtn = document.getElementById('clear-form-btn');
-            const itemsTableBody = document.getElementById('items-table-body');
-            const ganttChartBtn = document.getElementById('gantt-chart-btn');
-            const ganttModal = document.getElementById('gantt-modal');
-            const closeGanttBtn = document.getElementById('close-gantt-btn');
-            const ganttChartContainer = document.getElementById('gantt-chart-container');
-            const notesSection = document.getElementById('notes-section');
-            const notesList = document.getElementById('notes-list');
-            const newNoteTextInput = document.getElementById('new-note-text');
-            const addNoteBtn = document.getElementById('add-note-btn');
-            const fileNoteModal = document.getElementById('file-note-modal');
-            const closeFileNoteBtn = document.getElementById('close-file-note-btn');
-            const fileNoteForm = document.getElementById('file-note-form');
-            const fileNoteModalFilename = document.getElementById('file-note-modal-filename');
-            const fileNoteItemIdInput = document.getElementById('file-note-item-id');
-            const fileNoteFileIndexInput = document.getElementById('file-note-file-index');
-            const fileNoteTextarea = document.getElementById('file-note-textarea');
-
-            let currentProjectName = null;
-            let objectUrls = []; // For memory management of file URLs
-
-            // --- UUID Generation ---
-            const generateUUID = () => crypto.randomUUID();
-
-            // --- View Management ---
-            const showProjectsView = async () => {
-                projectsView.classList.remove('hidden');
-                projectDetailView.classList.add('hidden');
-                currentProjectName = null;
-                await renderProjectsList();
-            };
-
-            const showProjectDetailView = async (projectName) => {
-                projectsView.classList.add('hidden');
-                projectDetailView.classList.remove('hidden');
-                currentProjectName = projectName;
-                projectNameHeader.textContent = projectName;
-                await renderItemsTable();
-                await populateDependenciesDropdown();
-                clearForm();
-            };
-
-            // --- Project Management ---
-            const createProject = async () => {
-                const projectName = newProjectNameInput.value.trim();
-                if (!projectName) {
-                    alert('Project name cannot be empty.');
-                    return;
-                }
-                const existingProject = await dbGet(projectName);
-                if (existingProject) {
-                    alert('A project with this name already exists.');
-                    return;
-                }
-                await dbSet(projectName, []);
-                newProjectNameInput.value = '';
-                await renderProjectsList();
-            };
-            
-            const deleteProject = async (projectName) => {
-                if (!confirm(`Are you sure you want to delete the project "${projectName}" and all its items?`)) {
-                    return;
-                }
-                await dbDelete(projectName);
-                await renderProjectsList();
-            };
-
-            // --- Item Management ---
-            const saveItem = async (event) => {
-                event.preventDefault();
-                if (itemContentInput.value.trim() === '') {
-                    alert('Content / Description cannot be empty.');
-                    return;
-                }
-
-                const items = await dbGet(currentProjectName) || [];
-                const itemId = itemIdInput.value || generateUUID();
-                const selectedDependencies = Array.from(itemDependenciesSelect.selectedOptions).map(opt => opt.value);
-
-                if (hasCircularDependency(itemId, selectedDependencies, items)) {
-                    alert('Error: This creates a circular dependency. Please revise the dependencies.');
-                    return;
-                }
-                
-                const existingItemIndex = items.findIndex(item => item.id === itemId);
-                const existingItem = existingItemIndex > -1 ? items[existingItemIndex] : null;
-                
-                const existingFiles = existingItem ? existingItem.files || [] : [];
-                const newFiles = Array.from(itemFilesInput.files).map(file => ({ 
-                    name: file.name, 
-                    type: file.type, 
-                    data: file,
-                    note: '' // Initialize with empty note
-                }));
-
-                const newItem = {
-                    id: itemId,
-                    content: itemContentInput.value.trim(),
-                    owner: itemOwnerInput.value.trim(),
-                    cost: itemCostInput.value ? parseFloat(itemCostInput.value) : null,
-                    startDate: itemStartDateInput.value,
-                    duration: itemDurationInput.value ? parseInt(itemDurationInput.value, 10) : null,
-                    dependencies: selectedDependencies,
-                    files: [...existingFiles, ...newFiles],
-                    notes: existingItem ? existingItem.notes || [] : [] // Preserve existing notes
-                };
-
-                if (existingItemIndex > -1) {
-                    items[existingItemIndex] = newItem;
-                } else {
-                    items.push(newItem);
-                }
-
-                await dbSet(currentProjectName, items);
-                await renderItemsTable();
-                await populateDependenciesDropdown();
-                clearForm();
-            };
-
-            const editItem = async (itemId) => {
-                const items = await dbGet(currentProjectName) || [];
-                const item = items.find(i => i.id === itemId);
-                if (!item) return;
-
-                formTitle.textContent = 'Edit Item';
-                itemIdInput.value = item.id;
-                itemContentInput.value = item.content;
-                itemOwnerInput.value = item.owner;
-                itemCostInput.value = item.cost !== null ? item.cost : '';
-                itemStartDateInput.value = item.startDate;
-                itemDurationInput.value = item.duration !== null ? item.duration : '';
-                
-                await populateDependenciesDropdown(item.id); 
-                
-                (item.dependencies || []).forEach(depId => {
-                    const option = itemDependenciesSelect.querySelector(`option[value="${depId}"]`);
-                    if (option) option.selected = true;
-                });
-
-                renderExistingFiles(item);
-                
-                notesSection.classList.remove('hidden');
-                renderNotes(item.id, item.notes || []);
-
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            };
-
-            const renderExistingFiles = (item) => {
-                existingFilesList.innerHTML = '';
-                if (item.files && item.files.length > 0) {
-                    existingFilesList.innerHTML = '<p class="font-medium">Existing files:</p>';
-                    item.files.forEach((file, index) => {
-                        const fileEl = document.createElement('div');
-                        fileEl.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
-                        fileEl.innerHTML = `
+        const renderExistingFiles = (item) => {
+            existingFilesList.innerHTML = '';
+            if (item.files && item.files.length > 0) {
+                existingFilesList.innerHTML = '<p class="font-medium">Existing files:</p>';
+                item.files.forEach((file, index) => {
+                    const fileEl = document.createElement('div');
+                    fileEl.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
+                    fileEl.innerHTML = `
                             <div>
                                 <span class="font-medium">${file.name}</span>
                                 <p class="text-xs text-gray-500">${file.note || 'No note'}</p>
@@ -490,69 +490,69 @@
                                 <button type="button" class="remove-file-btn text-red-500 hover:text-red-700 font-bold" data-item-id="${item.id}" data-file-index="${index}">&times;</button>
                             </div>
                         `;
-                        existingFilesList.appendChild(fileEl);
-                    });
-                }
-            };
-
-            const removeFile = async (itemId, fileIndex) => {
-                 const items = await dbGet(currentProjectName) || [];
-                 const itemIndex = items.findIndex(i => i.id === itemId);
-                 if (itemIndex > -1 && items[itemIndex].files) {
-                     items[itemIndex].files.splice(fileIndex, 1);
-                     await dbSet(currentProjectName, items);
-                     await editItem(itemId); // Refresh the form view
-                 }
-            };
-
-            const deleteItem = async (itemId) => {
-                if (!confirm('Are you sure you want to delete this item?')) {
-                    return;
-                }
-                let items = await dbGet(currentProjectName) || [];
-                items = items.filter(item => item.id !== itemId);
-                
-                items.forEach(item => {
-                    if (item.dependencies && item.dependencies.includes(itemId)) {
-                        item.dependencies = item.dependencies.filter(depId => depId !== itemId);
-                    }
+                    existingFilesList.appendChild(fileEl);
                 });
+            }
+        };
 
+        const removeFile = async (itemId, fileIndex) => {
+            const items = await dbGet(currentProjectName) || [];
+            const itemIndex = items.findIndex(i => i.id === itemId);
+            if (itemIndex > -1 && items[itemIndex].files) {
+                items[itemIndex].files.splice(fileIndex, 1);
                 await dbSet(currentProjectName, items);
-                await renderItemsTable();
-                await populateDependenciesDropdown();
-                clearForm();
-            };
+                await editItem(itemId); // Refresh the form view
+            }
+        };
 
-            const clearForm = () => {
-                itemForm.reset();
-                itemIdInput.value = '';
-                existingFilesList.innerHTML = '';
-                formTitle.textContent = 'Add New Item';
-                notesSection.classList.add('hidden');
-                notesList.innerHTML = '';
-                newNoteTextInput.value = '';
-                populateDependenciesDropdown();
-            };
+        const deleteItem = async (itemId) => {
+            if (!confirm('Are you sure you want to delete this item?')) {
+                return;
+            }
+            let items = await dbGet(currentProjectName) || [];
+            items = items.filter(item => item.id !== itemId);
 
-            // --- Notes Management ---
-            const renderNotes = (itemId, notes) => {
-                notesList.innerHTML = '';
-                if (!notes || notes.length === 0) {
-                    notesList.innerHTML = '<p class="text-sm text-gray-500">No notes for this item yet.</p>';
-                    return;
+            items.forEach(item => {
+                if (item.dependencies && item.dependencies.includes(itemId)) {
+                    item.dependencies = item.dependencies.filter(depId => depId !== itemId);
                 }
+            });
 
-                notes
-                    .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate))
-                    .forEach(note => {
-                        const noteEl = document.createElement('div');
-                        noteEl.className = 'bg-gray-50 p-3 rounded-lg';
-                        noteEl.dataset.noteId = note.id;
+            await dbSet(currentProjectName, items);
+            await renderItemsTable();
+            await populateDependenciesDropdown();
+            clearForm();
+        };
 
-                        const formattedDate = new Date(note.createdDate).toLocaleString();
+        const clearForm = () => {
+            itemForm.reset();
+            itemIdInput.value = '';
+            existingFilesList.innerHTML = '';
+            formTitle.textContent = 'Add New Item';
+            notesSection.classList.add('hidden');
+            notesList.innerHTML = '';
+            newNoteTextInput.value = '';
+            populateDependenciesDropdown();
+        };
 
-                        noteEl.innerHTML = `
+        // --- Notes Management ---
+        const renderNotes = (itemId, notes) => {
+            notesList.innerHTML = '';
+            if (!notes || notes.length === 0) {
+                notesList.innerHTML = '<p class="text-sm text-gray-500">No notes for this item yet.</p>';
+                return;
+            }
+
+            notes
+                .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate))
+                .forEach(note => {
+                    const noteEl = document.createElement('div');
+                    noteEl.className = 'bg-gray-50 p-3 rounded-lg';
+                    noteEl.dataset.noteId = note.id;
+
+                    const formattedDate = new Date(note.createdDate).toLocaleString();
+
+                    noteEl.innerHTML = `
                             <div class="note-display">
                                 <p class="text-gray-800 whitespace-pre-wrap">${note.text}</p>
                                 <div class="text-xs text-gray-400 mt-2 flex justify-between items-center">
@@ -571,280 +571,280 @@
                                 </div>
                             </div>
                         `;
-                        notesList.appendChild(noteEl);
-                    });
+                    notesList.appendChild(noteEl);
+                });
+        };
+
+        const addNote = async () => {
+            const itemId = itemIdInput.value;
+            const noteText = newNoteTextInput.value.trim();
+            if (!itemId || !noteText) return;
+
+            const items = await dbGet(currentProjectName);
+            const itemIndex = items.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
+
+            const newNote = {
+                id: generateUUID(),
+                text: noteText,
+                createdDate: new Date().toISOString()
             };
 
-            const addNote = async () => {
-                const itemId = itemIdInput.value;
-                const noteText = newNoteTextInput.value.trim();
-                if (!itemId || !noteText) return;
+            if (!items[itemIndex].notes) {
+                items[itemIndex].notes = [];
+            }
+            items[itemIndex].notes.push(newNote);
 
-                const items = await dbGet(currentProjectName);
-                const itemIndex = items.findIndex(i => i.id === itemId);
-                if (itemIndex === -1) return;
+            await dbSet(currentProjectName, items);
+            newNoteTextInput.value = '';
+            renderNotes(itemId, items[itemIndex].notes);
+            await renderItemsTable(); // Update note count in main table
+        };
 
-                const newNote = {
-                    id: generateUUID(),
-                    text: noteText,
-                    createdDate: new Date().toISOString()
-                };
+        const deleteNote = async (itemId, noteId) => {
+            if (!confirm('Are you sure you want to delete this note?')) return;
 
-                if (!items[itemIndex].notes) {
-                    items[itemIndex].notes = [];
-                }
-                items[itemIndex].notes.push(newNote);
+            const items = await dbGet(currentProjectName);
+            const itemIndex = items.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
 
+            items[itemIndex].notes = items[itemIndex].notes.filter(n => n.id !== noteId);
+
+            await dbSet(currentProjectName, items);
+            renderNotes(itemId, items[itemIndex].notes);
+            await renderItemsTable();
+        };
+
+        const toggleNoteEditState = (noteEl, isEditing) => {
+            noteEl.querySelector('.note-display').classList.toggle('hidden', isEditing);
+            noteEl.querySelector('.note-edit').classList.toggle('hidden', !isEditing);
+        };
+
+        const saveNoteEdit = async (itemId, noteId, newText) => {
+            const items = await dbGet(currentProjectName);
+            const itemIndex = items.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
+
+            const noteIndex = items[itemIndex].notes.findIndex(n => n.id === noteId);
+            if (noteIndex === -1) return;
+
+            items[itemIndex].notes[noteIndex].text = newText;
+
+            await dbSet(currentProjectName, items);
+            renderNotes(itemId, items[itemIndex].notes);
+        };
+
+        // --- File Note Modal Logic ---
+        const openFileNoteModal = async (itemId, fileIndex) => {
+            const items = await dbGet(currentProjectName);
+            const item = items.find(i => i.id === itemId);
+            const file = item?.files?.[fileIndex];
+            if (!file) return;
+
+            fileNoteModalFilename.textContent = file.name;
+            fileNoteTextarea.value = file.note || '';
+            fileNoteItemIdInput.value = itemId;
+            fileNoteFileIndexInput.value = fileIndex;
+            fileNoteModal.classList.remove('hidden');
+        };
+
+        const closeFileNoteModal = () => {
+            fileNoteModal.classList.add('hidden');
+            fileNoteForm.reset();
+        };
+
+        const saveFileNote = async (event) => {
+            event.preventDefault();
+            const itemId = fileNoteItemIdInput.value;
+            const fileIndex = parseInt(fileNoteFileIndexInput.value, 10);
+            const noteText = fileNoteTextarea.value;
+
+            const items = await dbGet(currentProjectName);
+            const itemIndex = items.findIndex(i => i.id === itemId);
+            if (itemIndex > -1 && items[itemIndex].files[fileIndex]) {
+                items[itemIndex].files[fileIndex].note = noteText;
                 await dbSet(currentProjectName, items);
-                newNoteTextInput.value = '';
-                renderNotes(itemId, items[itemIndex].notes);
-                await renderItemsTable(); // Update note count in main table
-            };
+                closeFileNoteModal();
+                await editItem(itemId); // Refresh the edit form
+                await renderItemsTable(); // Refresh the table to update accordion
+            }
+        };
 
-            const deleteNote = async (itemId, noteId) => {
-                if (!confirm('Are you sure you want to delete this note?')) return;
-                
-                const items = await dbGet(currentProjectName);
-                const itemIndex = items.findIndex(i => i.id === itemId);
-                if (itemIndex === -1) return;
-
-                items[itemIndex].notes = items[itemIndex].notes.filter(n => n.id !== noteId);
-                
-                await dbSet(currentProjectName, items);
-                renderNotes(itemId, items[itemIndex].notes);
-                await renderItemsTable();
-            };
-            
-            const toggleNoteEditState = (noteEl, isEditing) => {
-                noteEl.querySelector('.note-display').classList.toggle('hidden', isEditing);
-                noteEl.querySelector('.note-edit').classList.toggle('hidden', !isEditing);
-            };
-
-            const saveNoteEdit = async (itemId, noteId, newText) => {
-                const items = await dbGet(currentProjectName);
-                const itemIndex = items.findIndex(i => i.id === itemId);
-                if (itemIndex === -1) return;
-                
-                const noteIndex = items[itemIndex].notes.findIndex(n => n.id === noteId);
-                if (noteIndex === -1) return;
-                
-                items[itemIndex].notes[noteIndex].text = newText;
-                
-                await dbSet(currentProjectName, items);
-                renderNotes(itemId, items[itemIndex].notes);
-            };
-
-            // --- File Note Modal Logic ---
-            const openFileNoteModal = async (itemId, fileIndex) => {
-                const items = await dbGet(currentProjectName);
-                const item = items.find(i => i.id === itemId);
-                const file = item?.files?.[fileIndex];
-                if (!file) return;
-
-                fileNoteModalFilename.textContent = file.name;
-                fileNoteTextarea.value = file.note || '';
-                fileNoteItemIdInput.value = itemId;
-                fileNoteFileIndexInput.value = fileIndex;
-                fileNoteModal.classList.remove('hidden');
-            };
-
-            const closeFileNoteModal = () => {
-                fileNoteModal.classList.add('hidden');
-                fileNoteForm.reset();
-            };
-
-            const saveFileNote = async (event) => {
-                event.preventDefault();
-                const itemId = fileNoteItemIdInput.value;
-                const fileIndex = parseInt(fileNoteFileIndexInput.value, 10);
-                const noteText = fileNoteTextarea.value;
-
-                const items = await dbGet(currentProjectName);
-                const itemIndex = items.findIndex(i => i.id === itemId);
-                if (itemIndex > -1 && items[itemIndex].files[fileIndex]) {
-                    items[itemIndex].files[fileIndex].note = noteText;
-                    await dbSet(currentProjectName, items);
-                    closeFileNoteModal();
-                    await editItem(itemId); // Refresh the edit form
-                    await renderItemsTable(); // Refresh the table to update accordion
-                }
-            };
-
-            // --- Dependency Logic ---
-            const hasCircularDependency = (currentItemId, newDependencies, items) => {
-                const dependencyMap = new Map(items.map(item => [item.id, item.dependencies || []]));
-                dependencyMap.set(currentItemId, newDependencies);
-                const visited = new Set();
-                const recursionStack = new Set();
-                const detectCycle = (itemId) => {
-                    visited.add(itemId);
-                    recursionStack.add(itemId);
-                    const dependencies = dependencyMap.get(itemId) || [];
-                    for (const depId of dependencies) {
-                        if (!visited.has(depId)) {
-                            if (detectCycle(depId)) return true;
-                        } else if (recursionStack.has(depId)) {
-                            return true;
-                        }
-                    }
-                    recursionStack.delete(itemId);
-                    return false;
-                };
-                for (const itemId of dependencyMap.keys()) {
-                    if (!visited.has(itemId)) {
-                        if (detectCycle(itemId)) return true;
+        // --- Dependency Logic ---
+        const hasCircularDependency = (currentItemId, newDependencies, items) => {
+            const dependencyMap = new Map(items.map(item => [item.id, item.dependencies || []]));
+            dependencyMap.set(currentItemId, newDependencies);
+            const visited = new Set();
+            const recursionStack = new Set();
+            const detectCycle = (itemId) => {
+                visited.add(itemId);
+                recursionStack.add(itemId);
+                const dependencies = dependencyMap.get(itemId) || [];
+                for (const depId of dependencies) {
+                    if (!visited.has(depId)) {
+                        if (detectCycle(depId)) return true;
+                    } else if (recursionStack.has(depId)) {
+                        return true;
                     }
                 }
+                recursionStack.delete(itemId);
                 return false;
             };
-
-            // --- Gantt Chart Logic ---
-            const showGanttChart = async () => {
-                await renderGanttChart();
-                ganttModal.classList.remove('hidden');
-            };
-
-            const hideGanttChart = () => {
-                ganttModal.classList.add('hidden');
-            };
-
-            const renderGanttChart = async () => {
-                const items = await dbGet(currentProjectName) || [];
-                const schedulableItems = items
-                    .filter(item => item.startDate && item.duration > 0)
-                    .map(item => ({...item, startDate: new Date(item.startDate + 'T00:00:00')}));
-
-                if (schedulableItems.length === 0) {
-                    ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">No schedulable items with both a start date and duration.</p>';
-                    return;
+            for (const itemId of dependencyMap.keys()) {
+                if (!visited.has(itemId)) {
+                    if (detectCycle(itemId)) return true;
                 }
+            }
+            return false;
+        };
 
-                const calculatedItems = new Map();
-                let itemsToProcess = [...schedulableItems];
-                
-                for (let i = 0; i < schedulableItems.length && itemsToProcess.length > 0; i++) {
-                    itemsToProcess = itemsToProcess.filter(item => {
-                        const deps = item.dependencies || [];
-                        const allDepsCalculated = deps.every(depId => calculatedItems.has(depId));
+        // --- Gantt Chart Logic ---
+        const showGanttChart = async () => {
+            await renderGanttChart();
+            ganttModal.classList.remove('hidden');
+        };
 
-                        if (allDepsCalculated) {
-                            let effectiveStartDate = item.startDate;
-                            deps.forEach(depId => {
-                                const dep = calculatedItems.get(depId);
-                                if (dep.effectiveEndDate > effectiveStartDate) {
-                                    effectiveStartDate = dep.effectiveEndDate;
-                                }
-                            });
-                            
-                            const effectiveEndDate = new Date(effectiveStartDate);
-                            effectiveEndDate.setDate(effectiveEndDate.getDate() + item.duration);
+        const hideGanttChart = () => {
+            ganttModal.classList.add('hidden');
+        };
 
-                            calculatedItems.set(item.id, {...item, effectiveStartDate, effectiveEndDate});
-                            return false;
-                        }
-                        return true;
-                    });
-                }
-                const finalItems = Array.from(calculatedItems.values());
-                if (finalItems.length === 0) {
-                    ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">Could not calculate dates for any items. Check for dependency loops on items without start dates.</p>';
-                    return;
-                }
-                const projectStartDate = new Date(Math.min(...finalItems.map(item => item.effectiveStartDate)));
-                const projectEndDate = new Date(Math.max(...finalItems.map(item => item.effectiveEndDate)));
-                const dayInMillis = 1000 * 60 * 60 * 24;
-                const totalDays = Math.ceil((projectEndDate - projectStartDate) / dayInMillis) + 1;
+        const renderGanttChart = async () => {
+            const items = await dbGet(currentProjectName) || [];
+            const schedulableItems = items
+                .filter(item => item.startDate && item.duration > 0)
+                .map(item => ({...item, startDate: new Date(item.startDate + 'T00:00:00')}));
 
-                if (totalDays <= 0 || !isFinite(totalDays)) {
-                     ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">Could not calculate project date range.</p>';
-                    return;
-                }
+            if (schedulableItems.length === 0) {
+                ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">No schedulable items with both a start date and duration.</p>';
+                return;
+            }
 
-                ganttChartContainer.innerHTML = '';
-                const grid = document.createElement('div');
-                grid.className = 'gantt-chart-grid';
-                grid.style.gridTemplateColumns = `200px repeat(${totalDays}, minmax(35px, 1fr))`;
-                
-                grid.innerHTML += '<div class="gantt-header font-semibold">Task</div>';
-                for (let i = 0; i < totalDays; i++) {
-                    const date = new Date(projectStartDate);
-                    date.setDate(date.getDate() + i);
-                    grid.innerHTML += `<div class="gantt-header bg-gray-100">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>`;
-                }
+            const calculatedItems = new Map();
+            let itemsToProcess = [...schedulableItems];
 
-                finalItems.sort((a,b) => a.effectiveStartDate - b.effectiveStartDate).forEach(item => {
-                    const offsetDays = Math.floor((item.effectiveStartDate - projectStartDate) / dayInMillis);
-                    const taskNameDiv = `<div class="gantt-task-name">${item.content}</div>`;
-                    const barContainerDiv = document.createElement('div');
-                    barContainerDiv.className = 'gantt-bar-container';
-                    barContainerDiv.style.gridColumn = `2 / span ${totalDays}`;
+            for (let i = 0; i < schedulableItems.length && itemsToProcess.length > 0; i++) {
+                itemsToProcess = itemsToProcess.filter(item => {
+                    const deps = item.dependencies || [];
+                    const allDepsCalculated = deps.every(depId => calculatedItems.has(depId));
 
-                    const barDiv = document.createElement('div');
-                    barDiv.className = 'gantt-bar';
-                    const barWidth = (item.duration / totalDays) * 100;
-                    const barOffset = (offsetDays / totalDays) * 100;
-                    barDiv.style.width = `${barWidth}%`;
-                    barDiv.style.left = `${barOffset}%`;
-                    barDiv.textContent = `${item.duration}d`;
+                    if (allDepsCalculated) {
+                        let effectiveStartDate = item.startDate;
+                        deps.forEach(depId => {
+                            const dep = calculatedItems.get(depId);
+                            if (dep.effectiveEndDate > effectiveStartDate) {
+                                effectiveStartDate = dep.effectiveEndDate;
+                            }
+                        });
 
-                    barContainerDiv.appendChild(barDiv);
-                    grid.innerHTML += taskNameDiv;
-                    grid.appendChild(barContainerDiv);
+                        const effectiveEndDate = new Date(effectiveStartDate);
+                        effectiveEndDate.setDate(effectiveEndDate.getDate() + item.duration);
+
+                        calculatedItems.set(item.id, {...item, effectiveStartDate, effectiveEndDate});
+                        return false;
+                    }
+                    return true;
                 });
+            }
+            const finalItems = Array.from(calculatedItems.values());
+            if (finalItems.length === 0) {
+                ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">Could not calculate dates for any items. Check for dependency loops on items without start dates.</p>';
+                return;
+            }
+            const projectStartDate = new Date(Math.min(...finalItems.map(item => item.effectiveStartDate)));
+            const projectEndDate = new Date(Math.max(...finalItems.map(item => item.effectiveEndDate)));
+            const dayInMillis = 1000 * 60 * 60 * 24;
+            const totalDays = Math.ceil((projectEndDate - projectStartDate) / dayInMillis) + 1;
 
-                ganttChartContainer.appendChild(grid);
-            };
+            if (totalDays <= 0 || !isFinite(totalDays)) {
+                ganttChartContainer.innerHTML = '<p class="text-center text-gray-500">Could not calculate project date range.</p>';
+                return;
+            }
 
-            // --- Rendering Functions ---
-            const renderProjectsList = async () => {
-                const projectKeys = await dbGetAllKeys();
-                projectsList.innerHTML = '';
-                if (projectKeys.length === 0) {
-                    projectsList.innerHTML = '<p class="text-center text-gray-500">No projects yet. Create one above!</p>';
-                    return;
-                }
-                projectKeys.forEach(projectName => {
-                    const projectDiv = document.createElement('div');
-                    projectDiv.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
-                    projectDiv.innerHTML = `
+            ganttChartContainer.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'gantt-chart-grid';
+            grid.style.gridTemplateColumns = `200px repeat(${totalDays}, minmax(35px, 1fr))`;
+
+            grid.innerHTML += '<div class="gantt-header font-semibold">Task</div>';
+            for (let i = 0; i < totalDays; i++) {
+                const date = new Date(projectStartDate);
+                date.setDate(date.getDate() + i);
+                grid.innerHTML += `<div class="gantt-header bg-gray-100">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>`;
+            }
+
+            finalItems.sort((a,b) => a.effectiveStartDate - b.effectiveStartDate).forEach(item => {
+                const offsetDays = Math.floor((item.effectiveStartDate - projectStartDate) / dayInMillis);
+                const taskNameDiv = `<div class="gantt-task-name">${item.content}</div>`;
+                const barContainerDiv = document.createElement('div');
+                barContainerDiv.className = 'gantt-bar-container';
+                barContainerDiv.style.gridColumn = `2 / span ${totalDays}`;
+
+                const barDiv = document.createElement('div');
+                barDiv.className = 'gantt-bar';
+                const barWidth = (item.duration / totalDays) * 100;
+                const barOffset = (offsetDays / totalDays) * 100;
+                barDiv.style.width = `${barWidth}%`;
+                barDiv.style.left = `${barOffset}%`;
+                barDiv.textContent = `${item.duration}d`;
+
+                barContainerDiv.appendChild(barDiv);
+                grid.innerHTML += taskNameDiv;
+                grid.appendChild(barContainerDiv);
+            });
+
+            ganttChartContainer.appendChild(grid);
+        };
+
+        // --- Rendering Functions ---
+        const renderProjectsList = async () => {
+            const projectKeys = await dbGetAllKeys();
+            projectsList.innerHTML = '';
+            if (projectKeys.length === 0) {
+                projectsList.innerHTML = '<p class="text-center text-gray-500">No projects yet. Create one above!</p>';
+                return;
+            }
+            projectKeys.forEach(projectName => {
+                const projectDiv = document.createElement('div');
+                projectDiv.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
+                projectDiv.innerHTML = `
                         <span class="font-medium text-lg">${projectName}</span>
                         <div>
                             <button class="select-project-btn bg-green-500 text-white px-4 py-1 rounded-md hover:bg-green-600 mr-2" data-project="${projectName}">Open</button>
                             <button class="delete-project-btn bg-red-500 text-white px-4 py-1 rounded-md hover:bg-red-600" data-project="${projectName}">Delete</button>
                         </div>
                     `;
-                    projectsList.appendChild(projectDiv);
-                });
-            };
-            
-            const createAccordionContent = (item, itemMap) => {
-                const dependenciesHtml = (item.dependencies && item.dependencies.length > 0)
-                    ? `<ul>${item.dependencies.map(id => `<li class="list-disc ml-4">${itemMap.get(id) || 'Unknown Item'}</li>`).join('')}</ul>`
-                    : '<p>None</p>';
+                projectsList.appendChild(projectDiv);
+            });
+        };
 
-                const filesHtml = (item.files && item.files.length > 0)
-                    ? item.files.map(file => {
-                        const url = URL.createObjectURL(file.data);
-                        objectUrls.push(url); // Track for cleanup
-                        return `
+        const createAccordionContent = (item, itemMap) => {
+            const dependenciesHtml = (item.dependencies && item.dependencies.length > 0)
+                ? `<ul>${item.dependencies.map(id => `<li class="list-disc ml-4">${itemMap.get(id) || 'Unknown Item'}</li>`).join('')}</ul>`
+                : '<p>None</p>';
+
+            const filesHtml = (item.files && item.files.length > 0)
+                ? item.files.map(file => {
+                    const url = URL.createObjectURL(file.data);
+                    objectUrls.push(url); // Track for cleanup
+                    return `
                             <div class="border-t pt-2 mt-2">
                                 <a href="${url}" download="${file.name}" class="text-blue-600 hover:underline font-medium">${file.name}</a>
                                 <p class="text-sm text-gray-600 pl-2 mt-1">${file.note || 'No note'}</p>
                             </div>
                         `;
-                    }).join('')
-                    : '<p>No files attached.</p>';
-                
-                const notesHtml = (item.notes && item.notes.length > 0)
-                    ? item.notes.sort((a,b) => new Date(a.createdDate) - new Date(b.createdDate)).map(note => `
+                }).join('')
+                : '<p>No files attached.</p>';
+
+            const notesHtml = (item.notes && item.notes.length > 0)
+                ? item.notes.sort((a,b) => new Date(a.createdDate) - new Date(b.createdDate)).map(note => `
                         <div class="border-t pt-2 mt-2">
                             <p class="text-gray-800 whitespace-pre-wrap">${note.text}</p>
                             <p class="text-xs text-gray-400 mt-1">${new Date(note.createdDate).toLocaleString()}</p>
                         </div>
                     `).join('')
-                    : '<p>No notes for this item.</p>';
+                : '<p>No notes for this item.</p>';
 
-                return `
+            return `
                     <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <h4 class="font-semibold text-gray-700">Full Description</h4>
@@ -868,29 +868,29 @@
                         </div>
                     </div>
                 `;
-            };
+        };
 
-            const renderItemsTable = async () => {
-                objectUrls.forEach(URL.revokeObjectURL);
-                objectUrls = [];
+        const renderItemsTable = async () => {
+            objectUrls.forEach(URL.revokeObjectURL);
+            objectUrls = [];
 
-                const items = await dbGet(currentProjectName) || [];
-                itemsTableBody.innerHTML = '';
+            const items = await dbGet(currentProjectName) || [];
+            itemsTableBody.innerHTML = '';
 
-                if (items.length === 0) {
-                    itemsTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">No items in this project yet.</td></tr>`;
-                    return;
-                }
-                
-                const itemMap = new Map(items.map(item => [item.id, item.content]));
+            if (items.length === 0) {
+                itemsTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">No items in this project yet.</td></tr>`;
+                return;
+            }
 
-                items.forEach(item => {
-                    const notesCount = (item.notes || []).length;
-                    const fileCount = (item.files || []).length;
+            const itemMap = new Map(items.map(item => [item.id, item.content]));
 
-                    const row = document.createElement('tr');
-                    row.dataset.rowId = item.id;
-                    row.innerHTML = `
+            items.forEach(item => {
+                const notesCount = (item.notes || []).length;
+                const fileCount = (item.files || []).length;
+
+                const row = document.createElement('tr');
+                row.dataset.rowId = item.id;
+                row.innerHTML = `
                         <td class="px-6 py-4 whitespace-pre-wrap max-w-xs">${item.content}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${item.owner || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${item.startDate || 'N/A'}</td>
@@ -903,120 +903,120 @@
                             <button class="delete-item-btn text-red-600 hover:text-red-900" data-id="${item.id}">Delete</button>
                         </td>
                     `;
-                    
-                    const accordionRow = document.createElement('tr');
-                    accordionRow.classList.add('hidden');
-                    accordionRow.dataset.accordionId = item.id;
-                    
-                    const accordionCell = document.createElement('td');
-                    accordionCell.colSpan = 7;
-                    accordionCell.className = 'accordion-content';
-                    accordionCell.innerHTML = createAccordionContent(item, itemMap);
 
-                    accordionRow.appendChild(accordionCell);
-                    itemsTableBody.appendChild(row);
-                    itemsTableBody.appendChild(accordionRow);
-                });
-            };
+                const accordionRow = document.createElement('tr');
+                accordionRow.classList.add('hidden');
+                accordionRow.dataset.accordionId = item.id;
 
-            const populateDependenciesDropdown = async (currentItemId = null) => {
-                const items = await dbGet(currentProjectName) || [];
-                itemDependenciesSelect.innerHTML = '';
-                items.forEach(item => {
-                    if (item.id !== currentItemId) {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = item.content;
-                        itemDependenciesSelect.appendChild(option);
-                    }
-                });
-            };
+                const accordionCell = document.createElement('td');
+                accordionCell.colSpan = 7;
+                accordionCell.className = 'accordion-content';
+                accordionCell.innerHTML = createAccordionContent(item, itemMap);
 
-            // --- Event Listeners ---
-            createProjectBtn.addEventListener('click', createProject);
-            backToProjectsBtn.addEventListener('click', showProjectsView);
-            itemForm.addEventListener('submit', saveItem);
-            clearFormBtn.addEventListener('click', clearForm);
-            ganttChartBtn.addEventListener('click', showGanttChart);
-            closeGanttBtn.addEventListener('click', hideGanttChart);
-            ganttModal.addEventListener('click', (e) => e.target === ganttModal && hideGanttChart());
-            addNoteBtn.addEventListener('click', addNote);
-            fileNoteForm.addEventListener('submit', saveFileNote);
-            closeFileNoteBtn.addEventListener('click', closeFileNoteModal);
-            fileNoteModal.addEventListener('click', (e) => e.target === fileNoteModal && closeFileNoteModal());
+                accordionRow.appendChild(accordionCell);
+                itemsTableBody.appendChild(row);
+                itemsTableBody.appendChild(accordionRow);
+            });
+        };
 
-            projectsList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('select-project-btn')) {
-                    showProjectDetailView(e.target.dataset.project);
-                }
-                if (e.target.classList.contains('delete-project-btn')) {
-                    deleteProject(e.target.dataset.project);
+        const populateDependenciesDropdown = async (currentItemId = null) => {
+            const items = await dbGet(currentProjectName) || [];
+            itemDependenciesSelect.innerHTML = '';
+            items.forEach(item => {
+                if (item.id !== currentItemId) {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = item.content;
+                    itemDependenciesSelect.appendChild(option);
                 }
             });
+        };
 
-            itemsTableBody.addEventListener('click', (e) => {
-                const button = e.target;
-                const itemId = button.dataset.id;
+        // --- Event Listeners ---
+        createProjectBtn.addEventListener('click', createProject);
+        backToProjectsBtn.addEventListener('click', showProjectsView);
+        itemForm.addEventListener('submit', saveItem);
+        clearFormBtn.addEventListener('click', clearForm);
+        ganttChartBtn.addEventListener('click', showGanttChart);
+        closeGanttBtn.addEventListener('click', hideGanttChart);
+        ganttModal.addEventListener('click', (e) => e.target === ganttModal && hideGanttChart());
+        addNoteBtn.addEventListener('click', addNote);
+        fileNoteForm.addEventListener('submit', saveFileNote);
+        closeFileNoteBtn.addEventListener('click', closeFileNoteModal);
+        fileNoteModal.addEventListener('click', (e) => e.target === fileNoteModal && closeFileNoteModal());
 
-                if (button.classList.contains('edit-item-btn')) {
-                    editItem(itemId);
-                } else if (button.classList.contains('delete-item-btn')) {
-                    deleteItem(itemId);
-                } else if (button.classList.contains('view-item-btn')) {
-                    const openAccordion = document.querySelector('tr[data-accordion-id]:not(.hidden)');
-                    const targetAccordion = document.querySelector(`tr[data-accordion-id="${itemId}"]`);
-                    
-                    // If there's an open accordion and it's not the one we're targeting, close it.
-                    if (openAccordion && openAccordion !== targetAccordion) {
-                        openAccordion.classList.add('hidden');
-                    }
-                    
-                    // Toggle the target accordion.
-                    targetAccordion.classList.toggle('hidden');
-                }
-            });
-
-            existingFilesList.addEventListener('click', (e) => {
-                const button = e.target.closest('button');
-                if (!button) return;
-
-                const itemId = button.dataset.itemId;
-                const fileIndex = parseInt(button.dataset.fileIndex, 10);
-
-                if (button.classList.contains('remove-file-btn')) {
-                    removeFile(itemId, fileIndex);
-                } else if (button.classList.contains('edit-file-note-btn')) {
-                    openFileNoteModal(itemId, fileIndex);
-                }
-            });
-            
-            notesList.addEventListener('click', (e) => {
-                const noteEl = e.target.closest('[data-note-id]');
-                if (!noteEl) return;
-                
-                const itemId = itemIdInput.value;
-                const noteId = noteEl.dataset.noteId;
-
-                if (e.target.classList.contains('delete-note-btn')) {
-                    deleteNote(itemId, noteId);
-                } else if (e.target.classList.contains('edit-note-btn')) {
-                    toggleNoteEditState(noteEl, true);
-                } else if (e.target.classList.contains('cancel-edit-note-btn')) {
-                    toggleNoteEditState(noteEl, false);
-                } else if (e.target.classList.contains('save-note-btn')) {
-                    const newText = noteEl.querySelector('textarea').value;
-                    saveNoteEdit(itemId, noteId, newText);
-                }
-            });
-
-            // --- Initial Load ---
-            openDb().then(() => {
-                showProjectsView();
-            }).catch(err => {
-                console.error(err);
-                alert('Could not initialize the database. Please ensure you are not in private browsing mode and that your browser supports IndexedDB.');
-            });
+        projectsList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('select-project-btn')) {
+                showProjectDetailView(e.target.dataset.project);
+            }
+            if (e.target.classList.contains('delete-project-btn')) {
+                deleteProject(e.target.dataset.project);
+            }
         });
-    </script>
+
+        itemsTableBody.addEventListener('click', (e) => {
+            const button = e.target;
+            const itemId = button.dataset.id;
+
+            if (button.classList.contains('edit-item-btn')) {
+                editItem(itemId);
+            } else if (button.classList.contains('delete-item-btn')) {
+                deleteItem(itemId);
+            } else if (button.classList.contains('view-item-btn')) {
+                const openAccordion = document.querySelector('tr[data-accordion-id]:not(.hidden)');
+                const targetAccordion = document.querySelector(`tr[data-accordion-id="${itemId}"]`);
+
+                // If there's an open accordion and it's not the one we're targeting, close it.
+                if (openAccordion && openAccordion !== targetAccordion) {
+                    openAccordion.classList.add('hidden');
+                }
+
+                // Toggle the target accordion.
+                targetAccordion.classList.toggle('hidden');
+            }
+        });
+
+        existingFilesList.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (!button) return;
+
+            const itemId = button.dataset.itemId;
+            const fileIndex = parseInt(button.dataset.fileIndex, 10);
+
+            if (button.classList.contains('remove-file-btn')) {
+                removeFile(itemId, fileIndex);
+            } else if (button.classList.contains('edit-file-note-btn')) {
+                openFileNoteModal(itemId, fileIndex);
+            }
+        });
+
+        notesList.addEventListener('click', (e) => {
+            const noteEl = e.target.closest('[data-note-id]');
+            if (!noteEl) return;
+
+            const itemId = itemIdInput.value;
+            const noteId = noteEl.dataset.noteId;
+
+            if (e.target.classList.contains('delete-note-btn')) {
+                deleteNote(itemId, noteId);
+            } else if (e.target.classList.contains('edit-note-btn')) {
+                toggleNoteEditState(noteEl, true);
+            } else if (e.target.classList.contains('cancel-edit-note-btn')) {
+                toggleNoteEditState(noteEl, false);
+            } else if (e.target.classList.contains('save-note-btn')) {
+                const newText = noteEl.querySelector('textarea').value;
+                saveNoteEdit(itemId, noteId, newText);
+            }
+        });
+
+        // --- Initial Load ---
+        openDb().then(() => {
+            showProjectsView();
+        }).catch(err => {
+            console.error(err);
+            alert('Could not initialize the database. Please ensure you are not in private browsing mode and that your browser supports IndexedDB.');
+        });
+    });
+</script>
 </body>
 </html>
