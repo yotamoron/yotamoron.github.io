@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning App</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f7ff;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Main App Container */
+        #app-container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #005a9c;
+            margin-bottom: 25px;
+        }
+
+        /* Question Area */
+        #question-container {
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #question-text {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #1d3557;
+        }
+
+        /* Options Buttons */
+        #options-container {
+            margin-top: 20px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background-color: #457b9d;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #1d3557;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Feedback and Example Area */
+        #feedback-container {
+            margin-top: 25px;
+            min-height: 100px;
+        }
+
+        #feedback-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        #feedback-text.correct {
+            color: #2a9d8f;
+        }
+
+        #feedback-text.wrong {
+            color: #e63946;
+        }
+
+        #example-sentence {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .en-sentence {
+            font-weight: bold;
+        }
+
+        .he-sentence {
+            font-style: italic;
+            color: #666;
+        }
+
+        /* Next Button */
+        #next-btn {
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        #next-btn:hover {
+            background-color: #217a6f;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <h1>תרגול באנגלית! 🎉</h1>
+        <div id="question-container">
+            <p id="question-text"></p>
+        </div>
+        <div id="options-container"></div>
+        <div id="feedback-container">
+            <p id="feedback-text"></p>
+            <div id="example-sentence"></div>
+        </div>
+        <button id="next-btn" style="display: none;">השאלה הבאה</button>
+    </div>
+
+<script>
+    // --- DATABASE OF WORDS ---
+    // Each object contains the English word, its Hebrew translation,
+    // and an example sentence in both languages.
+    const words = [
+        { english: "attention", hebrew: "תשומת לב", sentence_en: "Please pay attention to the teacher.", sentence_he: "בבקשה שימו לב למורה." },
+        { english: "cloud", hebrew: "ענן", sentence_en: "There is a big white cloud in the sky.", sentence_he: "יש ענן לבן גדול בשמיים." },
+        { english: "fear", hebrew: "פחד", sentence_en: "He has a fear of spiders.", sentence_he: "יש לו פחד מעכבישים." },
+        { english: "fog", hebrew: "ערפל", sentence_en: "It is hard to see through the thick fog.", sentence_he: "קשה לראות דרך הערפל הסמיך." },
+        { english: "noise", hebrew: "רעש", sentence_en: "The construction site makes a lot of noise.", sentence_he: "אתר הבנייה עושה הרבה רעש." },
+        { english: "oil", hebrew: "שמן", sentence_en: "We cook the food with olive oil.", sentence_he: "אנחנו מבשלים את האוכל עם שמן זית." },
+        { english: "shape", hebrew: "צורה", sentence_en: "A circle is a round shape.", sentence_he: "עיגול הוא צורה עגולה." },
+        { english: "thick", hebrew: "עבה", sentence_en: "This is a very thick book.", sentence_he: "זהו ספר עבה מאוד." },
+        { english: "trouble", hebrew: "צרה", sentence_en: "If you don't do your homework, you will be in trouble.", sentence_he: "אם לא תכין שיעורי בית, תהיה בצרות." },
+        { english: "uniform", hebrew: "מדים", sentence_en: "The students wear a school uniform.", sentence_he: "התלמידים לובשים תלבושת אחידה." },
+        { english: "beside", hebrew: "לצד", sentence_en: "The cat is sitting beside the dog.", sentence_he: "החתול יושב לצד הכלב." },
+        { english: "close", hebrew: "לסגור / קרוב", sentence_en: "Please close the door, it's cold.", sentence_he: "בבקשה תסגור את הדלת, קר." },
+        { english: "concern", hebrew: "דאגה", sentence_en: "Her main concern is her daughter's health.", sentence_he: "הדאגה העיקרית שלה היא בריאותה של בתה." },
+        { english: "field", hebrew: "שדה", sentence_en: "The cows are in the green field.", sentence_he: "הפרות נמצאות בשדה הירוק." },
+        { english: "inform", hebrew: "ליידע", sentence_en: "Please inform me when you arrive.", sentence_he: "בבקשה יידע אותי כשתגיע." },
+        { english: "left", hebrew: "שמאל", sentence_en: "Turn left at the next corner.", sentence_he: "פנה שמאלה בפינה הבאה." },
+        { english: "low", hebrew: "נמוך", sentence_en: "The price of the shirt is very low.", sentence_he: "מחיר החולצה נמוך מאוד." },
+        { english: "shock", hebrew: "הלם", sentence_en: "It was a big shock to hear the news.", sentence_he: "זה היה הלם גדול לשמוע את החדשות." },
+        { english: "towards", hebrew: "לכיוון", sentence_en: "She is walking towards the sea.", sentence_he: "היא הולכת לכיוון הים." },
+        { english: "a long time ago", hebrew: "לפני זמן רב", sentence_en: "Dinosaurs lived a long time ago.", sentence_he: "דינוזאורים חיו לפני זמן רב." },
+        { english: "by mistake", hebrew: "בטעות", sentence_en: "I took your bag by mistake.", sentence_he: "לקחתי את התיק שלך בטעות." },
+        { english: "cold", hebrew: "קר", sentence_en: "The weather is very cold today.", sentence_he: "מזג האוויר קר מאוד היום." },
+        { english: "come in", hebrew: "להיכנס", sentence_en: "Please open the door and come in.", sentence_he: "בבקשה פתח את הדלת והיכנס." },
+        { english: "far away", hebrew: "רחוק", sentence_en: "The stars are very far away.", sentence_he: "הכוכבים רחוקים מאוד." },
+        { english: "run out of", hebrew: "נגמר", sentence_en: "We will run out of milk soon.", sentence_he: "בקרוב ייגמר לנו החלב." },
+        { english: "side", hebrew: "צד", sentence_en: "Which side of the road do you live on?", sentence_he: "באיזה צד של הכביש אתה גר?" },
+        { english: "used to", hebrew: "היה רגיל ל", sentence_en: "I used to live in a small town.", sentence_he: "הייתי רגיל לגור בעיירה קטנה." },
+        { english: "as quickly as possible", hebrew: "מהר ככל האפשר", sentence_en: "Please finish your food as quickly as possible.", sentence_he: "בבקשה סיים את האוכל שלך מהר ככל האפשר." },
+        { english: "belief", hebrew: "אמונה", sentence_en: "It is my belief that everyone can succeed.", sentence_he: "זו אמונתי שכולם יכולים להצליח." },
+        { english: "lead", hebrew: "להוביל", sentence_en: "A good captain will lead the team to victory.", sentence_he: "קפטן טוב יוביל את הקבוצה לניצחון." },
+        { english: "period", hebrew: "תקופה", sentence_en: "The 90s was a great period for music.", sentence_he: "שנות ה-90 היו תקופה נהדרת למוזיקה." },
+        { english: "promise", hebrew: "להבטיח", sentence_en: "I promise to help you with your homework.", sentence_he: "אני מבטיח לעזור לך עם שיעורי הבית." },
+        { english: "scene", hebrew: "סצנה / זירה", sentence_en: "The first scene of the movie was very exciting.", sentence_he: "הסצנה הראשונה של הסרט הייתה מרגשת מאוד." },
+        { english: "stay away", hebrew: "להתרחק", sentence_en: "You should stay away from the fire.", sentence_he: "כדאי לך להתרחק מהאש." },
+        { english: "body", hebrew: "גוף", sentence_en: "It is important to take care of your body.", sentence_he: "חשוב לדאוג לגוף שלך." },
+        { english: "explanation", hebrew: "הסבר", sentence_en: "Can you give me an explanation?", sentence_he: "אתה יכול לתת לי הסבר?" },
+        { english: "leader", hebrew: "מנהיג", sentence_en: "The wolf is the leader of the pack.", sentence_he: "הזאב הוא מנהיג הלהקה." },
+        { english: "own", hebrew: "שייך ל / משלו", sentence_en: "I have my own room.", sentence_he: "יש לי חדר משלי." },
+        { english: "population", hebrew: "אוכלוסייה", sentence_en: "The population of the city is growing.", sentence_he: "אוכלוסיית העיר גדלה." },
+        { english: "share", hebrew: "לחלוק", sentence_en: "It's nice to share your toys with friends.", sentence_he: "זה נחמד לחלוק את הצעצועים שלך עם חברים." },
+        { english: "storm", hebrew: "סופה", sentence_en: "A big storm is coming tonight.", sentence_he: "סופה גדולה מגיעה הלילה." },
+        { english: "among", hebrew: "בין", sentence_en: "The cat is hiding among the trees.", sentence_he: "החתול מתחבא בין העצים." },
+        { english: "ceiling", hebrew: "תקרה", sentence_en: "The lamp is hanging from the ceiling.", sentence_he: "המנורה תלויה מהתקרה." },
+        { english: "drawer", hebrew: "מגירה", sentence_en: "My socks are in the top drawer.", sentence_he: "הגרביים שלי במגירה העליונה." },
+        { english: "explore", hebrew: "לחקור", sentence_en: "Let's go and explore the forest.", sentence_he: "בוא נלך לחקור את היער." },
+        { english: "immediately", hebrew: "מיד", sentence_en: "When I call your name, come here immediately.", sentence_he: "כשאקרא בשמך, בוא לכאן מיד." },
+        { english: "notice", hebrew: "להבחין", sentence_en: "Did you notice the new painting on the wall?", sentence_he: "האם הבחנת בציור החדש על הקיר?" },
+        { english: "piece", hebrew: "חתיכה", sentence_en: "Can I have a piece of cake?", sentence_he: "אפשר לקבל חתיכת עוגה?" },
+        { english: "both", hebrew: "שניהם", sentence_en: "Both of my parents are teachers.", sentence_he: "שני ההורים שלי מורים." },
+        { english: "carpet", hebrew: "שטיח", sentence_en: "We have a soft carpet in the living room.", sentence_he: "יש לנו שטיח רך בסלון." },
+        { english: "escape", hebrew: "לברוח", sentence_en: "The rabbit tried to escape from the cage.", sentence_he: "הארנב ניסה לברוח מהכלוב." },
+        { english: "examine", hebrew: "לבדוק", sentence_en: "The doctor will examine the patient.", sentence_he: "הרופא יבדוק את המטופל." },
+        { english: "fine", hebrew: "בסדר / קנס", sentence_en: "Everything will be fine, don't worry.", sentence_he: "הכל יהיה בסדר, אל תדאג." },
+        { english: "available", hebrew: "זמין", sentence_en: "The book is available in the library.", sentence_he: "הספר זמין בספרייה." },
+        { english: "brain", hebrew: "מוח", sentence_en: "The brain helps us to think and learn.", sentence_he: "המוח עוזר לנו לחשוב וללמוד." },
+        { english: "clever", hebrew: "חכם", sentence_en: "She is a very clever student.", sentence_he: "היא תלמידה חכמה מאוד." },
+        { english: "furniture", hebrew: "רהיטים", sentence_en: "We bought new furniture for our house.", sentence_he: "קנינו רהיטים חדשים לבית שלנו." },
+        { english: "hide", hebrew: "להתחבא", sentence_en: "Let's play hide and seek!", sentence_he: "בוא נשחק מחבואים!" },
+        { english: "lamp", hebrew: "מנורה", sentence_en: "Please turn on the lamp, it's getting dark.", sentence_he: "בבקשה תדליק את המנורה, מתחיל להחשיך." },
+        { english: "object", hebrew: "חפץ", sentence_en: "What is that strange object on the table?", sentence_he: "מהו החפץ המוזר הזה על השולחן?" },
+        { english: "airplane", hebrew: "מטוס", sentence_en: "The airplane is flying high in the sky.", sentence_he: "המטוס טס גבוה בשמיים." },
+        { english: "be able to", hebrew: "להיות מסוגל", sentence_en: "After I practice, I will be able to play the piano.", sentence_he: "אחרי שאתאמן, אהיה מסוגל לנגן בפסנתר." },
+        { english: "deep", hebrew: "עמוק", sentence_en: "The ocean is very deep.", sentence_he: "האוקיינוס עמוק מאוד." },
+        { english: "disappear", hebrew: "להיעלם", sentence_en: "The magician made the rabbit disappear.", sentence_he: "הקוסם גרם לארנב להיעלם." },
+        { english: "however", hebrew: "אולם / עם זאת", sentence_en: "It's a sunny day, however, it is quite cold.", sentence_he: "זה יום שמשי, אולם, די קר." },
+        { english: "respond", hebrew: "להגיב", sentence_en: "She did not respond to my question.", sentence_he: "היא לא הגיבה לשאלתי." },
+        { english: "story", hebrew: "סיפור", sentence_en: "My mom reads me a story every night.", sentence_he: "אמא שלי מקריאה לי סיפור כל לילה." },
+        { english: "survive", hebrew: "לשרוד", sentence_en: "Plants need water and sunlight to survive.", sentence_he: "צמחים צריכים מים ואור שמש כדי לשרוד." },
+        { english: "additional", hebrew: "נוסף", sentence_en: "Do you have any additional questions?", sentence_he: "האם יש לך שאלות נוספות?" },
+        { english: "amount", hebrew: "כמות", sentence_en: "Please use a small amount of sugar.", sentence_he: "בבקשה השתמש בכמות קטנה של סוכר." },
+        { english: "bottom", hebrew: "תחתית", sentence_en: "My name is at the bottom of the list.", sentence_he: "השם שלי נמצא בתחתית הרשימה." },
+        { english: "control", hebrew: "שליטה", sentence_en: "You need to learn to control your anger.", sentence_he: "אתה צריך ללמוד לשלוט בכעס שלך." },
+        { english: "island", hebrew: "אי", sentence_en: "They live on a beautiful tropical island.", sentence_he: "הם גרים על אי טרופי יפהפה." },
+        { english: "mystery", hebrew: "תעלומה", sentence_en: "The missing cookie is a mystery.", sentence_he: "העוגייה החסרה היא תעלומה." },
+        { english: "peace", hebrew: "שלום", sentence_en: "Everyone wants to live in peace.", sentence_he: "כולם רוצים לחיות בשלום." },
+        { english: "sign", hebrew: "סימן / שלט", sentence_en: "The stop sign is red.", sentence_he: "שלט העצור הוא אדום." },
+        { english: "wonder", hebrew: "לתהות", sentence_en: "I wonder what is inside the box.", sentence_he: "אני תוהה מה יש בתוך הקופסה." },
+        { english: "admit", hebrew: "להודות", sentence_en: "He was afraid to admit his mistake.", sentence_he: "הוא פחד להודות בטעות שלו." },
+        { english: "area", hebrew: "אזור", sentence_en: "This is a quiet area of the city.", sentence_he: "זהו אזור שקט של העיר." },
+        { english: "death", hebrew: "מוות", sentence_en: "Everyone was sad after the death of the king.", sentence_he: "כולם היו עצובים לאחר מותו של המלך." },
+        { english: "definitely", hebrew: "בהחלט", sentence_en: "This is definitely the best ice cream I've ever had.", sentence_he: "זו בהחלט הגלידה הכי טובה שאכלתי." },
+        { english: "ocean", hebrew: "אוקיינוס", sentence_en: "Dolphins live in the ocean.", sentence_he: "דולפינים חיים באוקיינוס." },
+        { english: "repeat", hebrew: "לחזור על", sentence_en: "Can you please repeat the question?", sentence_he: "תוכל בבקשה לחזור על השאלה?" },
+        { english: "solve", hebrew: "לפתור", sentence_en: "She likes to solve difficult puzzles.", sentence_he: "היא אוהבת לפתור חידות קשות." },
+        { english: "suddenly", hebrew: "פתאום", sentence_en: "Suddenly, the lights went out.", sentence_he: "פתאום, האורות כבו." }
+    ];
+
+    // --- DOM ELEMENTS ---
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainerEl = document.getElementById('options-container');
+    const feedbackTextEl = document.getElementById('feedback-text');
+    const exampleSentenceEl = document.getElementById('example-sentence');
+    const nextBtn = document.getElementById('next-btn');
+
+    // --- STATE VARIABLES ---
+    let currentWord = {};
+    let correctAnswer = '';
+
+    // --- HELPER FUNCTIONS ---
+    /**
+     * Shuffles an array in place.
+     * @param {Array} array The array to shuffle.
+     */
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // --- CORE LOGIC ---
+    /**
+     * Clears previous state and generates a new random question.
+     */
+    function generateQuestion() {
+        // 1. Reset the UI
+        feedbackTextEl.textContent = '';
+        feedbackTextEl.className = '';
+        exampleSentenceEl.innerHTML = '';
+        optionsContainerEl.innerHTML = '';
+        nextBtn.style.display = 'none';
+
+        // 2. Pick a random word for the question
+        const wordIndex = Math.floor(Math.random() * words.length);
+        currentWord = words[wordIndex];
+
+        // 3. Randomly decide the question type (English -> Hebrew or Hebrew -> English)
+        const isEnglishToHebrew = Math.random() < 0.5;
+
+        let question, options;
+        const optionType = isEnglishToHebrew ? 'hebrew' : 'english';
+        
+        // 4. Set up the question and correct answer
+        if (isEnglishToHebrew) {
+            question = currentWord.english;
+            correctAnswer = currentWord.hebrew;
+        } else {
+            question = currentWord.hebrew;
+            correctAnswer = currentWord.english;
+        }
+
+        // 5. Get three incorrect options
+        const incorrectOptions = [];
+        const wordsCopy = [...words]; // Create a copy to avoid modifying the original
+        shuffleArray(wordsCopy);
+        
+        for (const word of wordsCopy) {
+            if (incorrectOptions.length === 3) break;
+            // Ensure the incorrect option isn't the same as the correct one
+            if (word[optionType] !== correctAnswer) {
+                incorrectOptions.push(word[optionType]);
+            }
+        }
+        
+        options = [correctAnswer, ...incorrectOptions];
+        shuffleArray(options);
+
+        // 6. Display the question and options on the screen
+        questionTextEl.textContent = question;
+
+        options.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.className = 'option-btn';
+            button.onclick = () => checkAnswer(button);
+            optionsContainerEl.appendChild(button);
+        });
+    }
+
+    /**
+     * Checks if the selected answer is correct and provides feedback.
+     * @param {HTMLElement} selectedButton The button element that was clicked.
+     */
+    function checkAnswer(selectedButton) {
+        // Disable all buttons after an answer is chosen
+        const allButtons = optionsContainerEl.querySelectorAll('.option-btn');
+        allButtons.forEach(btn => btn.disabled = true);
+        
+        const selectedAnswer = selectedButton.textContent;
+
+        if (selectedAnswer === correctAnswer) {
+            feedbackTextEl.textContent = 'נכון! 👍';
+            feedbackTextEl.className = 'correct';
+            selectedButton.style.backgroundColor = '#2a9d8f'; // Correct color
+        } else {
+            feedbackTextEl.textContent = 'טעות... 😕';
+            feedbackTextEl.className = 'wrong';
+            selectedButton.style.backgroundColor = '#e63946'; // Wrong color
+            // Highlight the correct answer
+            allButtons.forEach(btn => {
+                if (btn.textContent === correctAnswer) {
+                    btn.style.backgroundColor = '#2a9d8f'; 
+                }
+            });
+        }
+
+        // Display the example sentence
+        exampleSentenceEl.innerHTML = `
+            <p class="en-sentence">${currentWord.sentence_en}</p>
+            <p class="he-sentence">${currentWord.sentence_he}</p>
+        `;
+        
+        // Show the 'Next Question' button
+        nextBtn.style.display = 'block';
+    }
+
+    // --- EVENT LISTENERS ---
+    // Generate the next question when the button is clicked
+    nextBtn.addEventListener('click', generateQuestion);
+
+    // Generate the first question when the page loads
+    document.addEventListener('DOMContentLoaded', generateQuestion);
+
+</script>
+
+</body>
+</html>
